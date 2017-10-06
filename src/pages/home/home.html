@@ -1,0 +1,65 @@
+
+
+
+<ion-content class="body">
+
+<div>
+  <ion-segment [(ngModel)]="operation" class="operationItem">
+    <ion-segment-button value="openRoom" (click)="openRoom()" class="text-foreground">
+      Open Room
+    </ion-segment-button>
+    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="text-foreground">
+      Join Room
+    </ion-segment-button>
+  </ion-segment>
+</div>
+
+<div [ngSwitch]="operation" ngClass="middle-vertical">
+  <ion-list *ngSwitchCase="'openRoom'" >
+
+    <ion-item  >
+      <ion-label fixed color="darkBlack">Username</ion-label>
+      <ion-input [disabled]="isUserAuthorized" type="text" value="" class="text-foreground"  [(ngModel)]="userName"></ion-input>
+    </ion-item>
+
+    <ion-item >
+      <ion-label fixed color="darkBlack" >Room Name</ion-label>
+      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>
+    </ion-item> 
+  </ion-list>
+
+  <ion-list *ngSwitchCase="'joinRoom'" (click)="joinRoom()">
+    <ion-item>
+      <ion-label fixed color="darkBlack" >Username</ion-label>
+      <ion-input type="text" value="" [disabled]="isUserAuthorized" [(ngModel)]="userName" class="text-foreground" ></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label fixed color="darkBlack" >Entry Code</ion-label>
+      <ion-input type="text" value=""  [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+
+
+  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">
+       Play 
+  </button>
+  <button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!isUserAuthorized">
+       Sign with FaceBook 
+  </button>
+    <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="isUserAuthorized">
+       Logout 
+  </button>
+
+ <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">
+      <ion-avatar item-start >
+        <img [src]="photoUrl" ngClass="photo">
+      </ion-avatar>
+      <h2 > Hello {{ displayName }}</h2>
+      <p>Ugh. As if.</p>
+    </ion-item>
+</div>
+
+</ion-content>

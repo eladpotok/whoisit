@@ -1,0 +1,66 @@
+page-home {
+
+    .operationItem {
+        background-color: white;
+    };
+
+    .details {
+       vertical-align: middle;
+
+
+
+    };
+
+    .profileCard {
+        position: absolute;
+        margin:0 auto;
+        left: 68%;
+        transform: translateY(90%) translateX(-50%);
+
+    }
+
+    .photo {
+        width: 15rem;
+        margin-top: 10px;
+        display: block;
+        margin: auto;
+        box-shadow: 0 1px #FFFFFF inset, 0 1px 3px rgba(34, 25, 25, 0.4);
+        border: 3px solid black;
+        border-radius: 3px;
+        border-radius: 50%;
+        position: relative;
+    };
+
+    .title {
+        text-align: center;
+        color: white;
+        background: black;
+    };
+    
+    .goButton {
+        margin:0 auto;
+        margin-bottom: 4px;
+        display:block;
+        width: 170px;
+    };
+
+    .item {
+        background: transparent;
+    };
+
+    .text-foreground {
+        color: white;
+    };
+
+    .middle-vertical {
+        position: relative;
+        top: 40%;
+        left: 50%;
+        transform: translateY(-50%) translateX(-50%);
+    }
+
+    
+    
+
+    
+}

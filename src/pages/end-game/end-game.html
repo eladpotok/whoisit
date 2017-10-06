@@ -1,0 +1,25 @@
+<!--
+  Generated template for the EndGamePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Who's the spy?</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+   <ion-list>
+    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)">
+      <ion-avatar item-start>
+        <img [src]="item.imageUrl">
+      </ion-avatar>
+      <h2> {{ item.displayName }}</h2>
+    </ion-item>
+  </ion-list> 
+</ion-content>

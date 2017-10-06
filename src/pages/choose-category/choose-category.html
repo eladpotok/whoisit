@@ -1,0 +1,38 @@
+
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Choose a category!</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+
+<ion-list>
+  <ion-item  *ngFor="let item of categories" >
+    <ion-thumbnail item-start>
+      <img [src]="item.url">
+    </ion-thumbnail>
+    <h2>{{ item.title }}</h2>
+    <p>{{ item.description }}</p>
+    <button ion-button clear item-end (click)="select(item)">Select</button>
+  </ion-item>
+</ion-list>
+
+
+<!--<ion-list>
+  <ion-item>
+    <ion-label>Category</ion-label>
+    <ion-select [(ngModel)]="categoryName">
+      <ion-option value="Cartoons" >Cartoons</ion-option>
+      <ion-option value="Pokemon">Pokemon</ion-option>
+      <ion-option value="Locations" >Locations</ion-option>
+    </ion-select>
+  </ion-item>
+</ion-list>-->
+
+<!--<button ion-button (click)="go()">Go ! </button>-->
+
+</ion-content>
