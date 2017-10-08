@@ -3,7 +3,8 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { CategoryModel } from '../../Models/category.model';
-import { AuthService } from '../../services/auth.service'
+import { AuthService } from '../../services/auth.service';
+import { RoundModel } from '../../Models/round.model';
 
 @IonicPage()
 @Component({
@@ -43,8 +44,6 @@ export class ChooseCategoryPage {
       url:  "assets/celebIcon.png"
     }
 
-    
-
     this.categories.push(pokemon);
     this.categories.push(movies);
     this.categories.push(location);
@@ -54,13 +53,22 @@ export class ChooseCategoryPage {
 
   select(category: CategoryModel) {
     let roomKey = this.navParams.get('roomKey');
-    this.af.object(`/rooms/${roomKey}/categoryName`).set(category.title);
     this.af.object(`/rooms/${roomKey}/isCategorySelected`).set(true);
 
-     this.navCtrl.push('GamePage', { 
+    let round: RoundModel = {
+      categoryName: category.title,
+      selectorKey: this.authService.currentUser.displayName,
+      spyKey: this.navParams.get('spy'),
+      roomKey: roomKey
+    }
+
+
+    // add game to db
+    let roundKey = this.af.list(`rounds/`).push(round).key;
+
+    this.navCtrl.push('GamePage', { 
       roomKey: roomKey,
-      userName: this.authService.currentUser.displayName,
-      selectorUser: this.authService.currentUser.displayName
+      roundKey: roundKey
     });
   }
 

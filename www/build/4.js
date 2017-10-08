@@ -100,12 +100,18 @@ var ChooseCategoryPage = (function () {
     }
     ChooseCategoryPage.prototype.select = function (category) {
         var roomKey = this.navParams.get('roomKey');
-        this.af.object("/rooms/" + roomKey + "/categoryName").set(category.title);
         this.af.object("/rooms/" + roomKey + "/isCategorySelected").set(true);
+        var round = {
+            categoryName: category.title,
+            selectorKey: this.authService.currentUser.displayName,
+            spyKey: this.navParams.get('spy'),
+            roomKey: roomKey
+        };
+        // add game to db
+        var roundKey = this.af.list("rounds/").push(round).key;
         this.navCtrl.push('GamePage', {
             roomKey: roomKey,
-            userName: this.authService.currentUser.displayName,
-            selectorUser: this.authService.currentUser.displayName
+            roundKey: roundKey
         });
     };
     return ChooseCategoryPage;

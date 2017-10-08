@@ -58,6 +58,8 @@ export class HomePage {
         roomName: this.roomName,
         categoryName: "empty",
         entryCode: this.roomName.substring(0,4),
+        isCategorySelected: false,
+        users: []
     }
 
     let roomKey = this.af.list(`/rooms`).push(roomModel).key;

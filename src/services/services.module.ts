@@ -1,5 +1,6 @@
 import { AngularFireModule } from 'angularfire2';
 import { AuthService } from './auth.service';
+import { RoomsService } from './rooms.service';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
@@ -20,7 +21,7 @@ export const firebaseConfig = {
     ],
     providers: [
         AuthService,
-        
+        RoomsService
     ],
     exports: [
     ]

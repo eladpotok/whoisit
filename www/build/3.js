@@ -66,13 +66,21 @@ var EndGamePage = (function () {
         this.af = af;
         this.usersModel = [];
         this.roomKey = this.navParams.get('roomKey');
-        // crearing and adding new stat model to db
-        var statModel = {
-            roomKey: this.roomKey
-        };
-        this.statKey = this.af.list("/games/").push(statModel).key;
-        this.af.object("games/" + this.statKey + "/votesCount").set(0);
-        this.af.object("games/" + this.statKey + "/votes/dummy").set(true);
+        this.roundKey = this.navParams.get('roundKey');
+        if (this.roundKey != null) {
+            this.af.object("rounds/" + this.roundKey + "/votesCount").set(0);
+            this.af.object("rounds/" + this.roundKey + "/votes/dummy").set(true);
+        }
+        else {
+            this.af.list("rounds/").subscribe(function (t) {
+                t.forEach(function (room) {
+                    if (room.val().roomKey == _this.roomKey) {
+                        _this.roomKey = room.val().key;
+                        return;
+                    }
+                });
+            });
+        }
         // get the users in the current room
         af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
             _this.usersModel = [];
@@ -80,15 +88,14 @@ var EndGamePage = (function () {
                 var userId = snapshot.$key;
                 af.object("users/" + userId).subscribe(function (t) {
                     _this.usersModel.push(t);
-                    //this.af.object(`games/${this.statKey}/votes/${userId}`).set(0);
                 });
             });
         });
         // wait till all users will vote
-        af.object("games/" + this.statKey + "/isAllVoted").subscribe(function (t) {
+        af.object("rounds/" + this.roundKey + "/isAllVoted").subscribe(function (t) {
             if (t.$value) {
                 _this.navCtrl.push('ScorePage', {
-                    statId: _this.statKey,
+                    roundKey: _this.roundKey,
                     roomKey: _this.roomKey
                 });
             }
@@ -97,11 +104,11 @@ var EndGamePage = (function () {
     EndGamePage.prototype.selectUser = function (user) {
         var _this = this;
         var counter = 0;
-        var subscribtion = this.af.object("/games/" + this.statKey + "/votes/" + user.$key).subscribe(function (user) {
+        var subscribtion = this.af.object("/rounds/" + this.roundKey + "/votes/" + user.$key).subscribe(function (user) {
             counter = user.$value;
             subscribtion.unsubscribe();
             counter++;
-            _this.af.object("/games/" + _this.statKey + "/votes/" + user.$key).set(counter);
+            _this.af.object("/rounds/" + _this.roundKey + "/votes/" + user.$key).set(counter);
         });
         //this.navCtrl.push('cat');
     };

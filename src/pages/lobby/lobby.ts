@@ -7,12 +7,12 @@ import { RoomModel } from '../../Models/room.model';
 import { Platform } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import { AuthService } from '../../services/auth.service'
-
+import { RoomsService } from '../../services/rooms.service';
 
 @IonicPage()
 @Component({
   selector: 'page-lobby',
-  templateUrl: 'lobby.html',
+  templateUrl: 'lobby.html'
 })
 export class LobbyPage {
 
@@ -30,7 +30,8 @@ export class LobbyPage {
   usersCount: number;
 
   constructor(private platform: Platform, public navCtrl: NavController, public navParams: NavParams, 
-              public af: AngularFireDatabase, private alertCtrl: AlertController, private authService: AuthService) {
+              public af: AngularFireDatabase, private alertCtrl: AlertController, private authService: AuthService,
+              private roomService: RoomsService) {
 
 
     // Get thr paramters from the navigation controller
@@ -50,7 +51,6 @@ export class LobbyPage {
       });
     });
 
-
     // Get the current room
     af.object(`/rooms/${this.roomKey}`).subscribe( t=> {
       this.roomName = t.roomName;
@@ -67,7 +67,8 @@ export class LobbyPage {
           this.af.object(`rooms/${this.roomKey}/selector`).subscribe(  selector => {
             if(selector.$value == authService.currentUser.displayName) {
               this.navCtrl.push('ChooseCategoryPage', {
-                roomKey: this.roomKey
+                roomKey: this.roomKey,
+                spy: this.spyUser
               });
             }
             });
@@ -86,8 +87,6 @@ export class LobbyPage {
       }
     });
   }
-
-  
     
   private raffleSpy(){ 
      let spyRandNumber = Math.floor(Math.random() * (this.usersModel.length - 1) );
@@ -109,6 +108,8 @@ export class LobbyPage {
 
   startGame() {
  
+      this.roomService.updateUsersInRoom(this.roomKey);
+
       // raffle spy and category selector  
       this.raffleSelector(); 
       this.raffleSpy();

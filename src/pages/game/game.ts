@@ -26,15 +26,16 @@ export class GamePage {
   photoTitle: string;
   cardList: CardModel[];
   isGameStarted: string;
-  selectorUser: string;
   imageKey: string;
   isSpy: Boolean;
+  roundKey: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
               private authService: AuthService) {
 
       this.roomKey = this.navParams.get('roomKey');
-      this.selectorUser = this.navParams.get('selectorUser');
+      this.roundKey = this.navParams.get('roundKey');
+
       this.af.object(`rooms/${this.roomKey}/categoryName`).subscribe(
         t=> {
           this.titleGame = t.$value;
@@ -42,7 +43,6 @@ export class GamePage {
       )
      
       this.drawCard();
-      
   }
 
   private drawCard() {
@@ -86,7 +86,8 @@ export class GamePage {
   LeaveGame() {
     //this.af.object(`categories/${this.imageKey}/isTaken`).set(false);
     this.navCtrl.push('EndGamePage', {
-      roomKey: this.roomKey
+      roomKey: this.roomKey,
+      roundKey: this.roundKey
     });
   }
 
