@@ -4,6 +4,8 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Facebook } from '@ionic-native/facebook';
+import { AuthService } from '../services/auth.service';
+import { ServicesModule } from '../services/services.module'; 
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -35,7 +37,9 @@ export const firebaseConfig = {
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    ServicesModule
+
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -47,6 +51,7 @@ export const firebaseConfig = {
     StatusBar,
     SplashScreen,
         Facebook,
+        
 
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]

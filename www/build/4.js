@@ -46,6 +46,7 @@ ChooseCategoryPageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(458);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -58,11 +59,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var ChooseCategoryPage = (function () {
-    function ChooseCategoryPage(navCtrl, navParams, af) {
+    function ChooseCategoryPage(navCtrl, navParams, af, authService) {
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
+        this.authService = authService;
         this.categories = [];
         var pokemon = {
             title: "Pokemon",
@@ -97,13 +100,12 @@ var ChooseCategoryPage = (function () {
     }
     ChooseCategoryPage.prototype.select = function (category) {
         var roomKey = this.navParams.get('roomKey');
-        var userName = this.navParams.get('userName');
         this.af.object("/rooms/" + roomKey + "/categoryName").set(category.title);
         this.af.object("/rooms/" + roomKey + "/isCategorySelected").set(true);
         this.navCtrl.push('GamePage', {
             roomKey: roomKey,
-            userName: userName,
-            selectorUser: userName
+            userName: this.authService.currentUser.displayName,
+            selectorUser: this.authService.currentUser.displayName
         });
     };
     return ChooseCategoryPage;
@@ -111,9 +113,10 @@ var ChooseCategoryPage = (function () {
 ChooseCategoryPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-choose-category',template:/*ion-inline-start:"C:\Users\EladPotok\Desktop\lastChance\spyApp\src\pages\choose-category\choose-category.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Choose a category!</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n<ion-list>\n  <ion-item  *ngFor="let item of categories" >\n    <ion-thumbnail item-start>\n      <img [src]="item.url">\n    </ion-thumbnail>\n    <h2>{{ item.title }}</h2>\n    <p>{{ item.description }}</p>\n    <button ion-button clear item-end (click)="select(item)">Select</button>\n  </ion-item>\n</ion-list>\n\n\n<!--<ion-list>\n  <ion-item>\n    <ion-label>Category</ion-label>\n    <ion-select [(ngModel)]="categoryName">\n      <ion-option value="Cartoons" >Cartoons</ion-option>\n      <ion-option value="Pokemon">Pokemon</ion-option>\n      <ion-option value="Locations" >Locations</ion-option>\n    </ion-select>\n  </ion-item>\n</ion-list>-->\n\n<!--<button ion-button (click)="go()">Go ! </button>-->\n\n</ion-content>\n'/*ion-inline-end:"C:\Users\EladPotok\Desktop\lastChance\spyApp\src\pages\choose-category\choose-category.html"*/,
+        selector: 'page-choose-category',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\choose-category\choose-category.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Choose a category!</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n<ion-list>\n  <ion-item  *ngFor="let item of categories" >\n    <ion-thumbnail item-start>\n      <img [src]="item.url">\n    </ion-thumbnail>\n    <h2>{{ item.title }}</h2>\n    <p>{{ item.description }}</p>\n    <button ion-button clear item-end (click)="select(item)">Select</button>\n  </ion-item>\n</ion-list>\n\n\n<!--<ion-list>\n  <ion-item>\n    <ion-label>Category</ion-label>\n    <ion-select [(ngModel)]="categoryName">\n      <ion-option value="Cartoons" >Cartoons</ion-option>\n      <ion-option value="Pokemon">Pokemon</ion-option>\n      <ion-option value="Locations" >Locations</ion-option>\n    </ion-select>\n  </ion-item>\n</ion-list>-->\n\n<!--<button ion-button (click)="go()">Go ! </button>-->\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\choose-category\choose-category.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]])
 ], ChooseCategoryPage);
 
 //# sourceMappingURL=choose-category.js.map

@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { CategoryModel } from '../../Models/category.model';
+import { AuthService } from '../../services/auth.service'
 
 @IonicPage()
 @Component({
@@ -14,7 +15,8 @@ export class ChooseCategoryPage {
   categoryName: string;
   categories: CategoryModel[] = [];
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
+              private authService: AuthService) {
     let pokemon: CategoryModel = {
       title: "Pokemon",
       description: "Catch'em all!",
@@ -52,14 +54,13 @@ export class ChooseCategoryPage {
 
   select(category: CategoryModel) {
     let roomKey = this.navParams.get('roomKey');
-    let userName = this.navParams.get('userName');
     this.af.object(`/rooms/${roomKey}/categoryName`).set(category.title);
     this.af.object(`/rooms/${roomKey}/isCategorySelected`).set(true);
 
      this.navCtrl.push('GamePage', { 
       roomKey: roomKey,
-      userName: userName,
-      selectorUser: userName
+      userName: this.authService.currentUser.displayName,
+      selectorUser: this.authService.currentUser.displayName
     });
   }
 

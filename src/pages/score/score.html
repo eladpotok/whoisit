@@ -13,15 +13,21 @@
 </ion-header>
 
 
-<ion-content padding>
-    <ion-grid>
-      <ion-row>
-        <ion-col col-12>
-          
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col col-6>And the spy is {{ spy }}</ion-col>
-     </ion-row>
-    </ion-grid>
+<ion-content padding >
+   
+   <ion-card [ngClass]="isSpyWon ? 'backgroundWin' : 'backgroundLose'">
+
+   <ion-item [ngClass]="isSpyWon ? 'backgroundWin' : 'backgroundLose'">
+    <ion-avatar item-start>
+      <img [src]="currentUser.imageUrl">
+    </ion-avatar>
+    <h2>{{ currentUser.displayName }}</h2>
+    <p>{{ currentUser.level }}</p>
+  </ion-item>
+
+  <img src="assets/spy.png">
+
+
+</ion-card>
+
 </ion-content>

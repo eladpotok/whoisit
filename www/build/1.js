@@ -46,6 +46,7 @@ ScorePageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(458);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -58,12 +59,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var ScorePage = (function () {
-    function ScorePage(navCtrl, navParams, af) {
+    function ScorePage(navCtrl, navParams, af, auth) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
+        this.auth = auth;
+        this.currentUser = auth.currentUser;
         this.roomKey = this.navParams.get('roomKey');
         this.statKey = this.navParams.get('statId');
         console.log("the room key " + this.roomKey);
@@ -75,17 +79,31 @@ var ScorePage = (function () {
     ScorePage.prototype.ionViewDidLoad = function () {
         console.log('ionViewDidLoad ScorePage');
     };
+    ScorePage.prototype.checkWinner = function () {
+        var maxVotes = 0;
+        var userMax;
+        this.af.list("games/" + this.statKey + "/votes", { preserveSnapshot: true }).subscribe(function (t) {
+            t.forEach(function (user) {
+                if (user.val().$value > maxVotes) {
+                    maxVotes = user.val().$value;
+                    userMax = user.val().key;
+                }
+            });
+        });
+        if (userMax == this.spy)
+            this.isSpyWon = false;
+    };
     return ScorePage;
 }());
 ScorePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-score',template:/*ion-inline-start:"C:\Users\EladPotok\Desktop\lastChance\spyApp\src\pages\score\score.html"*/'<!--\n  Generated template for the ScorePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>score</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n    <ion-grid>\n      <ion-row>\n        <ion-col col-12>\n          \n        </ion-col>\n      </ion-row>\n      <ion-row>\n        <ion-col col-6>And the spy is {{ spy }}</ion-col>\n     </ion-row>\n    </ion-grid>\n</ion-content>\n'/*ion-inline-end:"C:\Users\EladPotok\Desktop\lastChance\spyApp\src\pages\score\score.html"*/,
+        selector: 'page-score',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\score\score.html"*/'<!--\n  Generated template for the ScorePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>score</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding >\n   \n   <ion-card [ngClass]="isSpyWon ? \'backgroundWin\' : \'backgroundLose\'">\n\n   <ion-item [ngClass]="isSpyWon ? \'backgroundWin\' : \'backgroundLose\'">\n    <ion-avatar item-start>\n      <img [src]="currentUser.imageUrl">\n    </ion-avatar>\n    <h2>{{ currentUser.displayName }}</h2>\n    <p>{{ currentUser.level }}</p>\n  </ion-item>\n\n  <img src="assets/spy.png">\n\n\n</ion-card>\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\score\score.html"*/,
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _d || Object])
 ], ScorePage);
 
-var _a, _b, _c;
+var _a, _b, _c, _d;
 //# sourceMappingURL=score.js.map
 
 /***/ })

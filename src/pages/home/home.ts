@@ -10,7 +10,7 @@ import { Observable } from 'rxjs/Observable';
 import { CardModel }  from '../../Models/card.model';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 import * as firebase from 'firebase';
-
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'page-home',
@@ -28,44 +28,14 @@ export class HomePage {
   openRoomTab: Component;
   isOpenRoomSelected: Boolean;
   operation: any;
-  photoUrl: string;
-  displayName: string;
-  isUserAuthorized: Boolean;
-  userId: string;
-
 
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
-                 private fb: Facebook, private platform: Platform, public alertCtrl: AlertController) {
+                 private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
+                 public authService: AuthService) {
 
-    this.isUserAuthorized = false;
+    //this.isUserAuthorized = false;
     this.operation = "openRoom";
     this.isOpenRoomSelected = true;
-   
-    // let spy: CardModel = {
-    //   title: "Spy",
-    //   link: "https://firebasestorage.googleapis.com/v0/b/spycookie-31a6f.appspot.com/o/category%2Fspy.png?alt=media&token=8cf47740-c7a2-4f51-a961-eb9145f8066d",
-    //   category: "All"
-    // }
-    
-    // TODO: check if its raised with any user which sign in.
-    // Maybe I should detect it by its uid.
-    afAuth.authState.subscribe((user: firebase.User) => {
-      if (!user) {
-        this.displayName = null;
-        return;
-      }
-
-      this.activeUser(user); 
-    });
-  }
-
-// TODO: need to contain only one object "user" instead of all of its fields.
-  private activeUser(user: firebase.User) {
-    this.userName = user.displayName;
-    this.displayName = user.displayName;
-    this.photoUrl = user.photoURL;
-    this.isUserAuthorized = true;
-    this.userId = user.uid;
   }
 
   private openRoomSubmit() {
@@ -96,28 +66,13 @@ export class HomePage {
 
   private addUserToRoom(roomKey: string) {
  
-    let userId = this.userId  ;
 
-    if(!this.isUserAuthorized) {
-         let userModel: UserModel = 
-            {
-                displayName: this.userName,
-                games: 0,
-                totalPoints: 0,
-                imageUrl: "assets/geust.png",
-                level: "beginner"
-            }
-
-        userId = this.af.list(`users`).push(userModel).key;
-    }
-
-    // let usersInRoomKey = this.af.list(`users/${roomKey}`).push(userModel).key;
-    //this.af.object(`rooms/${roomKey}/users/key`).set(userId);
-    this.af.object(`rooms/${roomKey}/users/${userId}`).set(true);
+    if(!this.authService.isAuthenticated)
+      this.authService.addGuestUser(this.userName, roomKey);
+   
 
     this.navCtrl.push('LobbyPage', {
-        roomKey: roomKey,
-        userName: this.userName
+        roomKey: roomKey
     });
   }
 
@@ -129,7 +84,6 @@ export class HomePage {
 
      if(this.userName == null ||
        this.roomEntryCode == null) {
-    
 
       this.showMsg("Wrong parameter!", "One of the given paramter is incorrect");
       return;
@@ -182,23 +136,13 @@ export class HomePage {
 
 
   public signInWithFacebook() {
-    
-      if (this.platform.is('cordova')) {
-      this.fb.login(['email', 'public_profile']).then(res => {
-          const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-          firebase.auth().signInWithCredential(facebookCredential);
 
-      })
-      }
-      else {
-        return this.afAuth.auth
-            .signInWithPopup(new firebase.auth.FacebookAuthProvider())
-            .then(res => console.log(res));
-      }
+      this.authService.signInWithFacebook();
   }
 
   public signOut() {
-    this.afAuth.auth.signOut();
+
+    this.authService.signOut();
   }
 }
 

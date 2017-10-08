@@ -46,6 +46,7 @@ LobbyPageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(458);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -60,18 +61,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var LobbyPage = (function () {
-    function LobbyPage(platform, navCtrl, navParams, af, alertCtrl) {
+    function LobbyPage(platform, navCtrl, navParams, af, alertCtrl, authService) {
         var _this = this;
         this.platform = platform;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
         this.alertCtrl = alertCtrl;
+        this.authService = authService;
         this.usersModel = [];
         // Get thr paramters from the navigation controller
         this.roomKey = this.navParams.get('roomKey');
-        this.userName = this.navParams.get('userName');
         this.userItems = af.list("rooms/" + this.roomKey + "/users");
         // get the users in the current room
         af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
@@ -87,7 +89,7 @@ var LobbyPage = (function () {
         // Get the current room
         af.object("/rooms/" + this.roomKey).subscribe(function (t) {
             _this.roomName = t.roomName;
-            if (t.owner == _this.userName)
+            if (t.owner == authService.currentUser.displayName)
                 _this.isOwner = true;
             _this.entryCode = t.entryCode;
         });
@@ -95,10 +97,9 @@ var LobbyPage = (function () {
             console.log("enter");
             if (t.$value) {
                 _this.af.object("rooms/" + _this.roomKey + "/selector").subscribe(function (selector) {
-                    if (selector.$value == _this.userName) {
+                    if (selector.$value == authService.currentUser.displayName) {
                         _this.navCtrl.push('ChooseCategoryPage', {
-                            roomKey: _this.roomKey,
-                            userName: _this.userName
+                            roomKey: _this.roomKey
                         });
                     }
                 });
@@ -109,7 +110,6 @@ var LobbyPage = (function () {
                         // go to the loading game...
                         _this.navCtrl.push('GamePage', {
                             roomKey: _this.roomKey,
-                            userName: _this.userName,
                             selectorUser: _this.selectorUser
                         });
                     }
@@ -121,7 +121,7 @@ var LobbyPage = (function () {
         var spyRandNumber = Math.floor(Math.random() * (this.usersModel.length - 1));
         if (spyRandNumber >= this.usersModel.length)
             spyRandNumber = this.usersModel.length - 1;
-        this.spyUser = this.usersModel[spyRandNumber].displayName;
+        this.spyUser = this.usersModel[spyRandNumber].$key;
         this.af.object("/rooms/" + this.roomKey + "/spy").set(this.spyUser);
     };
     LobbyPage.prototype.raffleSelector = function () {
@@ -144,12 +144,12 @@ var LobbyPage = (function () {
 LobbyPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-lobby',template:/*ion-inline-start:"C:\Users\EladPotok\Desktop\lastChance\spyApp\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  \n</ion-content>\n'/*ion-inline-end:"C:\Users\EladPotok\Desktop\lastChance\spyApp\src\pages\lobby\lobby.html"*/,
+        selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  \n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */],
-        __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _f || Object])
 ], LobbyPage);
 
+var _a, _b, _c, _d, _e, _f;
 //# sourceMappingURL=lobby.js.map
 
 /***/ })

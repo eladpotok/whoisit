@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { RoomModel } from '../../Models/room.model';
 import { CardModel } from '../../Models/card.model';
+import { AuthService } from '../../services/auth.service';
 import 'rxjs/add/operator/map';
 
 /**
@@ -19,7 +20,6 @@ import 'rxjs/add/operator/map';
 })
 export class GamePage {
   roomKey: string;
-  userName: string;
   roomModel: RoomModel;
   titleGame: string;
   photoImage: string;
@@ -30,9 +30,9 @@ export class GamePage {
   imageKey: string;
   isSpy: Boolean;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase) {
+  constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
+              private authService: AuthService) {
 
-      this.userName = this.navParams.get('userName');
       this.roomKey = this.navParams.get('roomKey');
       this.selectorUser = this.navParams.get('selectorUser');
       this.af.object(`rooms/${this.roomKey}/categoryName`).subscribe(
@@ -47,7 +47,7 @@ export class GamePage {
 
   private drawCard() {
      this.af.object(`rooms/${this.roomKey}/spy`).subscribe( spy => {
-        if(spy.$value == this.userName) {
+        if(spy.$value == this.authService.currentUser.$key) {
             this.drawSpy();
         }
         else {

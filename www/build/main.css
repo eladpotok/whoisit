@@ -27615,3 +27615,11 @@ page-lobby .myButton:active {
   position: relative;
   top: 1px;
 }
+
+page-score .backgroundWin {
+  background: lightgreen;
+}
+
+page-score .backgroundLose {
+  background: indianred;
+}

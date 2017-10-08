@@ -6,6 +6,7 @@ import { UserModel } from '../../Models/user.model';
 import { RoomModel } from '../../Models/room.model';
 import { Platform } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
+import { AuthService } from '../../services/auth.service'
 
 
 @IonicPage()
@@ -16,7 +17,6 @@ import { AlertController } from 'ionic-angular';
 export class LobbyPage {
 
   roomKey: string;
-  userName: string;
   userItems: Observable<UserModel[]>;
   roomsItems: Observable<RoomModel>;
   users: Observable<UserModel[]>;
@@ -30,12 +30,11 @@ export class LobbyPage {
   usersCount: number;
 
   constructor(private platform: Platform, public navCtrl: NavController, public navParams: NavParams, 
-              public af: AngularFireDatabase, private alertCtrl: AlertController) {
+              public af: AngularFireDatabase, private alertCtrl: AlertController, private authService: AuthService) {
 
 
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
-    this.userName = this.navParams.get('userName');
 
     this.userItems = af.list(`rooms/${this.roomKey}/users`);
 
@@ -55,7 +54,7 @@ export class LobbyPage {
     // Get the current room
     af.object(`/rooms/${this.roomKey}`).subscribe( t=> {
       this.roomName = t.roomName;
-      if(t.owner == this.userName)
+      if(t.owner == authService.currentUser.displayName)
           this.isOwner = true;
 
       this.entryCode = t.entryCode;
@@ -66,10 +65,9 @@ export class LobbyPage {
       if(t.$value) {
 
           this.af.object(`rooms/${this.roomKey}/selector`).subscribe(  selector => {
-            if(selector.$value == this.userName) {
+            if(selector.$value == authService.currentUser.displayName) {
               this.navCtrl.push('ChooseCategoryPage', {
-                roomKey: this.roomKey,
-                userName: this.userName
+                roomKey: this.roomKey
               });
             }
             });
@@ -80,7 +78,6 @@ export class LobbyPage {
                   // go to the loading game...
                   this.navCtrl.push('GamePage', {
                     roomKey: this.roomKey,
-                    userName: this.userName,
                     selectorUser: this.selectorUser
               }
             );
@@ -97,7 +94,7 @@ export class LobbyPage {
 
      if(spyRandNumber >= this.usersModel.length)
       spyRandNumber = this.usersModel.length - 1;
-     this.spyUser = this.usersModel[spyRandNumber].displayName;
+     this.spyUser = this.usersModel[spyRandNumber].$key;
      this.af.object(`/rooms/${this.roomKey}/spy`).set(this.spyUser);
   }
 
