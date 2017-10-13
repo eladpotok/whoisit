@@ -13,8 +13,8 @@
 </ion-header>
 
 
-<ion-content padding>
-   <ion-list>
+<ion-content padding class="bodyCategory">
+   <ion-list *ngIf="!isTheSpy">
     <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)">
       <ion-avatar item-start>
         <img [src]="item.imageUrl">
@@ -22,4 +22,8 @@
       <h2> {{ item.displayName }}</h2>
     </ion-item>
   </ion-list> 
+
+  <!--<button *ngIf="spyReadyToVote" ion-button class="myButton" >vote</button>-->
+
+
 </ion-content>

@@ -2,7 +2,9 @@ import {AngularFireAuth } from 'angularfire2/auth'
 import { Injectable } from '@angular/core';
 import * as firebase from 'firebase';
 import { UserModel } from '../Models/user.model'
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+
+import { AngularFireDatabase, FirebaseListObservable} from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 
 import { Platform } from 'ionic-angular';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
@@ -10,17 +12,19 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
  export class AuthService {
 
     private static _currentUser: UserModel;
-    private _isAuthenticated: Boolean;
 
-     constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
-        afAuth.authState.subscribe((user: firebase.User) => {
-        if (!user) {
-            AuthService._currentUser = null;
-            return;
-        }
+     constructor( public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
+        // afAuth.authState.subscribe((user: firebase.User) => {
+        // if (!user) {
+        //     AuthService._currentUser = null;
+        //     return;
+        // }
+        //     this.activeUser(user); 
+        // });
+    }
 
-            this.activeUser(user); 
-        });
+    public clearUser() {
+        AuthService._currentUser = null;
     }
 
     public get currentUser(): UserModel {
@@ -28,7 +32,7 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
     }
 
     public get isAuthenticated() : Boolean {
-        return this._isAuthenticated;
+        return this.currentUser != null && this.currentUser.isAuthenticated;
     }
 
    public signInWithFacebook() {
@@ -51,9 +55,9 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
     this.afAuth.auth.signOut();
   }
 
+
   public addGuestUser(userName: string, roomKey: string) {
 
-       this._isAuthenticated = true;
         let userModel: UserModel = 
         {
             displayName: userName,
@@ -69,13 +73,34 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 
     // let usersInRoomKey = this.af.list(`users/${roomKey}`).push(userModel).key;
     //this.af.object(`rooms/${roomKey}/users/key`).set(userId);
-    this.af.object(`rooms/${roomKey}/users/${userId}`).set(true);
+    this.af.object(`rooms/${roomKey}/users/${userId}`).set(0);
 
     userModel.$key = userId;
     AuthService._currentUser = userModel;
+
+    this.getPointsInRoom(AuthService._currentUser, roomKey).subscribe( t=> {
+        console.log("add guest " + t.$value);
+        AuthService._currentUser.pointsInRoom = t.$value;
+    });
+
+    
+
+    // this.getPointsInRoom(AuthService._currentUser, roomKey).subscribe( t=> {
+        
+    //     console.log("add guest " + t.pointsinRoom);
+    //     AuthService._currentUser.pointsInRoom = t;
+    // });
   }
 
-  private activeUser(user: firebase.User) {
+  public getUser(userKey: string) : Observable<UserModel> {
+      return this.af.object(`users/${userKey}`);
+  }
+
+  public getPointsInRoom(user: UserModel, roomKey: string) : Observable<any> {
+    return this.af.object(`rooms/${roomKey}/users/${user.$key}`);
+  }
+
+  public activeUser(user: firebase.User) {
 
       let userModel: UserModel =
       {

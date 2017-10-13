@@ -6,6 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { Facebook } from '@ionic-native/facebook';
 import { AuthService } from '../services/auth.service';
 import { ServicesModule } from '../services/services.module'; 
+import { FormsModule } from '@angular/forms';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -38,8 +39,8 @@ export const firebaseConfig = {
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
-    ServicesModule
-
+    ServicesModule,
+    FormsModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -50,7 +51,7 @@ export const firebaseConfig = {
   providers: [
     StatusBar,
     SplashScreen,
-        Facebook,
+    Facebook,
         
 
     {provide: ErrorHandler, useClass: IonicErrorHandler}

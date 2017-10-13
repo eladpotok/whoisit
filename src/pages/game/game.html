@@ -10,12 +10,12 @@
 </ion-header>
 
 
-<ion-content padding>
-      <ion-card>
-        <img [src]="photoImage" class="photo"/>
+<ion-content padding class="bodyCategory">
+      <ion-card class="cardback">
+        <img [src]="photoImage" class="photoGame"/>
         <ion-card-content>
             <ion-card-title text-align: center>
-                {{ photoTitle }}
+                {{ titleGame }}
             </ion-card-title>
           <p *ngIf="isSpy">
             Be aware for the question and try to obsorb any information you can.
@@ -27,7 +27,11 @@
           </p>
         </ion-card-content>
       </ion-card>
-      <button ion-button (click)="LeaveGame()">Leave</button>
+      
+      <button ion-button (click)="LeaveGame()">Vote</button>
+      
+       
+
 </ion-content>
 
 

@@ -1,14 +1,14 @@
 webpackJsonp([2],{
 
-/***/ 450:
+/***/ 457:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LobbyPageModule", function() { return LobbyPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lobby__ = __webpack_require__(456);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lobby__ = __webpack_require__(464);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -38,16 +38,16 @@ LobbyPageModule = __decorate([
 
 /***/ }),
 
-/***/ 456:
+/***/ 464:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LobbyPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(458);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(298);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -77,14 +77,15 @@ var LobbyPage = (function () {
         this.usersModel = [];
         // Get thr paramters from the navigation controller
         this.roomKey = this.navParams.get('roomKey');
-        this.userItems = af.list("rooms/" + this.roomKey + "/users");
         // get the users in the current room
         af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
             _this.usersModel = [];
             _this.usersCount = snapshots.length;
             snapshots.forEach(function (snapshot) {
                 var userId = snapshot.$key;
+                var points = snapshot.$value;
                 af.object("users/" + userId).subscribe(function (t) {
+                    t.pointsInRoom = points;
                     _this.usersModel.push(t);
                 });
             });
@@ -94,10 +95,13 @@ var LobbyPage = (function () {
             _this.roomName = t.roomName;
             if (t.owner == authService.currentUser.displayName)
                 _this.isOwner = true;
+            else {
+                _this.roomService.updateUsersInRoom(_this.roomKey);
+            }
             _this.entryCode = t.entryCode;
         });
+        // wait till the selector will select a category
         af.object("rooms/" + this.roomKey + "/isStarted").subscribe(function (t) {
-            console.log("enter");
             if (t.$value) {
                 _this.af.object("rooms/" + _this.roomKey + "/selector").subscribe(function (selector) {
                     if (selector.$value == authService.currentUser.displayName) {
@@ -106,17 +110,21 @@ var LobbyPage = (function () {
                             spy: _this.spyUser
                         });
                     }
-                });
-            }
-            else {
-                af.object("rooms/" + _this.roomKey + "/isCategorySelected").subscribe(function (catSelected) {
-                    if (catSelected.$value) {
-                        // go to the loading game...
-                        _this.navCtrl.push('GamePage', {
-                            roomKey: _this.roomKey,
-                            selectorUser: _this.selectorUser
+                    else {
+                        af.object("rooms/" + _this.roomKey + "/isCategorySelected").subscribe(function (catSelected) {
+                            if (catSelected.$value) {
+                                // if(this.selectorUser == authService.currentUser.$key) {
+                                // go to the loading game...
+                                _this.navCtrl.push('GamePage', {
+                                    roomKey: _this.roomKey,
+                                    roundKey: _this.selectorUser
+                                });
+                            }
                         });
                     }
+                    // else {
+                    // }
+                    // }
                 });
             }
         });
@@ -126,7 +134,8 @@ var LobbyPage = (function () {
         if (spyRandNumber >= this.usersModel.length)
             spyRandNumber = this.usersModel.length - 1;
         this.spyUser = this.usersModel[spyRandNumber].$key;
-        this.af.object("/rooms/" + this.roomKey + "/spy").set(this.spyUser);
+        //this.af.object(`/rooms/${this.roomKey}/spy`).set(this.spyUser);
+        this.roomService.setSpy(this.spyUser);
     };
     LobbyPage.prototype.raffleSelector = function () {
         var spyRandNumber = Math.floor(Math.random() * (this.usersModel.length - 1));
@@ -144,14 +153,20 @@ var LobbyPage = (function () {
         this.af.object("rooms/" + this.roomKey + "/isStarted").set(true);
         this.af.object("rooms/" + this.roomKey + "/usersCount").set(this.usersCount);
     };
+    LobbyPage.prototype.getUserPoints = function (user) {
+        this.af.object("/rooms/" + this.roomKey + "/users/" + user.$key).subscribe(function (t) {
+            console.log("return value " + t.$value);
+            return t.$value;
+        });
+    };
     return LobbyPage;
 }());
 LobbyPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  \n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
+        selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      <h2 item-end > {{ item.pointsInRoom  }} </h2>\n\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  \n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */],
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
         __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */],
         __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]])
 ], LobbyPage);

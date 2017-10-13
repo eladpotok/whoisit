@@ -1,14 +1,14 @@
 webpackJsonp([0],{
 
-/***/ 449:
+/***/ 455:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GamePageModule", function() { return GamePageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game__ = __webpack_require__(454);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game__ = __webpack_require__(461);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,6 +18,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
+// import { ComponentsModule } from '../../components/components.module'
 var GamePageModule = (function () {
     function GamePageModule() {
     }
@@ -38,17 +39,18 @@ GamePageModule = __decorate([
 
 /***/ }),
 
-/***/ 454:
+/***/ 461:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return GamePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(458);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_map__ = __webpack_require__(455);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs_add_operator_map__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(298);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_map__ = __webpack_require__(462);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5_rxjs_add_operator_map__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -63,6 +65,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 /**
  * Generated class for the GamePage page.
  *
@@ -70,83 +73,86 @@ var __metadata = (this && this.__metadata) || function (k, v) {
  * Ionic pages and navigation.
  */
 var GamePage = (function () {
-    function GamePage(navCtrl, navParams, af, authService) {
+    function GamePage(navCtrl, navParams, af, authService, roomsService) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
         this.authService = authService;
+        this.roomsService = roomsService;
         this.roomKey = this.navParams.get('roomKey');
-        this.roundKey = this.navParams.get('roundKey');
-        this.af.object("rooms/" + this.roomKey + "/categoryName").subscribe(function (t) {
-            _this.titleGame = t.$value;
-        });
-        this.drawCard();
-    }
-    GamePage.prototype.drawCard = function () {
-        var _this = this;
-        this.af.object("rooms/" + this.roomKey + "/spy").subscribe(function (spy) {
-            if (spy.$value == _this.authService.currentUser.$key) {
-                _this.drawSpy();
-            }
-            else {
-                console.log("enter to random card");
-                _this.drawRandomCard();
-            }
-        });
-    };
-    GamePage.prototype.drawRandomCard = function () {
-        var _this = this;
-        this.af.list('/categories', { preserveSnapshot: true }).subscribe(function (snapshots) {
-            snapshots.forEach(function (snapshot) {
-                if (snapshot.val().category == _this.titleGame) {
-                    if (!snapshot.val().isTaken) {
-                        _this.photoImage = snapshot.val().link;
-                        _this.photoTitle = snapshot.val().title;
-                        // Take the key of the image so we can sign it as taken
-                        _this.imageKey = snapshot.key;
-                        return;
-                    }
+        console.log("1");
+        var subscription = this.af.list("rounds/").subscribe(function (round) {
+            round.forEach(function (r) {
+                if (r.roomKey == _this.roomKey) {
+                    _this.roundKey = r.$key;
+                    _this.roomsService.setSpy(r.spyKey);
+                    console.log("2");
+                    _this.af.object("/rounds/" + _this.roundKey + "/categoryName").subscribe(function (t) {
+                        console.log("3");
+                        _this.af.object("categories/" + t.$value + "/").subscribe(function (cat) {
+                            console.log("ctor game " + t.$value);
+                            _this.category = cat;
+                            subscription.unsubscribe();
+                            _this.drawCard();
+                        });
+                    });
                 }
             });
         });
+    }
+    GamePage.prototype.drawCard = function () {
+        if (this.roomsService.getSpy() == this.authService.currentUser.$key) {
+            this.drawSpy();
+        }
+        else {
+            this.drawRandomCard();
+        }
+    };
+    GamePage.prototype.drawRandomCard = function () {
+        var _this = this;
+        this.titleGame = this.category.title;
+        this.af.object("rounds/" + this.roundKey + "/secret").subscribe(function (t) {
+            _this.photoImage = 'assets/' + _this.titleGame + "/" + t.$value + ".png";
+        });
         // set the image as taken
-        this.af.object("/categories/" + this.imageKey + "/isTaken").set(true);
+        //this.af.object(`/categories/${this.imageKey}/isTaken`).set(true);
     };
     GamePage.prototype.drawSpy = function () {
-        this.photoImage = "assets/spy.png";
+        this.photoImage = "assets/spy2.png";
         this.photoTitle = "Spy";
+        this.titleGame = this.category.title;
         this.isSpy = true;
     };
     GamePage.prototype.LeaveGame = function () {
-        //this.af.object(`categories/${this.imageKey}/isTaken`).set(false);
         this.navCtrl.push('EndGamePage', {
             roomKey: this.roomKey,
             roundKey: this.roundKey
         });
+        //this.af.object(`categories/${this.imageKey}/isTaken`).set(false);
     };
     return GamePage;
 }());
 GamePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding>\n      <ion-card>\n        <img [src]="photoImage" class="photo"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ photoTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The spy is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n      </ion-card>\n      <button ion-button (click)="LeaveGame()">Leave</button>\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/,
+        selector: 'page-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n      <ion-card class="cardback">\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ titleGame }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The spy is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n      </ion-card>\n      \n      <button ion-button (click)="LeaveGame()">Vote</button>\n      \n       \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]) === "function" && _e || Object])
 ], GamePage);
 
+var _a, _b, _c, _d, _e;
 //# sourceMappingURL=game.js.map
 
 /***/ }),
 
-/***/ 455:
+/***/ 462:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var Observable_1 = __webpack_require__(10);
-var map_1 = __webpack_require__(86);
+var map_1 = __webpack_require__(90);
 Observable_1.Observable.prototype.map = map_1.map;
 //# sourceMappingURL=map.js.map
 

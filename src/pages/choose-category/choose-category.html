@@ -8,16 +8,16 @@
 </ion-header>
 
 
-<ion-content padding>
+<ion-content padding class="bodyCategory">
 
-<ion-list>
-  <ion-item  *ngFor="let item of categories" >
-    <ion-thumbnail item-start>
-      <img [src]="item.url">
+<ion-list class="list">
+  <ion-item  *ngFor="let item of categories" class="list">
+    <ion-thumbnail item-start class="list"> 
+      <img [src]="item.url"  >
     </ion-thumbnail>
     <h2>{{ item.title }}</h2>
-    <p>{{ item.description }}</p>
-    <button ion-button clear item-end (click)="select(item)">Select</button>
+    <p class="description">{{ item.description }}</p>
+    <button ion-button color="darkBrown" item-end (click)="select(item)" >Select</button>
   </ion-item>
 </ion-list>
 

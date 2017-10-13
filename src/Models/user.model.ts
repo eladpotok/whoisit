@@ -1,4 +1,5 @@
 import { BaseModel } from './base.model';
+import { Observable } from 'rxjs/Observable';
 
 export class UserModel extends BaseModel {
     displayName: string
@@ -7,4 +8,5 @@ export class UserModel extends BaseModel {
     games: number
     level: string
     isAuthenticated: Boolean
+    pointsInRoom?: number
 }

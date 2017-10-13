@@ -1,14 +1,14 @@
 webpackJsonp([3],{
 
-/***/ 448:
+/***/ 456:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EndGamePageModule", function() { return EndGamePageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GuessPageModule", function() { return GuessPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__end_game__ = __webpack_require__(453);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__guess__ = __webpack_require__(463);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,34 +18,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var EndGamePageModule = (function () {
-    function EndGamePageModule() {
+var GuessPageModule = (function () {
+    function GuessPageModule() {
     }
-    return EndGamePageModule;
+    return GuessPageModule;
 }());
-EndGamePageModule = __decorate([
+GuessPageModule = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
         declarations: [
-            __WEBPACK_IMPORTED_MODULE_2__end_game__["a" /* EndGamePage */],
+            __WEBPACK_IMPORTED_MODULE_2__guess__["a" /* GuessPage */],
         ],
         imports: [
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__end_game__["a" /* EndGamePage */]),
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__guess__["a" /* GuessPage */]),
         ],
     })
-], EndGamePageModule);
+], GuessPageModule);
 
-//# sourceMappingURL=end-game.module.js.map
+//# sourceMappingURL=guess.module.js.map
 
 /***/ }),
 
-/***/ 453:
+/***/ 463:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return EndGamePage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return GuessPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(298);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -58,71 +60,47 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var EndGamePage = (function () {
-    function EndGamePage(navCtrl, navParams, af) {
+
+
+var GuessPage = (function () {
+    function GuessPage(navCtrl, navParams, af, auth, roomsService) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
-        this.usersModel = [];
-        this.roomKey = this.navParams.get('roomKey');
-        this.roundKey = this.navParams.get('roundKey');
-        if (this.roundKey != null) {
-            this.af.object("rounds/" + this.roundKey + "/votesCount").set(0);
-            this.af.object("rounds/" + this.roundKey + "/votes/dummy").set(true);
-        }
-        else {
-            this.af.list("rounds/").subscribe(function (t) {
-                t.forEach(function (room) {
-                    if (room.val().roomKey == _this.roomKey) {
-                        _this.roomKey = room.val().key;
-                        return;
-                    }
-                });
-            });
-        }
-        // get the users in the current room
-        af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
-            _this.usersModel = [];
-            snapshots.forEach(function (snapshot) {
-                var userId = snapshot.$key;
-                af.object("users/" + userId).subscribe(function (t) {
-                    _this.usersModel.push(t);
-                });
-            });
-        });
-        // wait till all users will vote
-        af.object("rounds/" + this.roundKey + "/isAllVoted").subscribe(function (t) {
-            if (t.$value) {
-                _this.navCtrl.push('ScorePage', {
-                    roundKey: _this.roundKey,
-                    roomKey: _this.roomKey
-                });
-            }
+        this.auth = auth;
+        this.roomsService = roomsService;
+        this.members = [];
+        var categoryKey = navParams.get('category');
+        this.secret = navParams.get('secret');
+        this.roundKey = navParams.get('roundKey');
+        this.af.list("categories/" + categoryKey + "/members").subscribe(function (t) {
+            _this.members = t;
         });
     }
-    EndGamePage.prototype.selectUser = function (user) {
-        var _this = this;
-        var counter = 0;
-        var subscribtion = this.af.object("/rounds/" + this.roundKey + "/votes/" + user.$key).subscribe(function (user) {
-            counter = user.$value;
-            subscribtion.unsubscribe();
-            counter++;
-            _this.af.object("/rounds/" + _this.roundKey + "/votes/" + user.$key).set(counter);
+    GuessPage.prototype.choose = function (category) {
+        // check if the spy selects the right secret
+        if (this.secret.toString() == category.$key) {
+            this.auth.currentUser.pointsInRoom += 3;
+            this.af.object("/rooms/" + this.roomsService.currentRoom.$key + "/users/" + this.auth.currentUser.$key).set(this.auth.currentUser.pointsInRoom);
+        }
+        this.navCtrl.push('ScorePage', {
+            roomKey: this.roomsService.currentRoom.$key,
+            roundKey: this.roundKey
         });
-        //this.navCtrl.push('cat');
     };
-    return EndGamePage;
+    return GuessPage;
 }());
-EndGamePage = __decorate([
+GuessPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-end-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/'<!--\n  Generated template for the EndGamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Who\'s the spy?</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n   <ion-list>\n    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)">\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n    </ion-item>\n  </ion-list> \n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/,
+        selector: 'page-guess',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\guess\guess.html"*/'<!--\n  Generated template for the GuessPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>guess</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content class="card-background-page" >\n\n  <ion-card *ngFor="let cat of members " (click)="choose(cat)">\n    <img [src]="cat.url"/>\n    <div class="card-title">{{cat.title}}</div>\n    <!--<div class="card-subtitle">41 Listings</div>-->\n  </ion-card>\n\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\guess\guess.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]])
-], EndGamePage);
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]])
+], GuessPage);
 
-//# sourceMappingURL=end-game.js.map
+//# sourceMappingURL=guess.js.map
 
 /***/ })
 

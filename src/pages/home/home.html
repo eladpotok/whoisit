@@ -19,7 +19,7 @@
 
     <ion-item  >
       <ion-label fixed color="darkBlack">Username</ion-label>
-      <ion-input [disabled]="isUserAuthorized" type="text" value="" class="text-foreground"  [(ngModel)]="userName"></ion-input>
+      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>
     </ion-item>
 
     <ion-item >
@@ -31,7 +31,7 @@
   <ion-list *ngSwitchCase="'joinRoom'" (click)="joinRoom()">
     <ion-item>
       <ion-label fixed color="darkBlack" >Username</ion-label>
-      <ion-input type="text" value="" [disabled]="isUserAuthorized" [(ngModel)]="userName" class="text-foreground" ></ion-input>
+      <ion-input type="text" value="" [disabled]="isUserAuthorized" [(ngModel)]="currentUser.displayName" class="text-foreground" ></ion-input>
     </ion-item>
 
     <ion-item>
@@ -63,3 +63,5 @@
 </div>
 
 </ion-content>
+
+

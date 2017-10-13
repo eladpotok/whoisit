@@ -1,14 +1,14 @@
 webpackJsonp([4],{
 
-/***/ 447:
+/***/ 454:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChooseCategoryPageModule", function() { return ChooseCategoryPageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EndGamePageModule", function() { return EndGamePageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__choose_category__ = __webpack_require__(452);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__end_game__ = __webpack_require__(460);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,35 +18,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var ChooseCategoryPageModule = (function () {
-    function ChooseCategoryPageModule() {
+var EndGamePageModule = (function () {
+    function EndGamePageModule() {
     }
-    return ChooseCategoryPageModule;
+    return EndGamePageModule;
 }());
-ChooseCategoryPageModule = __decorate([
+EndGamePageModule = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
         declarations: [
-            __WEBPACK_IMPORTED_MODULE_2__choose_category__["a" /* ChooseCategoryPage */],
+            __WEBPACK_IMPORTED_MODULE_2__end_game__["a" /* EndGamePage */],
         ],
         imports: [
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__choose_category__["a" /* ChooseCategoryPage */]),
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__end_game__["a" /* EndGamePage */]),
         ],
     })
-], ChooseCategoryPageModule);
+], EndGamePageModule);
 
-//# sourceMappingURL=choose-category.module.js.map
+//# sourceMappingURL=end-game.module.js.map
 
 /***/ }),
 
-/***/ 452:
+/***/ 460:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChooseCategoryPage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return EndGamePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(152);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(458);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__ = __webpack_require__(298);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_auth_service__ = __webpack_require__(89);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -60,72 +61,116 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var ChooseCategoryPage = (function () {
-    function ChooseCategoryPage(navCtrl, navParams, af, authService) {
+
+
+var EndGamePage = (function () {
+    function EndGamePage(navCtrl, navParams, af, roomService, auth, loadingCtrl) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
-        this.authService = authService;
-        this.categories = [];
-        var pokemon = {
-            title: "Pokemon",
-            description: "Catch'em all!",
-            url: "assets/pokemonIcon.png"
-        };
-        var movies = {
-            title: "Movies",
-            description: "Did you watch it?!",
-            url: "assets/moviesIcon.png"
-        };
-        var location = {
-            title: "Locations",
-            description: "What dould you take to...?",
-            url: "assets/locationIcon.png"
-        };
-        var food = {
-            title: "Food",
-            description: "Yammmm....",
-            url: "assets/foodIcon.png"
-        };
-        var celeb = {
-            title: "Celebs",
-            description: "I know him!",
-            url: "assets/celebIcon.png"
-        };
-        this.categories.push(pokemon);
-        this.categories.push(movies);
-        this.categories.push(location);
-        this.categories.push(food);
-        this.categories.push(celeb);
-    }
-    ChooseCategoryPage.prototype.select = function (category) {
-        var roomKey = this.navParams.get('roomKey');
-        this.af.object("/rooms/" + roomKey + "/isCategorySelected").set(true);
-        var round = {
-            categoryName: category.title,
-            selectorKey: this.authService.currentUser.displayName,
-            spyKey: this.navParams.get('spy'),
-            roomKey: roomKey
-        };
-        // add game to db
-        var roundKey = this.af.list("rounds/").push(round).key;
-        this.navCtrl.push('GamePage', {
-            roomKey: roomKey,
-            roundKey: roundKey
+        this.roomService = roomService;
+        this.auth = auth;
+        this.loadingCtrl = loadingCtrl;
+        this.usersModel = [];
+        this.roomKey = this.navParams.get('roomKey');
+        this.roundKey = this.navParams.get('roundKey');
+        if (this.roundKey != null) {
+            this.af.object("rounds/" + this.roundKey + "/votesCount").set(0);
+            this.af.object("rounds/" + this.roundKey + "/votes/dummy").set(true);
+        }
+        else {
+            this.af.list("rounds/").subscribe(function (t) {
+                t.forEach(function (room) {
+                    if (room.roomKey == _this.roomKey) {
+                        _this.roomKey = room.$key;
+                        return;
+                    }
+                });
+            });
+        }
+        // get all of the users in the room
+        this.usersModel = roomService.getUsersFromRoom();
+        if (roomService.getSpy() == this.auth.currentUser.$key) {
+            this.isTheSpy = true;
+            this.presentLoading();
+        }
+        console.log("loading");
+        // wait till all users will vote
+        af.object("rounds/" + this.roundKey + "/isAllVoted").subscribe(function (t) {
+            // all users voted
+            if (t.$value) {
+                // check if i am the spy
+                if (_this.auth.currentUser.$key == _this.roomService.getSpy()) {
+                    _this.loader.dismiss();
+                    af.object("/rounds/" + _this.roundKey + "/isSpyWon").subscribe(function (spy) {
+                        // check if the spy won
+                        if (spy.$value) {
+                            _this.navCtrl.push('ScorePage', {
+                                roundKey: _this.roundKey,
+                                roomKey: _this.roomKey
+                            });
+                        }
+                        else {
+                            af.object("rounds/" + _this.roundKey + "/").subscribe(function (cat) {
+                                _this.navCtrl.push('GuessPage', {
+                                    category: cat.categoryName,
+                                    secret: cat.secret,
+                                    roundKey: _this.roundKey
+                                });
+                            });
+                        }
+                    });
+                }
+                else {
+                    _this.navCtrl.push('ScorePage', {
+                        roundKey: _this.roundKey,
+                        roomKey: _this.roomKey
+                    });
+                }
+            }
         });
+    }
+    EndGamePage.prototype.presentLoading = function () {
+        this.loader = this.loadingCtrl.create({
+            content: "Wait till all players vote...",
+        });
+        this.loader.present();
     };
-    return ChooseCategoryPage;
+    EndGamePage.prototype.selectUser = function (user) {
+        var _this = this;
+        var counter = 0;
+        var subscribtion = this.af.object("/rounds/" + this.roundKey + "/votes/" + user.$key).subscribe(function (u) {
+            counter = u.$value;
+            if (subscribtion != null)
+                subscribtion.unsubscribe();
+            counter++;
+            _this.af.object("/rounds/" + _this.roundKey + "/votes/" + user.$key).set(counter);
+        });
+        if (user.$key == this.roomService.getSpy()) {
+            this.auth.currentUser.pointsInRoom += 2;
+            // add the current user to the win user list
+            this.af.list("/rounds/" + this.roundKey + "/wins/").push(this.auth.currentUser.$key);
+        }
+        else {
+            // add the current user to the lose user list
+            this.af.list("/rounds/" + this.roundKey + "/loses/").push(this.auth.currentUser.$key);
+        }
+        // in case you find the real spy you get 3 points
+        this.af.object("/rooms/" + this.roomKey + "/users/" + this.auth.currentUser.$key).set(this.auth.currentUser.pointsInRoom);
+    };
+    return EndGamePage;
 }());
-ChooseCategoryPage = __decorate([
+EndGamePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-choose-category',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\choose-category\choose-category.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Choose a category!</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n<ion-list>\n  <ion-item  *ngFor="let item of categories" >\n    <ion-thumbnail item-start>\n      <img [src]="item.url">\n    </ion-thumbnail>\n    <h2>{{ item.title }}</h2>\n    <p>{{ item.description }}</p>\n    <button ion-button clear item-end (click)="select(item)">Select</button>\n  </ion-item>\n</ion-list>\n\n\n<!--<ion-list>\n  <ion-item>\n    <ion-label>Category</ion-label>\n    <ion-select [(ngModel)]="categoryName">\n      <ion-option value="Cartoons" >Cartoons</ion-option>\n      <ion-option value="Pokemon">Pokemon</ion-option>\n      <ion-option value="Locations" >Locations</ion-option>\n    </ion-select>\n  </ion-item>\n</ion-list>-->\n\n<!--<button ion-button (click)="go()">Go ! </button>-->\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\choose-category\choose-category.html"*/,
+        selector: 'page-end-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/'<!--\n  Generated template for the EndGamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Who\'s the spy?</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n   <ion-list *ngIf="!isTheSpy">\n    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)">\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n    </ion-item>\n  </ion-list> \n\n  <!--<button *ngIf="spyReadyToVote" ion-button class="myButton" >vote</button>-->\n\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]])
-], ChooseCategoryPage);
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_auth_service__["a" /* AuthService */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]) === "function" && _f || Object])
+], EndGamePage);
 
-//# sourceMappingURL=choose-category.js.map
+var _a, _b, _c, _d, _e, _f;
+//# sourceMappingURL=end-game.js.map
 
 /***/ })
 

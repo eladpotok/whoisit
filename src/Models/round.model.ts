@@ -5,4 +5,6 @@ export class RoundModel extends BaseModel {
      spyKey: string
      selectorKey: string
      categoryName: string
+     state: string
+     secret: number
 }
