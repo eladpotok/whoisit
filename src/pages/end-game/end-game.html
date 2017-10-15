@@ -15,11 +15,15 @@
 
 <ion-content padding class="bodyCategory">
    <ion-list *ngIf="!isTheSpy">
-    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)">
+    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)" class="cardBody">
       <ion-avatar item-start>
         <img [src]="item.imageUrl">
       </ion-avatar>
       <h2> {{ item.displayName }}</h2>
+      <ion-avatar item-end>
+        <img item-end src="assets/spy.png">
+      </ion-avatar>
+      
     </ion-item>
   </ion-list> 
 

@@ -62,64 +62,50 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var ChooseCategoryPage = (function () {
     function ChooseCategoryPage(navCtrl, navParams, af, authService) {
-        // let pokemon: CategoryModel = {
-        //   title: "Pokemon",
-        //   description: "Catch'em all!",
-        //   url:  "assets/pokemonIcon.png"
-        // }
-        // let movies: CategoryModel = {
-        //   title: "Movies",
-        //   description: "Did you watch it?!",
-        //   url:  "assets/moviesIcon.png"
-        // }
-        // let location: CategoryModel = {
-        //   title: "Locations",
-        //   description: "What dould you take to...?",
-        //   url:  "assets/locationIcon.png"
-        // }
-        // let food: CategoryModel = {
-        //   title: "Food",
-        //   description: "Yammmm....",
-        //   url:  "assets/foodIcon.png"
-        // }
-        // let celeb: CategoryModel = {
-        //   title: "Celebs",
-        //   description: "I know him!",
-        //   url:  "assets/celebIcon.png"
-        // }
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
         this.authService = authService;
         this.categories = [];
-        // this.categories.push(pokemon);
-        // this.categories.push(movies);
-        // this.categories.push(location);
-        // this.categories.push(food);
-        // this.categories.push(celeb);
+        console.log("enter to ctor of category selection");
         this.af.list("categories/").subscribe(function (t) {
             _this.categories = t;
         });
     }
     ChooseCategoryPage.prototype.select = function (category) {
+        var _this = this;
+        console.log("Choose member");
         var roomKey = this.navParams.get('roomKey');
+        //let roundKey = this.navParams.get('roundKey');
         this.af.object("/rooms/" + roomKey + "/isCategorySelected").set(true);
         var randomSecret = Math.floor(Math.random() * category.members.length);
-        var round = {
-            categoryName: category.$key,
-            selectorKey: this.authService.currentUser.displayName,
-            spyKey: this.navParams.get('spy'),
-            roomKey: roomKey,
-            state: "init",
-            secret: randomSecret
-        };
-        // add game to db
-        var roundKey = this.af.list("rounds/").push(round).key;
-        this.navCtrl.push('GamePage', {
-            roomKey: roomKey,
-            roundKey: roundKey
+        var sub = this.af.list("rounds/").subscribe(function (round) {
+            round.forEach(function (r) {
+                if (r.roomKey == roomKey) {
+                    console.log("enter to if");
+                    sub.unsubscribe();
+                    _this.af.object("rounds/" + r.$key + "/categoryName").set(category.$key);
+                    console.log(" roomd key in choose-category " + roomKey);
+                    //   console.log(" roundKey key in choose-category " + roundKey);
+                    _this.navCtrl.push('GamePage', {
+                        roomKey: roomKey,
+                        roundKey: r.$key
+                    });
+                }
+            });
         });
+        // let round: RoundModel = {
+        //   categoryName: category.$key,
+        //   selectorKey: this.authService.currentUser.displayName,
+        //   spyKey: this.navParams.get('spy'),
+        //   roomKey: roomKey,
+        //   state: "init",
+        //   secret: randomSecret
+        // }
+        console.log("before");
+        // add game to db
+        //let roundKey = this.af.list(`rounds/`).push(round).key;
     };
     return ChooseCategoryPage;
 }());

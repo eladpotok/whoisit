@@ -236,6 +236,9 @@ var HomePage = (function () {
     HomePage.prototype.openRoom = function () {
         this.isOpenRoomSelected = true;
     };
+    HomePage.prototype.nameExists = function () {
+        return this.usersInRoom.map(function (t) { return t.displayName; }).indexOf(this.currentUser.displayName) != -1;
+    };
     HomePage.prototype.joinRoomSubmit = function () {
         var _this = this;
         if (this.currentUser.displayName == null ||
@@ -249,9 +252,26 @@ var HomePage = (function () {
                 if (snapshot.val().entryCode == _this.roomEntryCode) {
                     roomFound = true;
                     if (!snapshot.val().isStarted) {
-                        _this.addUserToRoom(snapshot.key);
-                        subscription.unsubscribe();
-                        return;
+                        var sub_1 = _this.af.list("rooms/" + snapshot.key + "/users", { preserveSnapshot: true }).subscribe(function (t) {
+                            console.log("enter " + snapshot.key);
+                            t.forEach(function (u) {
+                                if (u != null) {
+                                    console.log("enter 2 " + u.key);
+                                    _this.af.object("users/" + u.key).subscribe(function (user) {
+                                        if (user.displayName == _this.currentUser.displayName) {
+                                            _this.showMsg("Sorry", "The given name is already exists in the room");
+                                            sub_1.unsubscribe();
+                                            return;
+                                        }
+                                        else {
+                                            _this.addUserToRoom(snapshot.key);
+                                            sub_1.unsubscribe();
+                                            return;
+                                        }
+                                    });
+                                }
+                            });
+                        });
                     }
                     else {
                         _this.showMsg("Sorry", "The room is in during the game");
@@ -259,8 +279,10 @@ var HomePage = (function () {
                     subscription.unsubscribe();
                 }
             });
-            if (!roomFound)
+            if (!roomFound) {
                 _this.showMsg("Room does not exist", "The key which is given is not exist!");
+                subscription.unsubscribe();
+            }
         });
     };
     HomePage.prototype.joinRoom = function () {
@@ -364,6 +386,9 @@ var RoomsService = RoomsService_1 = (function () {
     RoomsService.prototype.getUsersFromRoom = function () {
         return RoomsService_1._currentRooms.users;
     };
+    RoomsService.prototype.getUsersFromRoomButme = function (user) {
+        return this.getUsersFromRoom().filter(function (t) { return t.displayName != user.displayName; });
+    };
     RoomsService.prototype.getUser = function (userKey) {
         return RoomsService_1._currentRooms.users.find(function (t) { return t.$key == userKey; });
     };
@@ -404,10 +429,10 @@ var RoomsService = RoomsService_1 = (function () {
 }());
 RoomsService = RoomsService_1 = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["j" /* Platform */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]])
 ], RoomsService);
 
-var RoomsService_1, _a, _b, _c, _d;
+var RoomsService_1;
 //# sourceMappingURL=rooms.service.js.map
 
 /***/ }),

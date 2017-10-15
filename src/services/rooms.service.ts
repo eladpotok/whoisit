@@ -51,6 +51,10 @@ import { Observable } from 'rxjs/Observable';
         return RoomsService._currentRooms.users;
     }
 
+    public getUsersFromRoomButme(user: UserModel) : UserModel[] {
+        return this.getUsersFromRoom().filter(t=> t.displayName != user.displayName);
+    }
+
     public getUser(userKey: string) : UserModel {
         return RoomsService._currentRooms.users.find( t=> t.$key == userKey);
     }

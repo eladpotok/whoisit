@@ -30055,6 +30055,12 @@ ion-navbar.toolbar {
   border-radius: 50%;
 }
 
+.cardBody {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 30px;
+  margin-bottom: 5px;
+}
+
 .body {
   background-image: url("../assets/appBackground.PNG");
   background-size: cover;
@@ -30141,6 +30147,10 @@ page-game .cardback {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+page-guess .card-background-page {
+  background: black;
+}
+
 page-guess .card-background-page ion-card {
   position: relative;
   text-align: center;
@@ -30148,9 +30158,9 @@ page-guess .card-background-page ion-card {
 
 page-guess .card-background-page .card-title {
   position: absolute;
-  top: 36%;
+  top: 60%;
   font-size: 2.0em;
-  width: 100%;
+  width: 120%;
   font-weight: bold;
   color: #fff;
 }
@@ -30161,6 +30171,18 @@ page-guess .card-background-page .card-subtitle {
   top: 52%;
   width: 100%;
   color: #fff;
+}
+
+page-guess .cardsize {
+  height: 140px;
+  background: url("../assets/categoriesBackground.png");
+}
+
+page-guess .imgSize {
+  position: absolute;
+  height: 120px;
+  width: 140px;
+  top: 16%;
 }
 
 page-home .operationItem {
@@ -30224,12 +30246,6 @@ page-home .middle-vertical {
 page-lobby .entryCodeLabel {
   color: orangered;
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-}
-
-page-lobby .cardBody {
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 30px;
-  margin-bottom: 5px;
 }
 
 page-score .backgroundWin {

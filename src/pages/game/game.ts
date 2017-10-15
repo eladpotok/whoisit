@@ -33,7 +33,7 @@ export class GamePage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
               private authService: AuthService, private roomsService: RoomsService) {
-      
+
       this.roomKey = this.navParams.get('roomKey');
       console.log("1");
       let subscription = this.af.list(`rounds/`).subscribe(round=> {
@@ -94,7 +94,6 @@ export class GamePage {
   }
 
   LeaveGame() {
-     
       this.navCtrl.push('EndGamePage', {
       roomKey: this.roomKey,
       roundKey: this.roundKey

@@ -1,18 +1,21 @@
 page-guess {
     .card-background-page {
+        background:  black;
 
     ion-card {
         position: relative;
         text-align: center;
+         
     }
 
     .card-title {
         position: absolute;
-        top: 36%;
+        top: 60%;
         font-size: 2.0em;
-        width: 100%;
+        width: 120%;
         font-weight: bold;
         color: #fff;
+        
     }
 
     .card-subtitle {
@@ -23,5 +26,17 @@ page-guess {
         color: #fff;
     }
 
+    }
+
+    .cardsize {
+        height: 140px;
+        background: url("../assets/categoriesBackground.png"); 
+    }
+
+    .imgSize {
+        position: absolute;
+        height: 120px;
+        width: 140px;
+        top: 16%;
     }
 }

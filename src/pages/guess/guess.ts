@@ -27,12 +27,19 @@ export class GuessPage {
     });
   }
 
-  choose(category: CategoryModel) {
+  choose(category: MemberModel) {
     // check if the spy selects the right secret
+    console.log("this.secret  " + this.secret.toString());
+    console.log("category.$key " + category.$key);
     if(this.secret.toString() == category.$key) {
       this.auth.currentUser.pointsInRoom +=3;
       this.af.object(`/rooms/${this.roomsService.currentRoom.$key}/users/${this.auth.currentUser.$key}`).set(this.auth.currentUser.pointsInRoom);
+      console.log("round key of guess " + this.roundKey);
+      this.af.object(`/rounds/${this.roundKey}/spyGuessRight`).set(true);
     }
+
+    // raise that the spy guess 
+    this.af.object(`/rounds/${this.roundKey}/isSpyGuess`).set(true);
     
     this.navCtrl.push('ScorePage', {
       roomKey: this.roomsService.currentRoom.$key,

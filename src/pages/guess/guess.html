@@ -15,8 +15,8 @@
 
 <ion-content class="card-background-page" >
 
-  <ion-card *ngFor="let cat of members " (click)="choose(cat)">
-    <img [src]="cat.url"/>
+  <ion-card *ngFor="let cat of members " (click)="choose(cat)" class="cardsize">
+    <img [src]="cat.url" class="imgSize"/>
     <div class="card-title">{{cat.title}}</div>
     <!--<div class="card-subtitle">41 Listings</div>-->
   </ion-card>

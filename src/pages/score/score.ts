@@ -21,13 +21,13 @@ export class ScorePage {
   isSpyWon: Boolean;
   users: UserModel[];
   spy: UserModel;
-
+  spyGuessRight: boolean;
   winUsers: UserModel[] =[];
   loseUsers: UserModel[] =[];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
               private auth: AuthService, private roomsSerivce: RoomsService) {
-    
+    console.log("enter to ctor of score");
     this.users = roomsSerivce.getNonSpyPlayers();
     this.currentUser = auth.currentUser;
     this.roomKey = this.navParams.get('roomKey');
@@ -49,13 +49,19 @@ export class ScorePage {
 
     this.af.object(`rounds/${this.roundKey}/isSpyWon`).subscribe( t=> {
       this.isSpyWon = t.$value;
-      console.log("this is t " + this.isSpyWon);
-      this.calculatePoints(this.isSpyWon);
+      if(t.$value != null)
+        this.calculatePoints(this.isSpyWon);
     });
 
     // get the spy user
     this.af.object(`users/${this.roomsSerivce.getSpy()}/`).subscribe(t=> {
       this.spy = t;
+    });
+
+    this.af.object(`rounds/${this.roundKey}/spyGuessRight`).subscribe( t=> {
+      if(t.$value){
+        this.spyGuessRight = true;
+      }
     });
   }
 
@@ -77,19 +83,37 @@ export class ScorePage {
     this.af.object(`rounds/${this.roundKey}/votes/${user.$key}`).subscribe( t=> {
       return t.$value;
     });
-    return 0;
+      return 0;
   }
 
   public backToLobby() {
-    this.navCtrl.push('LobbyPage', {
-      roomKey: this.roomKey
-    });
+    
+    // this.navCtrl.push('LobbyPage', {
+    //   roomKey: this.roomKey
+    // });
+    //this.af.object(`rooms/${this.roomKey}/isCategorySelected`).set(false);
+    //this.af.object(`rooms/${this.roomKey}/selector`).set("");
+    this.navCtrl.popTo(this.navCtrl.getByIndex(1));
+    console.log("pop to");
   }
 
-  getNewPointsForLoser() : number {
+  getNewPointsForLosers() : number {
+
     if(!this.isSpyWon && this.spy.$key != this.auth.currentUser.$key)
       return 2;
 
+    return 0;
+  }
+
+  getPointsOfSpy() : number {
+    if(this.isSpyWon){
+      return 5;
+    }
+    else{
+      if(this.spyGuessRight){
+        return 3;
+      }
+    }
     return 0;
   }
 
@@ -113,3 +137,4 @@ export class ScorePage {
 // Spy Loses:
 // players who voted for spy: 2 points
 // all players execpt spy earn 3 points
+// If spy guess right he earns 3 points.

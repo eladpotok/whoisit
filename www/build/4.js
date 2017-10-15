@@ -73,6 +73,7 @@ var EndGamePage = (function () {
         this.auth = auth;
         this.loadingCtrl = loadingCtrl;
         this.usersModel = [];
+        console.log("enter to ctor of end-game");
         this.roomKey = this.navParams.get('roomKey');
         this.roundKey = this.navParams.get('roundKey');
         if (this.roundKey != null) {
@@ -90,10 +91,10 @@ var EndGamePage = (function () {
             });
         }
         // get all of the users in the room
-        this.usersModel = roomService.getUsersFromRoom();
+        this.usersModel = roomService.getUsersFromRoomButme(this.auth.currentUser);
         if (roomService.getSpy() == this.auth.currentUser.$key) {
             this.isTheSpy = true;
-            this.presentLoading();
+            this.presentLoadingSpy();
         }
         console.log("loading");
         // wait till all users will vote
@@ -102,8 +103,11 @@ var EndGamePage = (function () {
             if (t.$value) {
                 // check if i am the spy
                 if (_this.auth.currentUser.$key == _this.roomService.getSpy()) {
-                    _this.loader.dismiss();
+                    _this.dismissLoadingPlayer();
                     af.object("/rounds/" + _this.roundKey + "/isSpyWon").subscribe(function (spy) {
+                        if (spy.$value == null) {
+                            return;
+                        }
                         // check if the spy won
                         if (spy.$value) {
                             _this.navCtrl.push('ScorePage', {
@@ -123,19 +127,49 @@ var EndGamePage = (function () {
                     });
                 }
                 else {
-                    _this.navCtrl.push('ScorePage', {
-                        roundKey: _this.roundKey,
-                        roomKey: _this.roomKey
+                    af.object("/rounds/" + _this.roundKey + "/isSpyWon").subscribe(function (spy) {
+                        // if the spy won so we move to score page
+                        if (spy.$value) {
+                            _this.dismissLoadingPlayer();
+                            console.log("go to score page");
+                            _this.navCtrl.push('ScorePage', {
+                                roundKey: _this.roundKey,
+                                roomKey: _this.roomKey
+                            });
+                        }
+                        else {
+                            _this.af.object("rounds/" + _this.roundKey + "/isSpyGuess").subscribe(function (guess) {
+                                if (guess.$value) {
+                                    _this.dismissLoadingPlayer();
+                                    ;
+                                    console.log("go to score page");
+                                    _this.navCtrl.push('ScorePage', {
+                                        roundKey: _this.roundKey,
+                                        roomKey: _this.roomKey
+                                    });
+                                }
+                            });
+                        }
                     });
                 }
             }
         });
     }
-    EndGamePage.prototype.presentLoading = function () {
+    EndGamePage.prototype.presentLoadingSpy = function () {
         this.loader = this.loadingCtrl.create({
             content: "Wait till all players vote...",
         });
         this.loader.present();
+    };
+    EndGamePage.prototype.presentLoadinPlayer = function () {
+        this.loader = this.loadingCtrl.create({
+            content: "Wait till all players vote...",
+        });
+        this.loader.present();
+    };
+    EndGamePage.prototype.dismissLoadingPlayer = function () {
+        if (this.loader != null)
+            this.loader.dismiss();
     };
     EndGamePage.prototype.selectUser = function (user) {
         var _this = this;
@@ -158,18 +192,19 @@ var EndGamePage = (function () {
         }
         // in case you find the real spy you get 3 points
         this.af.object("/rooms/" + this.roomKey + "/users/" + this.auth.currentUser.$key).set(this.auth.currentUser.pointsInRoom);
+        this.presentLoadinPlayer();
     };
     return EndGamePage;
 }());
 EndGamePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-end-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/'<!--\n  Generated template for the EndGamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Who\'s the spy?</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n   <ion-list *ngIf="!isTheSpy">\n    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)">\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n    </ion-item>\n  </ion-list> \n\n  <!--<button *ngIf="spyReadyToVote" ion-button class="myButton" >vote</button>-->\n\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/,
+        selector: 'page-end-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/'<!--\n  Generated template for the EndGamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Who\'s the spy?</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n   <ion-list *ngIf="!isTheSpy">\n    <ion-item ion-item *ngFor="let item of usersModel" (click)="selectUser(item)" class="cardBody">\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <ion-avatar item-end>\n        <img item-end src="assets/spy.png">\n      </ion-avatar>\n      \n    </ion-item>\n  </ion-list> \n\n  <!--<button *ngIf="spyReadyToVote" ion-button class="myButton" >vote</button>-->\n\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\end-game\end-game.html"*/,
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_auth_service__["a" /* AuthService */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]) === "function" && _f || Object])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_4__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
 ], EndGamePage);
 
-var _a, _b, _c, _d, _e, _f;
 //# sourceMappingURL=end-game.js.map
 
 /***/ })

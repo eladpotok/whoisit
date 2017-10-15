@@ -19,7 +19,6 @@ import { CategoryModel, MemberModel } from '../../Models/category.model';
 export class HomePage {
 
   roomItems: FirebaseListObservable<any[]>;
-  userItems:  FirebaseListObservable<any[]>;
   roomsUsers: FirebaseListObservable<any[]>;
  // userName: string;
   roomModel: Observable<RoomModel>;
@@ -29,6 +28,7 @@ export class HomePage {
   isOpenRoomSelected: Boolean;
   operation: any;
   currentUser: UserModel = new UserModel;
+  usersInRoom: UserModel[];
 
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
                  private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
@@ -121,6 +121,7 @@ export class HomePage {
     }
     
     let roomKey = this.createRoom();
+    
     this.addUserToRoom(roomKey);
   }
 
@@ -138,6 +139,7 @@ export class HomePage {
     }
 
     let roomKey = this.af.list(`/rooms`).push(roomModel).key;
+    
     return roomKey;
   }
 
@@ -170,6 +172,11 @@ export class HomePage {
     this.isOpenRoomSelected = true;
   }
 
+  nameExists() : boolean {
+    return this.usersInRoom.map(t=>t.displayName).indexOf(this.currentUser.displayName) != -1;
+    
+  }
+
   private joinRoomSubmit() {
 
      if(this.currentUser.displayName == null ||
@@ -179,6 +186,8 @@ export class HomePage {
       return;
     }
 
+    
+
     let roomFound = false;
 
     let subscription = this.af.list('/rooms', { preserveSnapshot: true}).subscribe(snapshots=>{
@@ -186,9 +195,29 @@ export class HomePage {
               if(snapshot.val().entryCode == this.roomEntryCode) {
                 roomFound = true;
                 if(!snapshot.val().isStarted) {
-                  this.addUserToRoom(snapshot.key);
-                  subscription.unsubscribe();
-                  return;
+                  let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=>{
+                    console.log("enter " + snapshot.key);
+                    t.forEach(u => {
+                      if(u != null) {
+                        console.log("enter 2 " + u.key);
+                       this.af.object(`users/${u.key}`).subscribe( user=>{
+                          if(user.displayName == this.currentUser.displayName){
+                            this.showMsg("Sorry", "The given name is already exists in the room");
+                             sub.unsubscribe();
+                            return;
+                        }
+                        else {
+                             this.addUserToRoom(snapshot.key);
+                            sub.unsubscribe();
+                            return;
+                        }
+                       });
+                        
+                      } 
+                    });
+                  });
+
+                 
                 }
                 else {
                   this.showMsg("Sorry", "The room is in during the game");
@@ -196,8 +225,10 @@ export class HomePage {
                 subscription.unsubscribe();
               }
           });
-          if(!roomFound)
+          if(!roomFound){
             this.showMsg("Room does not exist", "The key which is given is not exist!");
+            subscription.unsubscribe();
+          }
       });
   }
 
