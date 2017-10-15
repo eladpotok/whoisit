@@ -71,29 +71,23 @@ var GuessPage = (function () {
         this.auth = auth;
         this.roomsService = roomsService;
         this.members = [];
-        var categoryKey = navParams.get('category');
-        this.secret = navParams.get('secret');
-        this.roundKey = navParams.get('roundKey');
-        this.af.list("categories/" + categoryKey + "/members").subscribe(function (t) {
-            _this.members = t;
+        this.roundKey = this.navParams.get('roundKey');
+        this.af.object("rounds/" + this.roomsService.currentRoom.$key + "/" + this.roundKey + "/categoryKey").subscribe(function (catKey) {
+            _this.af.list("categories/" + catKey.$value + "/members").subscribe(function (mem) {
+                _this.members = mem;
+            });
+        });
+        this.af.object("rounds/" + this.roomsService.currentRoom.$key + "/" + this.roundKey + "/secret").subscribe(function (secret) {
+            _this.secret = secret.$value;
         });
     }
     GuessPage.prototype.choose = function (category) {
-        // check if the spy selects the right secret
-        console.log("this.secret  " + this.secret.toString());
-        console.log("category.$key " + category.$key);
         if (this.secret.toString() == category.$key) {
-            this.auth.currentUser.pointsInRoom += 3;
-            this.af.object("/rooms/" + this.roomsService.currentRoom.$key + "/users/" + this.auth.currentUser.$key).set(this.auth.currentUser.pointsInRoom);
-            console.log("round key of guess " + this.roundKey);
-            this.af.object("/rounds/" + this.roundKey + "/spyGuessRight").set(true);
+            this.af.object("/rounds/" + this.roomsService.currentRoom.$key + "/" + this.roundKey + "/spyState").set("semi-win");
         }
-        // raise that the spy guess 
-        this.af.object("/rounds/" + this.roundKey + "/isSpyGuess").set(true);
-        this.navCtrl.push('ScorePage', {
-            roomKey: this.roomsService.currentRoom.$key,
-            roundKey: this.roundKey
-        });
+        else {
+            this.af.object("/rounds/" + this.roomsService.currentRoom.$key + "/" + this.roundKey + "/spyState").set("lose");
+        }
     };
     return GuessPage;
 }());
@@ -102,10 +96,10 @@ GuessPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
         selector: 'page-guess',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\guess\guess.html"*/'<!--\n  Generated template for the GuessPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>guess</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content class="card-background-page" >\n\n  <ion-card *ngFor="let cat of members " (click)="choose(cat)" class="cardsize">\n    <img [src]="cat.url" class="imgSize"/>\n    <div class="card-title">{{cat.title}}</div>\n    <!--<div class="card-subtitle">41 Listings</div>-->\n  </ion-card>\n\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\guess\guess.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]) === "function" && _e || Object])
 ], GuessPage);
 
+var _a, _b, _c, _d, _e;
 //# sourceMappingURL=guess.js.map
 
 /***/ })

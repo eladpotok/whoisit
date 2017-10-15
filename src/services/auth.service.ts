@@ -79,7 +79,6 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
     AuthService._currentUser = userModel;
 
     this.getPointsInRoom(AuthService._currentUser, roomKey).subscribe( t=> {
-        console.log("add guest " + t.$value);
         AuthService._currentUser.pointsInRoom = t.$value;
     });
 

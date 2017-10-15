@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { UserModel } from '../../Models/user.model';
-import { RoundModel } from '../../Models/round.model';
 import { RoomsService } from '../../services/rooms.service';
 import { AuthService } from '../../services/auth.service';
 import { LoadingController } from 'ionic-angular';
@@ -18,151 +17,128 @@ export class EndGamePage {
   spyReadyToVote: boolean;
   isTheSpy: boolean;
   usersModel: UserModel[] = [];
-  roomKey: string;
   roundKey: string;
+
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
               public roomService: RoomsService, public auth: AuthService, public loadingCtrl: LoadingController) {
-                console.log("enter to ctor of end-game");
-    this.roomKey = this.navParams.get('roomKey');
+
+    // get the round key
     this.roundKey = this.navParams.get('roundKey');
-
-    if(this.roundKey != null) {
-          this.af.object(`rounds/${this.roundKey}/votesCount`).set(0);
-          this.af.object(`rounds/${this.roundKey}/votes/dummy`).set(true);
-    } 
-    else {
-      this.af.list(`rounds/`).subscribe( t=> {
-        t.forEach( room => {
-          if(room.roomKey == this.roomKey){
-            this.roomKey = room.$key;
-            return;
-          }
-        });
-      });
-    }
-
-    // get all of the users in the room
-    this.usersModel = roomService.getUsersFromRoomButme(this.auth.currentUser);
-    if(roomService.getSpy() ==  this.auth.currentUser.$key) {
     
-      this.isTheSpy = true;
-      this.presentLoadingSpy();
+    // check if i am the spy
+    if(this.IamTheSpy()) {
+      this.presentLoading();
+      this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/spyState`).subscribe(spy =>{
+        
+        if(spy.$value == "found") {
+          this.dismissLoading();
+          // go to guess subject page
+          this.navCtrl.push("GuessPage", { roundKey: this.roundKey });
+        }
+        else if(spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
+          this.dismissLoading();
+
+          this.addPointsToSpy(spy.$value);
+          // go to score page 
+          this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value });
+        }
+      });
+    }
+    else {
+      // show the suspisious users
+      this.usersModel = this.loadUsers();
+
+      this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/isAllVoted`).subscribe(votes => {
+        // check if all users voted
+        if(votes.$value) {
+          this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/spyState`).subscribe(spy =>{
+            if(spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
+              this.dismissLoading();
+
+              this.addPointsToPlayer(spy.$value);
+              // go to score page 
+              this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value});
+            }
+          });
+        }
+      });
+    }
+  }
+
+  private addPointsToPlayer(spyState: string) {
+    if(spyState == "lose") {
+      this.auth.currentUser.pointsInRoom += 3;
+      this.af.object(`/rooms/${this.roomService.currentRoom.$key}/users/${this.auth.currentUser.$key}`).set(this.auth.currentUser.pointsInRoom);
+    }
+  }
+
+  private addPointsToSpy(spyState: string) {
+    let points =0;
+    switch(spyState) {
+      case "win":
+        points = 5;
+        break;
+      case "semi-win":
+        points = 3;
+        break;
     }
 
-    console.log("loading");
-      // wait till all users will vote
-      af.object(`rounds/${this.roundKey}/isAllVoted`).subscribe( t=> {
-          // all users voted
-         if(t.$value) {
-           // check if i am the spy
-            if(this.auth.currentUser.$key == this.roomService.getSpy()) {
-              this.dismissLoadingPlayer();
-              af.object(`/rounds/${this.roundKey}/isSpyWon`).subscribe( spy=> {
-                if(spy.$value == null){
-                  return;
-                }
-                
-                // check if the spy won
-                if(spy.$value) {
-                  this.navCtrl.push('ScorePage', {
-                          roundKey: this.roundKey,
-                          roomKey: this.roomKey
-                  });
-                }
-                else{ // spy lose
-                  af.object(`rounds/${this.roundKey}/`).subscribe(cat =>{
-                    
-                          this.navCtrl.push('GuessPage', {
-                            category: cat.categoryName,
-                            secret:  cat.secret,
-                            roundKey: this.roundKey
-                  })});
-                }
-              });
-            }
-            else { // i am not the spy
+    this.auth.currentUser.pointsInRoom += points;
+    this.af.object(`/rooms/${this.roomService.currentRoom.$key}/users/${this.auth.currentUser.$key}`).set(this.auth.currentUser.pointsInRoom);
+  }
 
-              af.object(`/rounds/${this.roundKey}/isSpyWon`).subscribe( spy=> {
-                
-                // if the spy won so we move to score page
-                if(spy.$value) {
-                  this.dismissLoadingPlayer();
-                  console.log("go to score page");
-                  this.navCtrl.push('ScorePage', {
-                            roundKey: this.roundKey,
-                            roomKey: this.roomKey
-                      });
-                }
-                else {
-                this.af.object(`rounds/${this.roundKey}/isSpyGuess`).subscribe( guess => {
+  private loadUsers() : UserModel[] {
+    return this.roomService.getUsersFromRoomButme(this.auth.currentUser);
+  }
 
-                    if(guess.$value) {
-                      this.dismissLoadingPlayer();;
-                      console.log("go to score page");
-                      this.navCtrl.push('ScorePage', {
-                              roundKey: this.roundKey,
-                              roomKey: this.roomKey
-                        });
-                    }
-                  });
-                }
-              });
-              
-            }
-         }
-  
-      });
-}
+  private IamTheSpy() : boolean {
+    return this.auth.currentUser.$key == this.roomService.getSpy();
+  }
 
-presentLoadingSpy() {
+  private presentLoading() {
     this.loader = this.loadingCtrl.create({
       content: "Wait till all players vote...",
     });
     this.loader.present();
   }
 
-  presentLoadinPlayer() {
-    this.loader = this.loadingCtrl.create({
-      content: "Wait till all players vote...",
-    });
-    this.loader.present();
-  }
-
-
-
-
-
-  private dismissLoadingPlayer(){
+  private dismissLoading(){
     if(this.loader != null)
       this.loader.dismiss();
   }
 
-  selectUser(user: UserModel) {
-
-    
-    
+  private voteUser(user: UserModel) {
     let counter = 0;  
-    let subscribtion = this.af.object(`/rounds/${this.roundKey}/votes/${user.$key}`).subscribe(u => {
+    let subscribtion = this.af.object(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/votes/${user.$key}`).subscribe(u => {
       counter = u.$value;
       if(subscribtion != null)
         subscribtion.unsubscribe();
       counter++;
-      this.af.object(`/rounds/${this.roundKey}/votes/${user.$key}`).set(counter);
+      this.af.object(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/votes/${user.$key}`).set(counter);
     });
+  }
+
+  public selectUser(user: UserModel) {
+    
+    // show loader
+    this.presentLoading();
+
+    // vote for the selected user
+    this.voteUser(user);
+    
+    // check if I selected right
     if(user.$key == this.roomService.getSpy()) {
-      this.auth.currentUser.pointsInRoom += 2;
+      this.auth.currentUser.pointsInRoom += 1;
 
       // add the current user to the win user list
-      this.af.list(`/rounds/${this.roundKey}/wins/`).push(this.auth.currentUser.$key);
+      this.af.list(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/wins/`).push(this.auth.currentUser.$key);
     }
     else {
       // add the current user to the lose user list
-      this.af.list(`/rounds/${this.roundKey}/loses/`).push(this.auth.currentUser.$key);
+      this.af.list(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/loses/`).push(this.auth.currentUser.$key);
     }
 
-    // in case you find the real spy you get 3 points
-    this.af.object(`/rooms/${this.roomKey}/users/${this.auth.currentUser.$key}`).set(this.auth.currentUser.pointsInRoom);
-
-    this.presentLoadinPlayer();
+    // in case you find the real spy you get 1 points
+    this.af.object(`/rooms/${this.roomService.currentRoom.$key}/users/${this.auth.currentUser.$key}`).set(this.auth.currentUser.pointsInRoom);
   }
 }

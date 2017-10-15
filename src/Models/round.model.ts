@@ -4,7 +4,6 @@ export class RoundModel extends BaseModel {
      roomKey: string
      spyKey: string
      selectorKey: string
-     categoryName: string
-     state: string
+     categoryKey: string
      secret: number
 }

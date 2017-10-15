@@ -63,16 +63,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-
-
 var LobbyPage = (function () {
-    function LobbyPage(platform, navCtrl, navParams, af, alertCtrl, authService, roomService, loadingCtrl) {
+    function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl) {
         var _this = this;
-        this.platform = platform;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
-        this.alertCtrl = alertCtrl;
         this.authService = authService;
         this.roomService = roomService;
         this.loadingCtrl = loadingCtrl;
@@ -80,87 +76,70 @@ var LobbyPage = (function () {
         console.log("enter to lobby ctor");
         // Get thr paramters from the navigation controller
         this.roomKey = this.navParams.get('roomKey');
-        // get the users in the current room
-        af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
-            _this.usersModel = [];
-            _this.usersCount = snapshots.length;
-            snapshots.forEach(function (snapshot) {
-                var userId = snapshot.$key;
-                var points = snapshot.$value;
-                af.object("users/" + userId).subscribe(function (t) {
-                    t.pointsInRoom = points;
-                    _this.usersModel.push(t);
-                });
+        // load the users from the room
+        this.loadUsers();
+        // find the room by the given entry code
+        this.findRoom();
+        var subscription = this.af.list("rounds/" + this.roomKey + "/").subscribe(function (t) {
+            t.forEach(function (r) {
+                if (r != null && r.roomKey == _this.roomKey && r.state != "done") {
+                    var roundKey_1 = r.$key;
+                    subscription.unsubscribe();
+                    _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/isCategorySelected").subscribe(function (category) {
+                        if (category.$value) {
+                            _this.dismissLoading();
+                            _this.navCtrl.push('GamePage', { roundKey: roundKey_1 });
+                        }
+                    });
+                    _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/selectorKey").subscribe(function (selector) {
+                        if (selector.$value == _this.authService.currentUser.$key) {
+                            _this.navCtrl.push('ChooseCategoryPage', { roundKey: roundKey_1 });
+                        }
+                        else if (selector.$value != null) {
+                            _this.presentLoading();
+                        }
+                    });
+                }
             });
         });
+    }
+    LobbyPage.prototype.findRoom = function () {
+        var _this = this;
         // Get the current room
-        af.object("/rooms/" + this.roomKey).subscribe(function (t) {
+        this.af.object("/rooms/" + this.roomKey).subscribe(function (t) {
             _this.roomName = t.roomName;
-            if (t.owner == authService.currentUser.displayName)
+            if (t.owner == _this.authService.currentUser.displayName)
                 _this.isOwner = true;
             else {
                 _this.roomService.updateUsersInRoom(_this.roomKey);
             }
             _this.entryCode = t.entryCode;
         });
-        // wait till the selector will select a category
-        var leaveLobby = af.object("rooms/" + this.roomKey + "/isStarted").subscribe(function (t) {
-            console.log("is started changed to " + t.$value);
-            if (t.$value) {
-                _this.af.object("rooms/" + _this.roomKey + "/selector").subscribe(function (selector) {
-                    console.log("selector changed to " + selector.$value);
-                    if (selector.$value == authService.currentUser.displayName) {
-                        //   leaveLobby.unsubscribe();
-                        _this.dismissLoading();
-                        _this.navCtrl.push('ChooseCategoryPage', {
-                            roomKey: _this.roomKey,
-                            spy: _this.spyUser
-                        });
-                    }
-                    else {
-                        console.log("before isCategorySelected");
-                        af.object("rooms/" + _this.roomKey + "/isCategorySelected").subscribe(function (catSelected) {
-                            console.log("isstarted is " + t.$value);
-                            console.log("selector is " + selector.$value);
-                            console.log("isCategorySelected to " + catSelected.$value);
-                            if (catSelected.$value) {
-                                // if(this.selectorUser == authService.currentUser.$key) {
-                                // go to the loading game...
-                                console.log("gp to game page");
-                                _this.dismissLoading();
-                                _this.navCtrl.push('GamePage', {
-                                    roomKey: _this.roomKey,
-                                });
-                            }
-                        });
-                    }
-                    // else {
-                    // }
-                    // }
+    };
+    LobbyPage.prototype.loadUsers = function () {
+        var _this = this;
+        // get the users in the current room
+        this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
+            _this.usersModel = [];
+            _this.usersCount = snapshots.length;
+            snapshots.forEach(function (snapshot) {
+                var userId = snapshot.$key;
+                var points = snapshot.$value;
+                _this.af.object("users/" + userId).subscribe(function (t) {
+                    t.pointsInRoom = points;
+                    _this.usersModel.push(t);
                 });
-            }
+            });
         });
-    }
-    LobbyPage.prototype.dismissLoading = function () {
-        if (this.loader != null)
-            this.loader.dismiss();
     };
     LobbyPage.prototype.raffleSpy = function () {
         var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
-        console.log("spy random number " + spyRandNumber);
-        //  if(spyRandNumber >= this.usersModel.length)
-        //   spyRandNumber = this.usersModel.length - 1;
         this.spyUser = this.usersModel[spyRandNumber].$key;
-        //this.af.object(`/rooms/${this.roomKey}/spy`).set(this.spyUser);
         this.roomService.setSpy(this.spyUser);
     };
     LobbyPage.prototype.raffleSelector = function () {
         var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
-        // if(spyRandNumber >= this.usersModel.length)
-        //   spyRandNumber = this.usersModel.length - 1;
-        console.log("selector random number " + spyRandNumber);
-        this.selectorUser = this.usersModel[spyRandNumber].displayName;
-        this.af.object("/rooms/" + this.roomKey + "/selector").set(this.selectorUser);
+        this.selectorUserKey = this.usersModel[spyRandNumber].$key;
     };
     LobbyPage.prototype.presentLoading = function () {
         this.loader = this.loadingCtrl.create({
@@ -168,32 +147,26 @@ var LobbyPage = (function () {
         });
         this.loader.present();
     };
+    LobbyPage.prototype.dismissLoading = function () {
+        if (this.loader != null)
+            this.loader.dismiss();
+    };
     LobbyPage.prototype.startGame = function () {
-        this.presentLoading();
         this.roomService.updateUsersInRoom(this.roomKey);
         // raffle spy and category selector  
         this.raffleSelector();
         this.raffleSpy();
-        console.log("new round");
         var round = {
-            categoryName: "",
-            selectorKey: this.selectorUser,
+            categoryKey: "",
+            selectorKey: this.selectorUserKey,
             spyKey: this.spyUser,
             roomKey: this.roomKey,
-            state: "init",
             secret: 0
         };
-        var roundKey = this.af.list("rounds/").push(round).key;
-        console.log("new round key " + roundKey);
+        this.af.list("rounds/" + this.roomKey + "/").push(round);
         // Add new room to the db
         this.af.object("rooms/" + this.roomKey + "/isStarted").set(true);
         this.af.object("rooms/" + this.roomKey + "/usersCount").set(this.usersCount);
-    };
-    LobbyPage.prototype.getUserPoints = function (user) {
-        this.af.object("/rooms/" + this.roomKey + "/users/" + user.$key).subscribe(function (t) {
-            console.log("return value " + t.$value);
-            return t.$value;
-        });
     };
     return LobbyPage;
 }());
@@ -202,11 +175,10 @@ LobbyPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
         selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  \n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
-        __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */],
-        __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]) === "function" && _f || Object])
 ], LobbyPage);
 
+var _a, _b, _c, _d, _e, _f;
 //# sourceMappingURL=lobby.js.map
 
 /***/ })
