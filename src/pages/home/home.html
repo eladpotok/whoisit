@@ -51,8 +51,11 @@ bower_components/humanize-duration/humanize-duration.js
   <button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!isUserAuthorized">
        Sign with FaceBook 
   </button>
-    <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="isUserAuthorized">
+  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="isUserAuthorized">
        Logout 
+  </button>
+  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">
+       Admin 
   </button>
 
  <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">

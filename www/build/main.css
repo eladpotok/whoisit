@@ -15947,7 +15947,7 @@ ion-list[inset] {
 }
 
 .list-md ion-item-options .button {
-  margin: 1px 0;
+  margin: 0;
   border-radius: 0;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -15957,7 +15957,7 @@ ion-list[inset] {
   -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
-  height: calc(100% - 2px);
+  height: 100%;
   border: 0;
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -30068,7 +30068,7 @@ ion-navbar.toolbar {
 }
 
 .bodyCategory {
-  background-image: url("../assets/categoriesBackground.png");
+  background-image: url("../assets/appBackground.png");
   background-size: cover;
   vertical-align: middle;
 }
@@ -30132,6 +30132,7 @@ page-choose-category .description {
 
 page-game .photoGame {
   width: 25rem;
+  height: 30rem;
   margin-top: 10px;
   display: block;
   margin-left: auto;
@@ -30169,7 +30170,7 @@ page-game .timerRed {
 }
 
 page-guess .card-background-page {
-  background: black;
+  background: url("../assets/appBackground.png");
 }
 
 page-guess .card-background-page ion-card {
@@ -30196,12 +30197,15 @@ page-guess .card-background-page .card-subtitle {
 
 page-guess .cardsize {
   height: 140px;
-  background: url("../assets/categoriesBackground.png");
+  background-color: rgba(100, 100, 100, 0.4);
+  border-radius: 30px;
+  margin-bottom: 5px;
 }
 
 page-guess .imgSize {
   position: absolute;
-  height: 120px;
+  height: 100px;
+  margin-left: 10px;
   width: 140px;
   top: 16%;
 }

@@ -20,7 +20,7 @@ export class GamePage {
   isSpy: Boolean;
   roundKey: string;
   second: number = 0;
-  min: number = 1;
+  min: number = 8;
   id: any;
   lastSeconds: boolean;
 
@@ -53,7 +53,6 @@ export class GamePage {
        }
        if(this.second == 30 && this.min == 0)
         this.lastSeconds = true;
-       console.log("hello");
        if(this.second == 0 && this.min == 0) {
          clearInterval(this.id);
          this.LeaveGame();

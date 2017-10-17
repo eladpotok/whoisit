@@ -1,6 +1,6 @@
 page-guess {
     .card-background-page {
-        background:  black;
+        background: url("../assets/appBackground.png"); 
 
     ion-card {
         position: relative;
@@ -30,12 +30,15 @@ page-guess {
 
     .cardsize {
         height: 140px;
-        background: url("../assets/categoriesBackground.png"); 
+        background-color: rgba(100,100,100, 0.4);
+        border-radius: 30px;
+        margin-bottom: 5px; 
     }
 
     .imgSize {
         position: absolute;
-        height: 120px;
+        height: 100px;
+        margin-left: 10px;
         width: 140px;
         top: 16%;
     }
