@@ -23,6 +23,8 @@
     </ion-avatar>
     <h2 >{{ spy?.displayName }}</h2>
     <p> +  {{getPointsOfSpy()}} points </p>
+
+    <p class="greatGuess" item-end *ngIf="isGreatGuess"> Great Guess </p>
   </ion-item>
 
   <img src="assets/spy2.png">
@@ -55,16 +57,6 @@
 
   </ion-item-group>
 </ion-list>
-
-<!--<ion-list >
-  <ion-item  *ngFor="let user of users">
-    <ion-avatar item-start>
-      <img [src]="user.imageUrl">
-    </ion-avatar>
-     <h2 >{{ user.displayName }}</h2>
-     <p>{{ getVotes(user) }}</p>
-  </ion-item>
-</ion-list>-->
 
 <button  ion-button (click)="backToLobby()" class="myButton">Back to Room</button>
 

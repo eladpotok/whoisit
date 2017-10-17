@@ -20,6 +20,8 @@ export class ScorePage {
   winUsers: UserModel[] =[];
   loseUsers: UserModel[] =[];
   spyState: string;
+  isSpyWon: boolean;
+  isGreatGuess: boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
               private auth: AuthService, private roomsSerivce: RoomsService) {
@@ -73,9 +75,12 @@ export class ScorePage {
 
   getPointsOfSpy() : number {
     if(this.spyState == "win") {
+      this.isSpyWon = true;
       return 5;
     }
     if(this.spyState == "semi-win"){
+      this.isSpyWon = true;
+      this.isGreatGuess = true;
       return 3;
     }
     return 0;

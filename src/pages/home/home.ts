@@ -9,6 +9,7 @@ import {AngularFireAuth } from 'angularfire2/auth'
 import { Observable } from 'rxjs/Observable';
 import { CardModel }  from '../../Models/card.model';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
+
 import * as firebase from 'firebase';
 import { AuthService } from '../../services/auth.service';
 import { CategoryModel, MemberModel } from '../../Models/category.model';
@@ -33,8 +34,6 @@ export class HomePage {
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
                  private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
                  public authService: AuthService) {
-    
-   
     this.waitForRegistration();
 
     //this.isUserAuthorized = false;
@@ -267,5 +266,10 @@ export class HomePage {
 
     this.authService.signOut();
   }
+
+
+ 
+
+  
 }
 

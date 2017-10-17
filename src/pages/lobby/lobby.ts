@@ -148,4 +148,10 @@ export class LobbyPage {
       this.af.object(`rooms/${this.roomKey}/isStarted`).set(true);
       this.af.object(`rooms/${this.roomKey}/usersCount`).set(this.usersCount);
   }
+
+  public exit() {
+    this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
+    this.navCtrl.push('HomePage');
+  }
+  
 }

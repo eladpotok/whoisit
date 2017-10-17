@@ -4,6 +4,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../services/auth.service';
 import { RoomsService } from '../../services/rooms.service';
 import {CategoryModel } from '../../Models/category.model';
+import { ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import 'rxjs/add/operator/map';
 
 @IonicPage()
@@ -18,9 +19,13 @@ export class GamePage {
   categoryTitle: string;
   isSpy: Boolean;
   roundKey: string;
+  second: number = 0;
+  min: number = 1;
+  id: any;
+  lastSeconds: boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
-              private authService: AuthService, private roomsService: RoomsService) {
+              private authService: AuthService, private roomsService: RoomsService, private cd : ChangeDetectorRef) {
 
     this.roundKey = this.navParams.get('roundKey');
     
@@ -37,6 +42,24 @@ export class GamePage {
       // set the spy so we could know him in the future
       this.roomsService.setSpy(round.spyKey);
     });
+
+    this.id = setInterval(()=> {
+       if(this.second == 0){
+         this.second = 59;
+         this.min--;
+       }
+       else {
+         this.second--;
+       }
+       if(this.second == 30 && this.min == 0)
+        this.lastSeconds = true;
+       console.log("hello");
+       if(this.second == 0 && this.min == 0) {
+         clearInterval(this.id);
+         this.LeaveGame();
+       }
+       cd.markForCheck();
+    }, 1000); 
   }
 
   private drawRandomCard(subject: number, categoryKey: string) {
@@ -59,4 +82,5 @@ export class GamePage {
       roundKey: this.roundKey
     });
   }
+
 }

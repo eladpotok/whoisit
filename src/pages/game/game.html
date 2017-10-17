@@ -26,9 +26,12 @@
             Remember! The spy is listening and can guess what the subject is.
           </p>
         </ion-card-content>
+
+        
       </ion-card>
-      
-      <button ion-button (click)="LeaveGame()">Vote</button>
+      <p [ngClass]="{'timer': !lastSeconds,
+                     'timerRed': lastSeconds}"> Time left : {{min}} : {{second}} </p>
+      <!--<button ion-button (click)="LeaveGame()">Vote</button>-->
       
        
 

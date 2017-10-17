@@ -15,4 +15,25 @@ page-game {
         	background-color: rgba(300,2300,1155, 0.3);
 
     }
+
+    .timer {
+        color: white;
+        margin-top: 35px;
+        font-size: 30px;
+        width: 25rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .timerRed {
+        color: red;
+        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        margin-top: 35px;
+        font-size: 30px;
+        width: 25rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
