@@ -30130,6 +30130,11 @@ page-choose-category .description {
   color: white;
 }
 
+page-choose-category .title {
+  color: #96021e;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
 page-game .photoGame {
   width: 25rem;
   height: 30rem;
@@ -30252,12 +30257,41 @@ page-home .goButton {
   width: 170px;
 }
 
+page-home .optionGrird {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 page-home .item {
   background: transparent;
 }
 
+page-home .label {
+  font-size: 18px;
+  color: black;
+  font-weight: bold;
+}
+
+page-home .newRoomButton {
+  margin-top: 20px;
+  height: 70px;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 160px;
+}
+
+page-home .listClass {
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  border-bottom: 0px;
+}
+
 page-home .text-foreground {
-  color: white;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 30px;
+  margin-bottom: 5px;
 }
 
 page-home .middle-vertical {

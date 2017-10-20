@@ -15,7 +15,7 @@
     <ion-thumbnail item-start class="list"> 
       <img [src]="item.url"  >
     </ion-thumbnail>
-    <h2>{{ item.title }}</h2>
+    <p class="title">{{ item.title }}</p>
     <p class="description">{{ item.description }}</p>
     <button ion-button color="darkBrown" item-end (click)="select(item)" >Select</button>
   </ion-item>

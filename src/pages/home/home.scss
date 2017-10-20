@@ -44,13 +44,43 @@ page-home {
         display:block;
         width: 170px;
     };
+    
+    .optionGrird {
+        margin-left: auto;
+        margin-right: auto;
+    }
 
     .item {
         background: transparent;
     };
 
+    .label {
+        font-size: 18px;
+        color: black;
+        font-weight: bold;
+    };
+
+    .newRoomButton {
+        margin-top: 20px;
+        height: 70px;
+        color: black;
+        background-color: rgba(300,2300,1155, 0.8);
+        border-radius: 160px;
+    }
+
+    .listClass
+    {
+        border-top: 0px;
+        border-left: 0px;
+        border-right: 0px;
+        border-bottom: 0px;
+    }
+
     .text-foreground {
-        color: white;
+        color: black;
+        background-color: rgba(300,2300,1155, 0.8);
+        border-radius: 30px;
+        margin-bottom: 5px;
     };
 
     .middle-vertical {

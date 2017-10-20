@@ -30,6 +30,7 @@ export class HomePage {
   currentUser: UserModel = new UserModel;
   usersInRoom: UserModel[];
   isDebug: boolean = false;
+  
 
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
                  private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
@@ -267,7 +268,7 @@ export class HomePage {
   private waitForRegistration() {
       this.afAuth.authState.subscribe((user: firebase.User) => {
         if (!user) {
-            this.authService.clearUser();
+            this.clearUser();
             return;
         }
             this.authService.activeUser(user); 
@@ -275,6 +276,12 @@ export class HomePage {
               this.currentUser = this.authService.currentUser;
             }
         });
+  }
+
+  private clearUser() {
+    this.authService.clearUser();
+    this.currentUser.displayName = "";
+    this.currentUser.isAuthenticated = false;
   }
 
   private openRoomSubmit() {

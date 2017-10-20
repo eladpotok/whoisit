@@ -13,18 +13,12 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 
     private static _currentUser: UserModel;
 
-     constructor( public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
-        // afAuth.authState.subscribe((user: firebase.User) => {
-        // if (!user) {
-        //     AuthService._currentUser = null;
-        //     return;
-        // }
-        //     this.activeUser(user); 
-        // });
+    constructor( public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
+      
     }
 
     public clearUser() {
-        AuthService._currentUser = null;
+        AuthService._currentUser = new UserModel;
     }
 
     public get currentUser(): UserModel {
@@ -38,11 +32,11 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
    public signInWithFacebook() {
     
       if (this.platform.is('cordova')) {
-      this.fb.login(['email', 'public_profile']).then(res => {
-          const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
-          firebase.auth().signInWithCredential(facebookCredential);
+        this.fb.login(['email', 'public_profile']).then(res => {
+            const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
+            firebase.auth().signInWithCredential(facebookCredential);
 
-      })
+        })
       }
       else {
         return this.afAuth.auth

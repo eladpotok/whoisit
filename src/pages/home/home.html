@@ -7,51 +7,83 @@ bower_components/humanize-duration/humanize-duration.js
 
 <div>
   <ion-segment [(ngModel)]="operation" class="operationItem">
-    <ion-segment-button value="openRoom" (click)="openRoom()" class="text-foreground">
+    <ion-segment-button value="openRoom" (click)="openRoom()" >
       Open Room
     </ion-segment-button>
-    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="text-foreground">
+    <ion-segment-button value="joinRoom" (click)="joinRoom()" >
       Join Room
     </ion-segment-button>
   </ion-segment>
 </div>
 
+<!--<ion-grid>
+  <ion-row>
+      <button ion-button class="newRoomButton">
+        New Room
+      </button>
+
+      <button ion-button class="newRoomButton">
+        Join Room
+      </button>
+  </ion-row>
+</ion-grid>
+-->
+
+
 <div [ngSwitch]="operation" ngClass="middle-vertical">
-  <ion-list *ngSwitchCase="'openRoom'" >
+  <ion-grid *ngSwitchCase="'openRoom'"   >
 
-    <ion-item  >
-      <ion-label fixed color="darkBlack">Username</ion-label>
+    <ion-row  no-lines>
+      <ion-col col-4>
+      <ion-label ngClass="label"  fixed >Username</ion-label>
+      </ion-col>
+      <ion-col >
       <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>
-    </ion-item>
+      </ion-col>
+    </ion-row>
 
-    <ion-item >
-      <ion-label fixed color="darkBlack" >Room Name</ion-label>
+    <ion-row >
+      <ion-col col-4>
+      <ion-label class="label" fixed   >Room Name</ion-label>
+      </ion-col>
+      <ion-col >
       <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>
-    </ion-item> 
-  </ion-list>
+      </ion-col>
+    </ion-row> 
+  </ion-grid>
 
-  <ion-list *ngSwitchCase="'joinRoom'" (click)="joinRoom()">
-    <ion-item>
-      <ion-label fixed color="darkBlack" >Username</ion-label>
-      <ion-input type="text" value="" [disabled]="isUserAuthorized" [(ngModel)]="currentUser.displayName" class="text-foreground" ></ion-input>
-    </ion-item>
+  <ion-grid *ngSwitchCase="'joinRoom'"   >
 
-    <ion-item>
-      <ion-label fixed color="darkBlack" >Entry Code</ion-label>
-      <ion-input type="text" value=""  [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>
-    </ion-item>
+    <ion-row  no-lines>
+      <ion-col col-4>
+      <ion-label ngClass="label"  fixed >Username</ion-label>
+      </ion-col>
+      <ion-col >
+      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>
+      </ion-col>
+    </ion-row>
 
-  </ion-list>
+    <ion-row >
+      <ion-col col-4>
+      <ion-label class="label" fixed   >Room Name</ion-label>
+      </ion-col>
+      <ion-col >
+      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>
+      </ion-col>
+    </ion-row> 
+  </ion-grid>
+
+
 
 
 
   <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">
        Play 
   </button>
-  <button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!isUserAuthorized">
+  <button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">
        Sign with FaceBook 
   </button>
-  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="isUserAuthorized">
+  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">
        Logout 
   </button>
   <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">
