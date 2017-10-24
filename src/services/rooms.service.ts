@@ -76,6 +76,7 @@ import { Observable } from 'rxjs/Observable';
                 RoomsService._currentRooms.$key = t.$key;  
                 RoomsService._currentRooms.categoryName = t.categoryName;
                 RoomsService._currentRooms.roomName = t.roomName;
+                RoomsService._currentRooms.settingsKey = t.settingsKey;
                 
             });
             this.af.list(`rooms/${roomKey}/users`, { preserveSnapshot: true}).subscribe(t=> {

@@ -9,5 +9,6 @@ export class RoomModel extends BaseModel {
      isCategorySelected: Boolean;
      users: UserModel[];
      spy: string;
+     settingsKey: string;
      
 }

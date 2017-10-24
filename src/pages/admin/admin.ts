@@ -25,10 +25,8 @@ export class AdminPage {
   }
   
   public add() {
-    console.log("1");
     let subscription = this.af.list(`categories/`).subscribe(t=>{
       t.forEach(cat=> {
-        console.log("2> " + cat.title);
         if(cat.title == this.categoryName){
           let member: MemberModel = {
             title: this.subjectTitle,

@@ -33,8 +33,6 @@ export class LobbyPage {
               public af: AngularFireDatabase, private authService: AuthService,
               private roomService: RoomsService, public loadingCtrl: LoadingController) {
                 
-    console.log("enter to lobby ctor");
-
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
 
@@ -152,6 +150,10 @@ export class LobbyPage {
   public exit() {
     this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
     this.navCtrl.push('HomePage');
+  }
+
+  public goSettings() {
+    this.navCtrl.push('SettingsPage', {roomKey: this.roomKey});
   }
   
 }

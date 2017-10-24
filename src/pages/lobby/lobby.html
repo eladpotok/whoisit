@@ -6,8 +6,12 @@
       <label>   {{ roomName }} - </label>
       <label class="entryCodeLabel"> {{ entryCode }} </label>
     </ion-title>
+    <ion-buttons end>
+      <button (click)="goSettings()" class="settingsButton" *ngIf="isOwner">
+        <ion-icon name="md-settings" ></ion-icon>    
+      </button>
+    </ion-buttons>
   </ion-navbar>
-
 </ion-header>
 
 

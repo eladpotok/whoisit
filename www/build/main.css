@@ -30068,7 +30068,7 @@ ion-navbar.toolbar {
 }
 
 .bodyCategory {
-  background-image: url("../assets/appBackground.png");
+  background-image: url("../assets/appBackground.PNG");
   background-size: cover;
   vertical-align: middle;
 }
@@ -30307,6 +30307,10 @@ page-lobby .entryCodeLabel {
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
+page-lobby .settingsButton {
+  background: transparent;
+}
+
 page-score .backgroundWin {
   background: lightgreen;
 }
@@ -30320,4 +30324,13 @@ page-score .greatGuess {
   font-weight: bold;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   font-size: 25px;
+}
+
+page-settings .settingsList {
+  background: transparent;
+}
+
+page-settings .iconTimer {
+  height: 20px;
+  margin-top: 20px;
 }

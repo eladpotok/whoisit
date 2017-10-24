@@ -35,7 +35,6 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
         this.fb.login(['email', 'public_profile']).then(res => {
             const facebookCredential = firebase.auth.FacebookAuthProvider.credential(res.authResponse.accessToken);
             firebase.auth().signInWithCredential(facebookCredential);
-
         })
       }
       else {
@@ -47,6 +46,7 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 
   public signOut() {
     this.afAuth.auth.signOut();
+    this.fb.logout();
   }
 
 

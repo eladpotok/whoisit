@@ -1,14 +1,14 @@
 webpackJsonp([6],{
 
-/***/ 453:
+/***/ 454:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AdminPageModule", function() { return AdminPageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ChooseCategoryPageModule", function() { return ChooseCategoryPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__admin__ = __webpack_require__(460);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__choose_category__ = __webpack_require__(462);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,34 +18,35 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var AdminPageModule = (function () {
-    function AdminPageModule() {
+var ChooseCategoryPageModule = (function () {
+    function ChooseCategoryPageModule() {
     }
-    return AdminPageModule;
+    return ChooseCategoryPageModule;
 }());
-AdminPageModule = __decorate([
+ChooseCategoryPageModule = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
         declarations: [
-            __WEBPACK_IMPORTED_MODULE_2__admin__["a" /* AdminPage */],
+            __WEBPACK_IMPORTED_MODULE_2__choose_category__["a" /* ChooseCategoryPage */],
         ],
         imports: [
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__admin__["a" /* AdminPage */]),
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__choose_category__["a" /* ChooseCategoryPage */]),
         ],
     })
-], AdminPageModule);
+], ChooseCategoryPageModule);
 
-//# sourceMappingURL=admin.module.js.map
+//# sourceMappingURL=choose-category.module.js.map
 
 /***/ }),
 
-/***/ 460:
+/***/ 462:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AdminPage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ChooseCategoryPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__ = __webpack_require__(299);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -58,47 +59,42 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-/**
- * Generated class for the AdminPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-var AdminPage = (function () {
-    function AdminPage(navCtrl, navParams, af) {
+
+var ChooseCategoryPage = (function () {
+    function ChooseCategoryPage(navCtrl, navParams, af, roomService) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
-        this.format = "png";
-    }
-    AdminPage.prototype.add = function () {
-        var _this = this;
-        console.log("1");
-        var subscription = this.af.list("categories/").subscribe(function (t) {
-            t.forEach(function (cat) {
-                console.log("2> " + cat.title);
-                if (cat.title == _this.categoryName) {
-                    var member = {
-                        title: _this.subjectTitle,
-                        url: "assets/" + _this.categoryName + "/" + _this.indexPhoto.toString() + "." + _this.format
-                    };
-                    subscription.unsubscribe();
-                    _this.af.object("categories/" + cat.$key + "/members/" + _this.indexPhoto).set(member);
-                }
-            });
+        this.roomService = roomService;
+        this.categories = [];
+        console.log("enter to ctor of category selection");
+        this.af.list("categories/").subscribe(function (t) {
+            _this.categories = t;
         });
+    }
+    ChooseCategoryPage.prototype.select = function (category) {
+        // get the room key
+        var roomKey = this.roomService.currentRoom.$key;
+        var roundKey = this.navParams.get('roundKey');
+        // random a subject from category 
+        var randomSecret = Math.floor(Math.random() * category.members.length);
+        this.af.object("/rounds/" + roomKey + "/" + roundKey + "/secret").set(randomSecret);
+        this.af.object("/rounds/" + roomKey + "/" + roundKey + "/isCategorySelected").set(true);
+        this.af.object("/rounds/" + roomKey + "/" + roundKey + "/categoryKey").set(category.$key);
     };
-    return AdminPage;
+    return ChooseCategoryPage;
 }());
-AdminPage = __decorate([
+ChooseCategoryPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-admin',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\admin\admin.html"*/'<!--\n  Generated template for the AdminPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>admin</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding>\n\n    <ion-list>\n    <ion-item>\n      <ion-label fixed color="darkBlack" >categoryName</ion-label>\n      <ion-input type="text" value="" [(ngModel)]="categoryName"  ></ion-input>\n    </ion-item>\n\n    <ion-item>\n      <ion-label fixed color="darkBlack" >subject title</ion-label>\n      <ion-input type="text" value=""  [(ngModel)]="subjectTitle"  ></ion-input>\n    </ion-item>\n\n    <ion-item>\n      <ion-label fixed color="darkBlack" >index photo</ion-label>\n      <ion-input type="text" value=""  [(ngModel)]="indexPhoto" ></ion-input>\n    </ion-item>\n\n    <ion-item>\n      <ion-label fixed color="darkBlack" >format</ion-label>\n      <ion-input type="text" value="png"  [(ngModel)]="format" ></ion-input>\n    </ion-item>\n\n\n  </ion-list>\n<button (click)="add()">Add</button>\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\admin\admin.html"*/,
+        selector: 'page-choose-category',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\choose-category\choose-category.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Choose a category!</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n\n<ion-list class="list">\n  <ion-item  *ngFor="let item of categories" class="list">\n    <ion-thumbnail item-start class="list"> \n      <img [src]="item.url"  >\n    </ion-thumbnail>\n    <p class="title">{{ item.title }}</p>\n    <p class="description">{{ item.description }}</p>\n    <button ion-button color="darkBrown" item-end (click)="select(item)" >Select</button>\n  </ion-item>\n</ion-list>\n\n\n<!--<ion-list>\n  <ion-item>\n    <ion-label>Category</ion-label>\n    <ion-select [(ngModel)]="categoryName">\n      <ion-option value="Cartoons" >Cartoons</ion-option>\n      <ion-option value="Pokemon">Pokemon</ion-option>\n      <ion-option value="Locations" >Locations</ion-option>\n    </ion-select>\n  </ion-item>\n</ion-list>-->\n\n<!--<button ion-button (click)="go()">Go ! </button>-->\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\choose-category\choose-category.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]])
-], AdminPage);
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */]])
+], ChooseCategoryPage);
 
-//# sourceMappingURL=admin.js.map
+//# sourceMappingURL=choose-category.js.map
 
 /***/ })
 

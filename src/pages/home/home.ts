@@ -9,7 +9,7 @@ import {AngularFireAuth } from 'angularfire2/auth'
 import { Observable } from 'rxjs/Observable';
 import { CardModel }  from '../../Models/card.model';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
-
+import { SettingsModel } from '../../Models/settings.model';
 import * as firebase from 'firebase';
 import { AuthService } from '../../services/auth.service';
 import { CategoryModel, MemberModel } from '../../Models/category.model';
@@ -299,6 +299,13 @@ export class HomePage {
 
   private createRoom(): string {
 
+    let settingsModel: SettingsModel = {
+      timeElapsed: 8
+    }
+    
+    // add new settings to db
+    let settingsKey = this.af.list(`settings`).push(settingsModel).key;
+
     let roomModel: RoomModel = 
     {
         owner: this.currentUser.displayName,
@@ -307,7 +314,8 @@ export class HomePage {
         entryCode: this.generateCode(),
         isCategorySelected: false,
         users: [],
-        spy: ""
+        spy: "",
+        settingsKey: settingsKey
     }
 
     let roomKey = this.af.list(`/rooms`).push(roomModel).key;
@@ -443,10 +451,6 @@ export class HomePage {
   public adminPanel() {
     this.navCtrl.push('AdminPage');
   }
-
-
- 
-
   
 }
 

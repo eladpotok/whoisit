@@ -1,14 +1,14 @@
 webpackJsonp([2],{
 
-/***/ 458:
+/***/ 459:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LobbyPageModule", function() { return LobbyPageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScorePageModule", function() { return ScorePageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lobby__ = __webpack_require__(466);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__score__ = __webpack_require__(468);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,31 +18,31 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var LobbyPageModule = (function () {
-    function LobbyPageModule() {
+var ScorePageModule = (function () {
+    function ScorePageModule() {
     }
-    return LobbyPageModule;
+    return ScorePageModule;
 }());
-LobbyPageModule = __decorate([
+ScorePageModule = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
         declarations: [
-            __WEBPACK_IMPORTED_MODULE_2__lobby__["a" /* LobbyPage */],
+            __WEBPACK_IMPORTED_MODULE_2__score__["a" /* ScorePage */],
         ],
         imports: [
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__lobby__["a" /* LobbyPage */]),
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__score__["a" /* ScorePage */]),
         ],
     })
-], LobbyPageModule);
+], ScorePageModule);
 
-//# sourceMappingURL=lobby.module.js.map
+//# sourceMappingURL=score.module.js.map
 
 /***/ }),
 
-/***/ 466:
+/***/ 468:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LobbyPage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ScorePage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
@@ -62,129 +62,89 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-
-var LobbyPage = (function () {
-    function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl) {
+var ScorePage = (function () {
+    function ScorePage(navCtrl, navParams, af, auth, roomsSerivce) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
-        this.authService = authService;
-        this.roomService = roomService;
-        this.loadingCtrl = loadingCtrl;
-        this.usersModel = [];
-        console.log("enter to lobby ctor");
-        // Get thr paramters from the navigation controller
-        this.roomKey = this.navParams.get('roomKey');
-        // load the users from the room
-        this.loadUsers();
-        // find the room by the given entry code
-        this.findRoom();
-        var subscription = this.af.list("rounds/" + this.roomKey + "/").subscribe(function (t) {
-            t.forEach(function (r) {
-                if (r != null && r.roomKey == _this.roomKey && r.state != "done") {
-                    var roundKey_1 = r.$key;
-                    subscription.unsubscribe();
-                    _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/isCategorySelected").subscribe(function (category) {
-                        if (category.$value) {
-                            _this.dismissLoading();
-                            _this.navCtrl.push('GamePage', { roundKey: roundKey_1 });
-                        }
-                    });
-                    _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/selectorKey").subscribe(function (selector) {
-                        if (selector.$value == _this.authService.currentUser.$key) {
-                            _this.navCtrl.push('ChooseCategoryPage', { roundKey: roundKey_1 });
-                        }
-                        else if (selector.$value != null) {
-                            _this.presentLoading();
-                        }
-                    });
-                }
+        this.auth = auth;
+        this.roomsSerivce = roomsSerivce;
+        this.winUsers = [];
+        this.loseUsers = [];
+        this.users = roomsSerivce.getNonSpyPlayers();
+        this.currentUser = this.auth.currentUser;
+        this.roundKey = this.navParams.get('roundKey');
+        this.spyState = this.navParams.get('spyState');
+        this.af.list("rounds/" + roomsSerivce.currentRoom.$key + "/" + this.roundKey + "/wins").subscribe(function (t) {
+            t.forEach(function (user) {
+                var userKey = user.$value;
+                _this.winUsers.push(_this.roomsSerivce.getUser(userKey));
             });
+        });
+        this.af.list("rounds/" + roomsSerivce.currentRoom.$key + "/" + this.roundKey + "/loses").subscribe(function (t) {
+            t.forEach(function (user) {
+                var userKey = user.$value;
+                _this.loseUsers.push(_this.roomsSerivce.getUser(userKey));
+            });
+        });
+        // get the spy user
+        this.af.object("users/" + this.roomsSerivce.getSpy() + "/").subscribe(function (t) {
+            _this.spy = t;
         });
     }
-    LobbyPage.prototype.findRoom = function () {
-        var _this = this;
-        // Get the current room
-        this.af.object("/rooms/" + this.roomKey).subscribe(function (t) {
-            _this.roomName = t.roomName;
-            if (t.owner == _this.authService.currentUser.displayName)
-                _this.isOwner = true;
-            else {
-                _this.roomService.updateUsersInRoom(_this.roomKey);
-            }
-            _this.entryCode = t.entryCode;
+    ScorePage.prototype.backToLobby = function () {
+        // set the round as done
+        this.af.object("rounds/" + this.roomsSerivce.currentRoom.$key + "/" + this.roundKey + "/state").set("done");
+        this.navCtrl.push('LobbyPage', {
+            roomKey: this.roomsSerivce.currentRoom.$key
         });
+        //this.af.object(`rooms/${this.roomKey}/isCategorySelected`).set(false);
+        //this.af.object(`rooms/${this.roomKey}/selector`).set("");
+        // this.navCtrl.popTo(this.navCtrl.getByIndex(1));
+        // console.log("pop to");
     };
-    LobbyPage.prototype.loadUsers = function () {
-        var _this = this;
-        // get the users in the current room
-        this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
-            _this.usersModel = [];
-            _this.usersCount = snapshots.length;
-            snapshots.forEach(function (snapshot) {
-                var userId = snapshot.$key;
-                var points = snapshot.$value;
-                _this.af.object("users/" + userId).subscribe(function (t) {
-                    t.pointsInRoom = points;
-                    _this.usersModel.push(t);
-                });
-            });
-        });
+    ScorePage.prototype.getNewPointsForLosers = function () {
+        if (this.spyState == "lose") {
+            return 3;
+        }
+        return 0;
     };
-    LobbyPage.prototype.raffleSpy = function () {
-        var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
-        this.spyUser = this.usersModel[spyRandNumber].$key;
-        this.roomService.setSpy(this.spyUser);
+    ScorePage.prototype.getPointsOfSpy = function () {
+        if (this.spyState == "win") {
+            this.isSpyWon = true;
+            return 5;
+        }
+        if (this.spyState == "semi-win") {
+            this.isSpyWon = true;
+            this.isGreatGuess = true;
+            return 3;
+        }
+        return 0;
     };
-    LobbyPage.prototype.raffleSelector = function () {
-        var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
-        this.selectorUserKey = this.usersModel[spyRandNumber].$key;
+    ScorePage.prototype.getNewPointsForWinners = function () {
+        return this.getNewPointsForLosers() + 1;
     };
-    LobbyPage.prototype.presentLoading = function () {
-        this.loader = this.loadingCtrl.create({
-            content: "Please wait...",
-        });
-        this.loader.present();
-    };
-    LobbyPage.prototype.dismissLoading = function () {
-        if (this.loader != null)
-            this.loader.dismiss();
-    };
-    LobbyPage.prototype.startGame = function () {
-        this.roomService.updateUsersInRoom(this.roomKey);
-        // raffle spy and category selector  
-        this.raffleSelector();
-        this.raffleSpy();
-        var round = {
-            categoryKey: "",
-            selectorKey: this.selectorUserKey,
-            spyKey: this.spyUser,
-            roomKey: this.roomKey,
-            secret: 0
-        };
-        this.af.list("rounds/" + this.roomKey + "/").push(round);
-        // Add new room to the db
-        this.af.object("rooms/" + this.roomKey + "/isStarted").set(true);
-        this.af.object("rooms/" + this.roomKey + "/usersCount").set(this.usersCount);
-    };
-    LobbyPage.prototype.exit = function () {
-        this.af.list("rooms/" + this.roomKey + "/users/").remove(this.authService.currentUser.$key);
-        this.navCtrl.push('HomePage');
-    };
-    return LobbyPage;
+    return ScorePage;
 }());
-LobbyPage = __decorate([
+ScorePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  <!--<button ion-button (click)="exit()" class="myButton">Exit</button>-->\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
+        selector: 'page-score',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\score\score.html"*/'<!--\n  Generated template for the ScorePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>score</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n   \n   <ion-card [ngClass]="isSpyWon ? \'backgroundWin\' : \'backgroundLose\'">\n\n   <ion-item [ngClass]="isSpyWon ? \'backgroundWin\' : \'backgroundLose\'">\n    <ion-avatar item-start>\n      <img [src]="currentUser.imageUrl">\n    </ion-avatar>\n    <h2 >{{ spy?.displayName }}</h2>\n    <p> +  {{getPointsOfSpy()}} points </p>\n\n    <p class="greatGuess" item-end *ngIf="isGreatGuess"> Great Guess </p>\n  </ion-item>\n\n  <img src="assets/spy2.png">\n\n</ion-card>\n\n<ion-list >\n    <ion-item-group>\n        <ion-item-divider color="light">Discover</ion-item-divider>\n\n        <ion-item  *ngFor="let user of winUsers">\n          <ion-avatar item-start>\n            <img [src]="user.imageUrl">\n          </ion-avatar>\n          <h2 >{{ user.displayName }}</h2>\n          <p>+ {{ getNewPointsForWinners()}} points</p>\n        </ion-item>\n\n  </ion-item-group>\n  <ion-item-group>\n        <ion-item-divider color="light">Faults:</ion-item-divider>\n\n        <ion-item  *ngFor="let user of loseUsers">\n          <ion-avatar item-start>\n            <img [src]="user.imageUrl">\n          </ion-avatar>\n          <h2 >{{ user.displayName }}</h2>\n          <p>+ {{ getNewPointsForLosers()}} points</p>\n        </ion-item>\n\n  </ion-item-group>\n</ion-list>\n\n<button  ion-button (click)="backToLobby()" class="myButton">Back to Room</button>\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\score\score.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
-        __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */],
-        __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
-], LobbyPage);
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]])
+], ScorePage);
 
-//# sourceMappingURL=lobby.js.map
+//rules
+// Spy Wins:
+// spy earn 5 points.
+// players who voted for spy: 1 points.
+// Spy Loses:
+// players who voted for spy: 1 points
+// all players execpt spy earn 3 points
+// If spy guess right he earns 3 points. 
+//# sourceMappingURL=score.js.map
 
 /***/ })
 

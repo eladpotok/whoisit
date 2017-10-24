@@ -20,7 +20,7 @@ export class GamePage {
   isSpy: Boolean;
   roundKey: string;
   second: number = 0;
-  min: number = 8;
+  min: number;
   id: any;
   lastSeconds: boolean;
 
@@ -41,6 +41,12 @@ export class GamePage {
 
       // set the spy so we could know him in the future
       this.roomsService.setSpy(round.spyKey);
+    });
+
+    this.af.object(`/settings/${roomsService.currentRoom.settingsKey}`).subscribe( set=> {
+      console.log("set.timeElapsed " + set.timeElapsed);
+      console.log("settigns " + roomsService.currentRoom.settingsKey);
+      this.min = set.timeElapsed;
     });
 
     this.id = setInterval(()=> {
@@ -72,7 +78,7 @@ export class GamePage {
   
   private drawSpy() {
     this.photoImage = "assets/spy2.png";
-    this.subjectTitle = "Spy";
+    this.subjectTitle = "Mole";
     this.isSpy = true;
   }
 

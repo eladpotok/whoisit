@@ -1,72 +1,6 @@
-webpackJsonp([7],{
+webpackJsonp([8],{
 
-/***/ 163:
-/***/ (function(module, exports) {
-
-function webpackEmptyAsyncContext(req) {
-	// Here Promise.resolve().then() is used instead of new Promise() to prevent
-	// uncatched exception popping up in devtools
-	return Promise.resolve().then(function() {
-		throw new Error("Cannot find module '" + req + "'.");
-	});
-}
-webpackEmptyAsyncContext.keys = function() { return []; };
-webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
-module.exports = webpackEmptyAsyncContext;
-webpackEmptyAsyncContext.id = 163;
-
-/***/ }),
-
-/***/ 204:
-/***/ (function(module, exports, __webpack_require__) {
-
-var map = {
-	"../pages/admin/admin.module": [
-		453,
-		6
-	],
-	"../pages/choose-category/choose-category.module": [
-		454,
-		5
-	],
-	"../pages/end-game/end-game.module": [
-		455,
-		4
-	],
-	"../pages/game/game.module": [
-		456,
-		0
-	],
-	"../pages/guess/guess.module": [
-		457,
-		3
-	],
-	"../pages/lobby/lobby.module": [
-		458,
-		2
-	],
-	"../pages/score/score.module": [
-		459,
-		1
-	]
-};
-function webpackAsyncContext(req) {
-	var ids = map[req];
-	if(!ids)
-		return Promise.reject(new Error("Cannot find module '" + req + "'."));
-	return __webpack_require__.e(ids[1]).then(function() {
-		return __webpack_require__(ids[0]);
-	});
-};
-webpackAsyncContext.keys = function webpackAsyncContextKeys() {
-	return Object.keys(map);
-};
-webpackAsyncContext.id = 204;
-module.exports = webpackAsyncContext;
-
-/***/ }),
-
-/***/ 244:
+/***/ 156:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -81,12 +15,82 @@ var BaseModel = (function () {
 
 /***/ }),
 
+/***/ 164:
+/***/ (function(module, exports) {
+
+function webpackEmptyAsyncContext(req) {
+	// Here Promise.resolve().then() is used instead of new Promise() to prevent
+	// uncatched exception popping up in devtools
+	return Promise.resolve().then(function() {
+		throw new Error("Cannot find module '" + req + "'.");
+	});
+}
+webpackEmptyAsyncContext.keys = function() { return []; };
+webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
+module.exports = webpackEmptyAsyncContext;
+webpackEmptyAsyncContext.id = 164;
+
+/***/ }),
+
+/***/ 205:
+/***/ (function(module, exports, __webpack_require__) {
+
+var map = {
+	"../pages/admin/admin.module": [
+		453,
+		7
+	],
+	"../pages/choose-category/choose-category.module": [
+		454,
+		6
+	],
+	"../pages/end-game/end-game.module": [
+		455,
+		5
+	],
+	"../pages/game/game.module": [
+		456,
+		0
+	],
+	"../pages/guess/guess.module": [
+		457,
+		4
+	],
+	"../pages/lobby/lobby.module": [
+		458,
+		3
+	],
+	"../pages/score/score.module": [
+		459,
+		2
+	],
+	"../pages/settings/settings.module": [
+		460,
+		1
+	]
+};
+function webpackAsyncContext(req) {
+	var ids = map[req];
+	if(!ids)
+		return Promise.reject(new Error("Cannot find module '" + req + "'."));
+	return __webpack_require__.e(ids[1]).then(function() {
+		return __webpack_require__(ids[0]);
+	});
+};
+webpackAsyncContext.keys = function webpackAsyncContextKeys() {
+	return Object.keys(map);
+};
+webpackAsyncContext.id = 205;
+module.exports = webpackAsyncContext;
+
+/***/ }),
+
 /***/ 256:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return UserModel; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_model__ = __webpack_require__(244);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_model__ = __webpack_require__(156);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -389,6 +393,11 @@ var HomePage = (function () {
         this.addUserToRoom(roomKey);
     };
     HomePage.prototype.createRoom = function () {
+        var settingsModel = {
+            timeElapsed: 8
+        };
+        // add new settings to db
+        var settingsKey = this.af.list("settings").push(settingsModel).key;
         var roomModel = {
             owner: this.currentUser.displayName,
             roomName: this.roomName,
@@ -396,7 +405,8 @@ var HomePage = (function () {
             entryCode: this.generateCode(),
             isCategorySelected: false,
             users: [],
-            spy: ""
+            spy: "",
+            settingsKey: settingsKey
         };
         var roomKey = this.af.list("/rooms").push(roomModel).key;
         return roomKey;
@@ -603,6 +613,7 @@ var RoomsService = RoomsService_1 = (function () {
                 RoomsService_1._currentRooms.$key = t.$key;
                 RoomsService_1._currentRooms.categoryName = t.categoryName;
                 RoomsService_1._currentRooms.roomName = t.roomName;
+                RoomsService_1._currentRooms.settingsKey = t.settingsKey;
             });
             this.af.list("rooms/" + roomKey + "/users", { preserveSnapshot: true }).subscribe(function (t) {
                 t.forEach(function (user) {
@@ -712,7 +723,8 @@ AppModule = __decorate([
                     { loadChildren: '../pages/game/game.module#GamePageModule', name: 'GamePage', segment: 'game', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/guess/guess.module#GuessPageModule', name: 'GuessPage', segment: 'guess', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/lobby/lobby.module#LobbyPageModule', name: 'LobbyPage', segment: 'lobby', priority: 'low', defaultHistory: [] },
-                    { loadChildren: '../pages/score/score.module#ScorePageModule', name: 'ScorePage', segment: 'score', priority: 'low', defaultHistory: [] }
+                    { loadChildren: '../pages/score/score.module#ScorePageModule', name: 'ScorePage', segment: 'score', priority: 'low', defaultHistory: [] },
+                    { loadChildren: '../pages/settings/settings.module#SettingsPageModule', name: 'SettingsPage', segment: 'settings', priority: 'low', defaultHistory: [] }
                 ]
             }),
             __WEBPACK_IMPORTED_MODULE_10_angularfire2__["a" /* AngularFireModule */].initializeApp(firebaseConfig),
@@ -744,7 +756,7 @@ AppModule = __decorate([
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return RoomModel; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_model__ = __webpack_require__(244);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_model__ = __webpack_require__(156);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -862,7 +874,7 @@ var MyApp = (function () {
     return MyApp;
 }());
 MyApp = __decorate([
-    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\app\app.html"*/'<ion-nav [root]="rootPage">\n\n <ion-header>\n    <ion-toolbar>\n      <ion-title>Pages</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n\n</ion-nav>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\app\app.html"*/
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\app\app.html"*/'<ion-nav [root]="rootPage">\n\n <ion-header>\n    <ion-toolbar>\n      <ion-title>Pages</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n\n</ion-nav>\n\nhjkhhkjh\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\app\app.html"*/
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */],
         __WEBPACK_IMPORTED_MODULE_5__services_auth_service__["a" /* AuthService */]])
@@ -940,6 +952,8 @@ var AuthService = AuthService_1 = (function () {
     };
     AuthService.prototype.signOut = function () {
         this.afAuth.auth.signOut();
+        this.fb.logout();
+        __WEBPACK_IMPORTED_MODULE_2_firebase__["auth"]().signOut();
     };
     AuthService.prototype.addGuestUser = function (userName, roomKey) {
         var userModel = {

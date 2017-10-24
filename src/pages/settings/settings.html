@@ -1,0 +1,33 @@
+<!--
+  Generated template for the SettingsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>settings</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding class="body">
+
+  <ion-list title="Setings" >
+    <ion-item class="settingsList">
+      <ion-avatar item-start >
+        <ion-icon name="timer" class="iconTimer"></ion-icon>
+      </ion-avatar>
+      <ion-range min="3" max="8" [(ngModel)]="settings.timeElapsed" color="secondary" pin="true" step="1">
+         <ion-label range-left color="light">3 mins</ion-label>
+         <ion-label range-right color="light">8 mins</ion-label>
+      </ion-range>
+    </ion-item>   
+    
+
+   
+  </ion-list>
+  <button ion-button (click)="submit()"  class="myButton" >Submit</button>
+</ion-content>

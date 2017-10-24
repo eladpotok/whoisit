@@ -1,14 +1,14 @@
 webpackJsonp([1],{
 
-/***/ 459:
+/***/ 460:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScorePageModule", function() { return ScorePageModule; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SettingsPageModule", function() { return SettingsPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__score__ = __webpack_require__(467);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__settings__ = __webpack_require__(469);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,36 +18,36 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 
 
-var ScorePageModule = (function () {
-    function ScorePageModule() {
+var SettingsPageModule = (function () {
+    function SettingsPageModule() {
     }
-    return ScorePageModule;
+    return SettingsPageModule;
 }());
-ScorePageModule = __decorate([
+SettingsPageModule = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["L" /* NgModule */])({
         declarations: [
-            __WEBPACK_IMPORTED_MODULE_2__score__["a" /* ScorePage */],
+            __WEBPACK_IMPORTED_MODULE_2__settings__["a" /* SettingsPage */],
         ],
         imports: [
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__score__["a" /* ScorePage */]),
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* IonicPageModule */].forChild(__WEBPACK_IMPORTED_MODULE_2__settings__["a" /* SettingsPage */]),
         ],
     })
-], ScorePageModule);
+], SettingsPageModule);
 
-//# sourceMappingURL=score.module.js.map
+//# sourceMappingURL=settings.module.js.map
 
 /***/ }),
 
-/***/ 467:
+/***/ 469:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ScorePage; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SettingsPage; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(299);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Models_settings_model__ = __webpack_require__(470);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__ = __webpack_require__(299);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__ = __webpack_require__(67);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -62,89 +62,68 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
-var ScorePage = (function () {
-    function ScorePage(navCtrl, navParams, af, auth, roomsSerivce) {
+var SettingsPage = (function () {
+    function SettingsPage(navCtrl, navParams, roomsService, af) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
+        this.roomsService = roomsService;
         this.af = af;
-        this.auth = auth;
-        this.roomsSerivce = roomsSerivce;
-        this.winUsers = [];
-        this.loseUsers = [];
-        this.users = roomsSerivce.getNonSpyPlayers();
-        this.currentUser = this.auth.currentUser;
-        this.roundKey = this.navParams.get('roundKey');
-        this.spyState = this.navParams.get('spyState');
-        this.af.list("rounds/" + roomsSerivce.currentRoom.$key + "/" + this.roundKey + "/wins").subscribe(function (t) {
-            t.forEach(function (user) {
-                var userKey = user.$value;
-                _this.winUsers.push(_this.roomsSerivce.getUser(userKey));
+        this.settings = new __WEBPACK_IMPORTED_MODULE_2__Models_settings_model__["a" /* SettingsModel */];
+        var roomKey = navParams.get('roomKey');
+        // get the settings of the current room
+        af.object("rooms/" + roomKey + "/settingsKey").subscribe(function (t) {
+            af.object("settings/" + t.$value).subscribe(function (set) {
+                _this.settings = set;
+                _this.settingsKey = t.$value;
             });
-        });
-        this.af.list("rounds/" + roomsSerivce.currentRoom.$key + "/" + this.roundKey + "/loses").subscribe(function (t) {
-            t.forEach(function (user) {
-                var userKey = user.$value;
-                _this.loseUsers.push(_this.roomsSerivce.getUser(userKey));
-            });
-        });
-        // get the spy user
-        this.af.object("users/" + this.roomsSerivce.getSpy() + "/").subscribe(function (t) {
-            _this.spy = t;
         });
     }
-    ScorePage.prototype.backToLobby = function () {
-        // set the round as done
-        this.af.object("rounds/" + this.roomsSerivce.currentRoom.$key + "/" + this.roundKey + "/state").set("done");
-        this.navCtrl.push('LobbyPage', {
-            roomKey: this.roomsSerivce.currentRoom.$key
-        });
-        //this.af.object(`rooms/${this.roomKey}/isCategorySelected`).set(false);
-        //this.af.object(`rooms/${this.roomKey}/selector`).set("");
-        // this.navCtrl.popTo(this.navCtrl.getByIndex(1));
-        // console.log("pop to");
+    SettingsPage.prototype.submit = function () {
+        this.af.object("settings/" + this.settingsKey).set(this.settings);
+        this.navCtrl.pop();
     };
-    ScorePage.prototype.getNewPointsForLosers = function () {
-        if (this.spyState == "lose") {
-            return 3;
-        }
-        return 0;
-    };
-    ScorePage.prototype.getPointsOfSpy = function () {
-        if (this.spyState == "win") {
-            this.isSpyWon = true;
-            return 5;
-        }
-        if (this.spyState == "semi-win") {
-            this.isSpyWon = true;
-            this.isGreatGuess = true;
-            return 3;
-        }
-        return 0;
-    };
-    ScorePage.prototype.getNewPointsForWinners = function () {
-        return this.getNewPointsForLosers() + 1;
-    };
-    return ScorePage;
+    return SettingsPage;
 }());
-ScorePage = __decorate([
+SettingsPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-score',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\score\score.html"*/'<!--\n  Generated template for the ScorePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>score</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n   \n   <ion-card [ngClass]="isSpyWon ? \'backgroundWin\' : \'backgroundLose\'">\n\n   <ion-item [ngClass]="isSpyWon ? \'backgroundWin\' : \'backgroundLose\'">\n    <ion-avatar item-start>\n      <img [src]="currentUser.imageUrl">\n    </ion-avatar>\n    <h2 >{{ spy?.displayName }}</h2>\n    <p> +  {{getPointsOfSpy()}} points </p>\n\n    <p class="greatGuess" item-end *ngIf="isGreatGuess"> Great Guess </p>\n  </ion-item>\n\n  <img src="assets/spy2.png">\n\n</ion-card>\n\n<ion-list >\n    <ion-item-group>\n        <ion-item-divider color="light">Discover</ion-item-divider>\n\n        <ion-item  *ngFor="let user of winUsers">\n          <ion-avatar item-start>\n            <img [src]="user.imageUrl">\n          </ion-avatar>\n          <h2 >{{ user.displayName }}</h2>\n          <p>+ {{ getNewPointsForWinners()}} points</p>\n        </ion-item>\n\n  </ion-item-group>\n  <ion-item-group>\n        <ion-item-divider color="light">Faults:</ion-item-divider>\n\n        <ion-item  *ngFor="let user of loseUsers">\n          <ion-avatar item-start>\n            <img [src]="user.imageUrl">\n          </ion-avatar>\n          <h2 >{{ user.displayName }}</h2>\n          <p>+ {{ getNewPointsForLosers()}} points</p>\n        </ion-item>\n\n  </ion-item-group>\n</ion-list>\n\n<button  ion-button (click)="backToLobby()" class="myButton">Back to Room</button>\n\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\score\score.html"*/,
+        selector: 'page-settings',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\settings\settings.html"*/'<!--\n  Generated template for the SettingsPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>settings</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list title="Setings" >\n    <ion-item class="settingsList">\n      <ion-avatar item-start >\n        <ion-icon name="timer" class="iconTimer"></ion-icon>\n      </ion-avatar>\n      <ion-range min="3" max="8" [(ngModel)]="settings.timeElapsed" color="secondary" pin="true" step="1">\n         <ion-label range-left color="light">3 mins</ion-label>\n         <ion-label range-right color="light">8 mins</ion-label>\n      </ion-range>\n    </ion-item>   \n    \n\n   \n  </ion-list>\n  <button ion-button (click)="submit()"  class="myButton" >Submit</button>\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\settings\settings.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]])
-], ScorePage);
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */],
+        __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]])
+], SettingsPage);
 
-//rules
-// Spy Wins:
-// spy earn 5 points.
-// players who voted for spy: 1 points.
-// Spy Loses:
-// players who voted for spy: 1 points
-// all players execpt spy earn 3 points
-// If spy guess right he earns 3 points. 
-//# sourceMappingURL=score.js.map
+//# sourceMappingURL=settings.js.map
+
+/***/ }),
+
+/***/ 470:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SettingsModel; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_model__ = __webpack_require__(156);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var SettingsModel = (function (_super) {
+    __extends(SettingsModel, _super);
+    function SettingsModel() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SettingsModel;
+}(__WEBPACK_IMPORTED_MODULE_0__base_model__["a" /* BaseModel */]));
+
+//# sourceMappingURL=settings.model.js.map
 
 /***/ })
 
