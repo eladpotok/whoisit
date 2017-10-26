@@ -60,7 +60,7 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
             level: "beginner",
             isAuthenticated: false
         }
-
+    console.log("added user ");
     let userId = this.af.list(`users`).push(userModel).key;
     
 

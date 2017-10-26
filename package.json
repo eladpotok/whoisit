@@ -33,7 +33,6 @@
         "@ionic/storage": "2.0.1",
         "angularfire2": "^4.0.0-rc0",
         "cordova-android": "^6.2.3",
-        "cordova-plugin-console": "^1.1.0",
         "cordova-plugin-device": "^1.1.4",
         "cordova-plugin-facebook4": "^1.7.4",
         "cordova-plugin-splashscreen": "^4.0.3",
@@ -62,8 +61,7 @@
             "cordova-plugin-facebook4": {
                 "APP_ID": "297045124035434",
                 "APP_NAME": "cookieSpy"
-            },
-            "cordova-plugin-console": {}
+            }
         },
         "platforms": [
             "android"

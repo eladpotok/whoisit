@@ -84,6 +84,7 @@ export class LobbyPage {
   private loadUsers() {
       // get the users in the current room
       this.af.list(`rooms/${this.roomKey}/users`).subscribe( snapshots => {
+        console.log("enter here");
         this.usersModel = [];
         this.usersCount = snapshots.length;
         snapshots.forEach( snapshot=> {

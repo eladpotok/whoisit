@@ -333,7 +333,7 @@ export class HomePage {
   }
 
   private addUserToRoom(roomKey: string) {
- 
+    // check if the user is authenticated 
     if(!this.authService.isAuthenticated)
       this.authService.addGuestUser(this.currentUser.displayName, roomKey);
     else {
@@ -376,32 +376,30 @@ export class HomePage {
 
     let subscription = this.af.list('/rooms', { preserveSnapshot: true}).subscribe(snapshots=>{
           snapshots.forEach(snapshot => {
+              // we find the room by entry code
               if(snapshot.val().entryCode == this.roomEntryCode) {
                 roomFound = true;
+                // check if the room is not started yet
                 if(!snapshot.val().isStarted) {
+                  // iterate over the users so there is not a user with a same name
                   let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=>{
                     console.log("enter " + snapshot.key);
                     t.forEach(u => {
                       if(u != null) {
                         console.log("enter 2 " + u.key);
-                       this.af.object(`users/${u.key}`).subscribe( user=>{
+                        this.af.object(`users/${u.key}`).subscribe( user=>{
                           if(user.displayName == this.currentUser.displayName){
                             this.showMsg("Sorry", "The given name is already exists in the room");
-                             sub.unsubscribe();
-                            return;
-                        }
-                        else {
-                             this.addUserToRoom(snapshot.key);
                             sub.unsubscribe();
                             return;
-                        }
-                       });
-                        
+                          }
+                        });
                       } 
                     });
-                  });
 
-                 
+                    this.addUserToRoom(snapshot.key);
+                    sub.unsubscribe();
+                  });
                 }
                 else {
                   this.showMsg("Sorry", "The room is in during the game");

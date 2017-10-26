@@ -119,6 +119,7 @@ var LobbyPage = (function () {
         var _this = this;
         // get the users in the current room
         this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
+            console.log("enter here");
             _this.usersModel = [];
             _this.usersCount = snapshots.length;
             snapshots.forEach(function (snapshot) {

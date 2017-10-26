@@ -425,6 +425,7 @@ var HomePage = (function () {
     };
     HomePage.prototype.addUserToRoom = function (roomKey) {
         var _this = this;
+        // check if the user is authenticated 
         if (!this.authService.isAuthenticated)
             this.authService.addGuestUser(this.currentUser.displayName, roomKey);
         else {
@@ -456,9 +457,12 @@ var HomePage = (function () {
         var roomFound = false;
         var subscription = this.af.list('/rooms', { preserveSnapshot: true }).subscribe(function (snapshots) {
             snapshots.forEach(function (snapshot) {
+                // we find the room by entry code
                 if (snapshot.val().entryCode == _this.roomEntryCode) {
                     roomFound = true;
+                    // check if the room is not started yet
                     if (!snapshot.val().isStarted) {
+                        // iterate over the users so there is not a user with a same name
                         var sub_1 = _this.af.list("rooms/" + snapshot.key + "/users", { preserveSnapshot: true }).subscribe(function (t) {
                             console.log("enter " + snapshot.key);
                             t.forEach(function (u) {
@@ -470,14 +474,11 @@ var HomePage = (function () {
                                             sub_1.unsubscribe();
                                             return;
                                         }
-                                        else {
-                                            _this.addUserToRoom(snapshot.key);
-                                            sub_1.unsubscribe();
-                                            return;
-                                        }
                                     });
                                 }
                             });
+                            _this.addUserToRoom(snapshot.key);
+                            sub_1.unsubscribe();
                         });
                     }
                     else {
@@ -527,11 +528,10 @@ HomePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
         selector: 'page-home',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/'\nbower_components/momentjs/min/moment.min.js\nbower_components/momentjs/min/locales.min.js\nbower_components/humanize-duration/humanize-duration.js\n\n<ion-content class="body">\n\n<div>\n  <ion-segment [(ngModel)]="operation" class="operationItem">\n    <ion-segment-button value="openRoom" (click)="openRoom()" >\n      Open Room\n    </ion-segment-button>\n    <ion-segment-button value="joinRoom" (click)="joinRoom()" >\n      Join Room\n    </ion-segment-button>\n  </ion-segment>\n</div>\n\n<!--<ion-grid>\n  <ion-row>\n      <button ion-button class="newRoomButton">\n        New Room\n      </button>\n\n      <button ion-button class="newRoomButton">\n        Join Room\n      </button>\n  </ion-row>\n</ion-grid>\n-->\n\n\n<div [ngSwitch]="operation" ngClass="middle-vertical">\n  <ion-grid *ngSwitchCase="\'openRoom\'"   >\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n  <ion-grid *ngSwitchCase="\'joinRoom\'"   >\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n\n\n\n\n  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">\n       Play \n  </button>\n  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">\n       Sign with FaceBook \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">\n       Logout \n  </button>-->\n  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">\n       About \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">\n       Admin \n  </button>\n\n <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">\n      <ion-avatar item-start >\n        <img [src]="photoUrl" ngClass="photo">\n      </ion-avatar>\n      <h2 > Hello {{ displayName }}</h2>\n      <p>Ugh. As if.</p>\n    </ion-item>\n</div>\n\n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
-        __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */]) === "function" && _g || Object])
 ], HomePage);
 
+var _a, _b, _c, _d, _e, _f, _g;
 //# sourceMappingURL=home.js.map
 
 /***/ }),
@@ -970,6 +970,7 @@ var AuthService = AuthService_1 = (function () {
             level: "beginner",
             isAuthenticated: false
         };
+        console.log("added user ");
         var userId = this.af.list("users").push(userModel).key;
         // let usersInRoomKey = this.af.list(`users/${roomKey}`).push(userModel).key;
         //this.af.object(`rooms/${roomKey}/users/key`).set(userId);
@@ -1006,10 +1007,10 @@ var AuthService = AuthService_1 = (function () {
 }());
 AuthService = AuthService_1 = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["j" /* Platform */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object])
 ], AuthService);
 
-var AuthService_1;
+var AuthService_1, _a, _b, _c, _d;
 //# sourceMappingURL=auth.service.js.map
 
 /***/ })
