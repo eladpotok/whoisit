@@ -80,11 +80,14 @@ bower_components/humanize-duration/humanize-duration.js
   <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">
        Play 
   </button>
-  <button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">
+  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">
        Sign with FaceBook 
   </button>
   <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">
        Logout 
+  </button>-->
+  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">
+       About 
   </button>
   <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">
        Admin 

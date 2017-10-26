@@ -30117,6 +30117,11 @@ ion-navbar.toolbar {
   top: 1px;
 }
 
+page-about label {
+  white-space: pre-wrap;
+  color: white;
+}
+
 page-choose-category .list {
   background: transparent;
 }

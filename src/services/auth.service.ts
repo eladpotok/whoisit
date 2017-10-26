@@ -45,8 +45,7 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
   }
 
   public signOut() {
-    this.afAuth.auth.signOut();
-    this.fb.logout();
+      this.fb.logout();
   }
 
 

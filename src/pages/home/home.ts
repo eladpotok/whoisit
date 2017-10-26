@@ -357,6 +357,10 @@ export class HomePage {
     
   }
 
+  public about() {
+    this.navCtrl.push('AboutPage');
+  }
+
   private joinRoomSubmit() {
 
      if(this.currentUser.displayName == null ||
