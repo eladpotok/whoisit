@@ -358,7 +358,7 @@ export class HomePage {
   }
 
   public about() {
-    this.navCtrl.push('AboutPage');
+    this.navCtrl.push('InfoPage');
   }
 
   private joinRoomSubmit() {

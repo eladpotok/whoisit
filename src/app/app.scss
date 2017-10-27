@@ -18,6 +18,12 @@
     border-radius: 50%;
 }
 
+.textLabel {
+	color: black;
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+	font-size: 20px;
+}
+
 .cardBody {
 	//background: white;
 	background-color: rgba(300,2300,1155, 0.8);
@@ -32,7 +38,14 @@
 };
 
 
-    .bodyCategory {
+.alternativeBack {
+    background-image: url("../assets/categoriesBackground.PNG"); 
+    background-size:cover;
+    vertical-align: middle;
+};
+
+
+.bodyCategory {
         background-image: url("../assets/appBackground.PNG"); 
         background-size:cover;
         vertical-align: middle;
