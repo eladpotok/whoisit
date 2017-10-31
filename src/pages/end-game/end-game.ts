@@ -25,44 +25,25 @@ export class EndGamePage {
     // get the round key
     this.roundKey = this.navParams.get('roundKey');
     
-    // check if i am the spy
-    if(this.IamTheSpy()) {
-      this.presentLoading();
-      this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/spyState`).subscribe(spy =>{
-        
-        if(spy.$value == "found") {
-          this.dismissLoading();
-          // go to guess subject page
-          this.navCtrl.push("GuessPage", { roundKey: this.roundKey });
-        }
-        else if(spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
-          this.dismissLoading();
+    
+    // show the suspisious users
+    this.usersModel = this.loadUsers();
 
-          this.addPointsToSpy(spy.$value);
-          // go to score page 
-          this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value });
-        }
-      });
-    }
-    else {
-      // show the suspisious users
-      this.usersModel = this.loadUsers();
+    this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/isAllVoted`).subscribe(votes => {
+      // check if all users voted
+      if(votes.$value) {
+        this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/spyState`).subscribe(spy =>{
+          if(spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
+            this.dismissLoading();
 
-      this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/isAllVoted`).subscribe(votes => {
-        // check if all users voted
-        if(votes.$value) {
-          this.af.object(`rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/spyState`).subscribe(spy =>{
-            if(spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
-              this.dismissLoading();
-
-              this.addPointsToPlayer(spy.$value);
-              // go to score page 
-              this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value});
-            }
-          });
-        }
-      });
-    }
+            this.addPointsToPlayer(spy.$value);
+            // go to score page 
+            this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value});
+          }
+        });
+      }
+    });
+ 
   }
 
   private addPointsToPlayer(spyState: string) {

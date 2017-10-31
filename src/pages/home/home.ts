@@ -33,10 +33,10 @@ export class HomePage {
   
 
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
-                 private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
-                 public authService: AuthService) {
+              private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
+              public authService: AuthService) {
     this.waitForRegistration();
-
+    platform.registerBackButtonAction(()=>this.myHandlerFunction());
     //this.isUserAuthorized = false;
     this.operation = "openRoom";
     this.isOpenRoomSelected = true;
@@ -370,9 +370,8 @@ export class HomePage {
       return;
     }
 
-    
-
     let roomFound = false;
+    let userFound = false;
 
     let subscription = this.af.list('/rooms', { preserveSnapshot: true}).subscribe(snapshots=>{
           snapshots.forEach(snapshot => {
@@ -382,22 +381,24 @@ export class HomePage {
                 // check if the room is not started yet
                 if(!snapshot.val().isStarted) {
                   // iterate over the users so there is not a user with a same name
-                  let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=>{
+                  let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=> {
                     console.log("enter " + snapshot.key);
                     t.forEach(u => {
                       if(u != null) {
                         console.log("enter 2 " + u.key);
                         this.af.object(`users/${u.key}`).subscribe( user=>{
                           if(user.displayName == this.currentUser.displayName){
-                            this.showMsg("Sorry", "The given name is already exists in the room");
+                            // this.showMsg("Sorry", "The given name is already exists in the room");
                             sub.unsubscribe();
+                            userFound = true;
                             return;
                           }
                         });
                       } 
                     });
-
-                    this.addUserToRoom(snapshot.key);
+                    console.log("user added");
+                    if(!userFound)
+                      this.addUserToRoom(snapshot.key);
                     sub.unsubscribe();
                   });
                 }
@@ -452,6 +453,30 @@ export class HomePage {
 
   public adminPanel() {
     this.navCtrl.push('AdminPage');
+  }
+
+
+  private myHandlerFunction(){
+      let confirm = this.alertCtrl.create({
+      title: 'Attention?',
+      message: 'Are you sure that you want to leave the room?',
+      buttons: [
+        {
+          text: 'Disagree',
+          handler: () => {
+            
+          }
+        },
+        {
+          text: 'Agree',
+          handler: () => {
+            // this.platform.registerBackButtonAction( () => { this.navCtrl.pop();  });
+            this.navCtrl.popToRoot();
+          }
+        }
+      ]
+    });
+    confirm.present();
   }
   
 }

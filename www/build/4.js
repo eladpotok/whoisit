@@ -63,8 +63,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var LobbyPage = (function () {
-    function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl) {
+    function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl, alertCtrl) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
@@ -72,6 +73,7 @@ var LobbyPage = (function () {
         this.authService = authService;
         this.roomService = roomService;
         this.loadingCtrl = loadingCtrl;
+        this.alertCtrl = alertCtrl;
         this.usersModel = [];
         // Get thr paramters from the navigation controller
         this.roomKey = this.navParams.get('roomKey');
@@ -92,7 +94,7 @@ var LobbyPage = (function () {
                     });
                     _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/selectorKey").subscribe(function (selector) {
                         if (selector.$value == _this.authService.currentUser.$key) {
-                            _this.navCtrl.push('ChooseCategoryPage', { roundKey: roundKey_1 });
+                            _this.navCtrl.push('ChooseCategoryPage', { roundKey: roundKey_1, roomKey: _this.roomKey });
                         }
                         else if (selector.$value != null) {
                             _this.presentLoading();
@@ -151,7 +153,19 @@ var LobbyPage = (function () {
         if (this.loader != null)
             this.loader.dismiss();
     };
+    LobbyPage.prototype.showMsg = function (title, subTitle) {
+        var alert = this.alertCtrl.create({
+            title: title,
+            subTitle: subTitle,
+            buttons: ['OK']
+        });
+        alert.present();
+    };
     LobbyPage.prototype.startGame = function () {
+        if (this.usersCount < 4 && !this.authService.IsDebug) {
+            this.showMsg("Sorry", "The round can be executed only for 4 players and above.");
+            return;
+        }
         this.roomService.updateUsersInRoom(this.roomKey);
         // raffle spy and category selector  
         this.raffleSelector();
@@ -182,11 +196,10 @@ LobbyPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
         selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n    <ion-buttons end>\n      <button (click)="goSettings()" class="settingsButton" *ngIf="isOwner">\n        <ion-icon name="md-settings" ></ion-icon>    \n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n\n  <!--<button ion-button (click)="exit()" class="myButton">Exit</button>-->\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
-        __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */],
-        __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _g || Object])
 ], LobbyPage);
 
+var _a, _b, _c, _d, _e, _f, _g;
 //# sourceMappingURL=lobby.js.map
 
 /***/ })

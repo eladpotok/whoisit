@@ -67,8 +67,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
 var GamePage = (function () {
-    function GamePage(navCtrl, navParams, af, authService, roomsService, cd) {
+    function GamePage(navCtrl, navParams, af, authService, roomsService, cd, platform, alertCtrl, loadingCtrl) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
@@ -76,7 +77,11 @@ var GamePage = (function () {
         this.authService = authService;
         this.roomsService = roomsService;
         this.cd = cd;
+        this.platform = platform;
+        this.alertCtrl = alertCtrl;
+        this.loadingCtrl = loadingCtrl;
         this.second = 0;
+        this.secLabel = "0";
         this.roundKey = this.navParams.get('roundKey');
         var subscription = this.af.object("rounds/" + roomsService.currentRoom.$key + "/" + this.roundKey).subscribe(function (round) {
             if (round.spyKey == _this.authService.currentUser.$key) {
@@ -91,27 +96,44 @@ var GamePage = (function () {
             _this.roomsService.setSpy(round.spyKey);
         });
         this.af.object("/settings/" + roomsService.currentRoom.settingsKey).subscribe(function (set) {
-            console.log("set.timeElapsed " + set.timeElapsed);
-            console.log("settigns " + roomsService.currentRoom.settingsKey);
             _this.min = set.timeElapsed;
         });
         this.id = setInterval(function () {
             if (_this.second == 0) {
                 _this.second = 59;
+                _this.secLabel = _this.second.toString();
                 _this.min--;
             }
             else {
                 _this.second--;
+                if (_this.second <= 9 && _this.second >= 0) {
+                    _this.secLabel = "0" + _this.second;
+                }
+                else {
+                    _this.secLabel = _this.second.toString();
+                }
             }
             if (_this.second == 30 && _this.min == 0)
                 _this.lastSeconds = true;
-            if (_this.second == 0 && _this.min == 0) {
-                clearInterval(_this.id);
+            if ((_this.second == 0 && _this.min == 0) || _this.min < 0) {
                 _this.LeaveGame();
             }
             cd.markForCheck();
         }, 1000);
     }
+    GamePage.prototype.addPointsToSpy = function (spyState) {
+        var points = 0;
+        switch (spyState) {
+            case "win":
+                points = 5;
+                break;
+            case "semi-win":
+                points = 3;
+                break;
+        }
+        this.authService.currentUser.pointsInRoom += points;
+        this.af.object("/rooms/" + this.roomsService.currentRoom.$key + "/users/" + this.authService.currentUser.$key).set(this.authService.currentUser.pointsInRoom);
+    };
     GamePage.prototype.drawRandomCard = function (subject, categoryKey) {
         var _this = this;
         this.af.object("categories/" + categoryKey + "/").subscribe(function (category) {
@@ -122,26 +144,59 @@ var GamePage = (function () {
         });
     };
     GamePage.prototype.drawSpy = function () {
+        var _this = this;
         this.photoImage = "assets/spy2.png";
         this.subjectTitle = "Mole";
         this.isSpy = true;
+        // wait till other users will vote
+        if (this.isSpy) {
+            this.af.object("rounds/" + this.roomsService.currentRoom.$key + "/" + this.roundKey + "/spyState").subscribe(function (spy) {
+                if (spy.$value == "found") {
+                    _this.dismissLoading();
+                    // go to guess subject page
+                    _this.navCtrl.push("GuessPage", { roundKey: _this.roundKey });
+                }
+                else if (spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
+                    _this.dismissLoading();
+                    _this.addPointsToSpy(spy.$value);
+                    // go to score page 
+                    _this.navCtrl.push('ScorePage', { roundKey: _this.roundKey, spyState: spy.$value });
+                }
+            });
+        }
+    };
+    GamePage.prototype.presentLoading = function () {
+        this.loader = this.loadingCtrl.create({
+            content: "Wait till all players vote...",
+        });
+        this.loader.present();
+    };
+    GamePage.prototype.dismissLoading = function () {
+        if (this.loader != null)
+            this.loader.dismiss();
     };
     GamePage.prototype.LeaveGame = function () {
-        this.navCtrl.push('EndGamePage', {
-            roundKey: this.roundKey
-        });
+        clearInterval(this.id);
+        if (!this.isSpy) {
+            this.navCtrl.push('EndGamePage', {
+                roundKey: this.roundKey
+            });
+        }
+        else {
+            this.presentLoading();
+        }
     };
     return GamePage;
 }());
 GamePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n      <ion-card class="cardback">\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ subjectTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the questions and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The mole is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n\n        \n      </ion-card>\n      <p [ngClass]="{\'timer\': !lastSeconds,\n                     \'timerRed\': lastSeconds}"> Time left {{min}} : {{second}} </p>\n      <!--<button ion-button (click)="LeaveGame()">Vote</button>-->\n      \n       \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/,
+        selector: 'page-game',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategory">\n      <ion-card class="cardback">\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ subjectTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the questions and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The mole is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n\n        \n      </ion-card>\n      <ion-item class="timerItem" no-lines>\n          <ion-icon name="alarm" item-start class="iconTimer" ></ion-icon>\n\n          <label [ngClass]="{\'timer\': !lastSeconds,\n                            \'timerRed\': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>\n\n          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="isSpy">\n            <ion-icon name="hand"></ion-icon>\n              Vote\n          </button>\n      </ion-item>\n      \n      \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\game\game.html"*/,
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* ChangeDetectorRef */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* ChangeDetectorRef */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* ChangeDetectorRef */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */]) === "function" && _g || Object, typeof (_h = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _h || Object, typeof (_j = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* LoadingController */]) === "function" && _j || Object])
 ], GamePage);
 
+var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 //# sourceMappingURL=game.js.map
 
 /***/ }),

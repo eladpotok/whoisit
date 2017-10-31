@@ -29,11 +29,19 @@
 
         
       </ion-card>
-      <p [ngClass]="{'timer': !lastSeconds,
-                     'timerRed': lastSeconds}"> Time left {{min}} : {{second}} </p>
-      <!--<button ion-button (click)="LeaveGame()">Vote</button>-->
+      <ion-item class="timerItem" no-lines>
+          <ion-icon name="alarm" item-start class="iconTimer" ></ion-icon>
+
+          <label [ngClass]="{'timer': !lastSeconds,
+                            'timerRed': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>
+
+          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="isSpy">
+            <ion-icon name="hand"></ion-icon>
+              Vote
+          </button>
+      </ion-item>
       
-       
+      
 
 </ion-content>
 

@@ -27,7 +27,7 @@ export class ChooseCategoryPage {
 
   select(category: CategoryModel) {
     // get the room key
-    let roomKey = this.roomService.currentRoom.$key;
+    let roomKey = this.navParams.get('roomKey');
     let roundKey = this.navParams.get('roundKey');
 
     // random a subject from category 

@@ -8,6 +8,8 @@ import { AuthService } from '../../services/auth.service'
 import { RoomsService } from '../../services/rooms.service';
 import { RoundModel } from '../../Models/round.model';
 import { LoadingController } from 'ionic-angular';
+import { AlertController } from 'ionic-angular';
+
 
 @IonicPage()
 @Component({
@@ -31,7 +33,8 @@ export class LobbyPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
-              private roomService: RoomsService, public loadingCtrl: LoadingController) {
+              private roomService: RoomsService, public loadingCtrl: LoadingController,
+              public alertCtrl: AlertController) {
                 
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
@@ -56,7 +59,7 @@ export class LobbyPage {
           });
           this.af.object(`rounds/${this.roomKey}/${roundKey}/selectorKey`).subscribe(selector => {
             if(selector.$value == this.authService.currentUser.$key){
-              this.navCtrl.push('ChooseCategoryPage', {roundKey: roundKey});
+              this.navCtrl.push('ChooseCategoryPage', {roundKey: roundKey , roomKey: this.roomKey});
             }
             else if(selector.$value != null) {
               this.presentLoading();
@@ -125,8 +128,22 @@ export class LobbyPage {
       this.loader.dismiss();
   }
 
+  private showMsg(title: string, subTitle: string) {
+    let alert = this.alertCtrl.create({
+          title: title,
+          subTitle: subTitle,
+          buttons: ['OK']
+        });
+    alert.present();
+  }
+
   startGame() {
       
+      if(this.usersCount < 4 && !this.authService.IsDebug) {
+        this.showMsg("Sorry", "The round can be executed only for 4 players and above.");
+        return;
+      }
+
       this.roomService.updateUsersInRoom(this.roomKey);
 
       // raffle spy and category selector  

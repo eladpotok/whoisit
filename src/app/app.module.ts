@@ -9,6 +9,7 @@ import { ServicesModule } from '../services/services.module';
 import { FormsModule } from '@angular/forms';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
+import {  NavController } from 'ionic-angular';
 
 
 import { AngularFireModule } from 'angularfire2';

@@ -5,9 +5,12 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import {AngularFireAuth } from 'angularfire2/auth'
 import { AuthService } from '../services/auth.service';
 import { HomePage } from '../pages/home/home';
+
 @Component({
+
   templateUrl: 'app.html'
 })
+
 export class MyApp {
   rootPage:any = HomePage;
 
@@ -18,9 +21,10 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+     
     });
   }
 
-
+  
 }
 

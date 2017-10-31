@@ -17,12 +17,30 @@ page-game {
 
     }
 
+    .iconTimer {
+        font-size:30px;
+        margin-top: 120px;
+        color: white;
+    }
+
+    .timerItem {
+        background: transparent;
+    }
+
+    .goButton {
+        margin:0 auto;
+        margin-bottom: 4px;
+        display:block;
+        width: 170px;
+    };
+    
+
     .timer {
         color: white;
         margin-top: 35px;
-        font-size: 30px;
+        font-size: 22px;
         width: 25rem;
-        display: block;
+        display: inline;
         margin-left: auto;
         margin-right: auto;
     }
