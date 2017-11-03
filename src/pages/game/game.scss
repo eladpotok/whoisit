@@ -20,7 +20,7 @@ page-game {
     .iconTimer {
         font-size:30px;
         margin-top: 120px;
-        color: white;
+        color: black;
     }
 
     .timerItem {
@@ -36,18 +36,19 @@ page-game {
     
 
     .timer {
-        color: white;
+        color: black;
         margin-top: 35px;
         font-size: 22px;
         width: 25rem;
         display: inline;
         margin-left: auto;
         margin-right: auto;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     }
 
     .timerRed {
         color: red;
-        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         margin-top: 35px;
         font-size: 30px;
         width: 25rem;

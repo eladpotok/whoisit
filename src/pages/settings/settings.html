@@ -7,7 +7,7 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>settings</ion-title>
+    <ion-title>Settings</ion-title>
   </ion-navbar>
 
 </ion-header>
@@ -20,9 +20,9 @@
       <ion-avatar item-start >
         <ion-icon name="timer" class="iconTimer"></ion-icon>
       </ion-avatar>
-      <ion-range min="3" max="8" [(ngModel)]="settings.timeElapsed" color="secondary" pin="true" step="1">
-         <ion-label range-left color="light">3 mins</ion-label>
-         <ion-label range-right color="light">8 mins</ion-label>
+      <ion-range min="3" max="8" [(ngModel)]="settings.timeElapsed" color="dark" pin="true" step="1">
+         <ion-label range-left color="dark">3 mins</ion-label>
+         <ion-label range-right color="dark">8 mins</ion-label>
       </ion-range>
     </ion-item>   
     

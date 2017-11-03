@@ -30067,9 +30067,14 @@ ion-navbar.toolbar {
 }
 
 .cardBody {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 30px;
   margin-bottom: 5px;
+}
+
+.toolbar-background {
+  background-color: rgba(255, 255, 255, 0.6);
+  border-bottom: transparent;
 }
 
 .body {
@@ -30090,6 +30095,12 @@ ion-navbar.toolbar {
   vertical-align: middle;
 }
 
+.bodyCategoryEmpty {
+  background-image: url("../assets/appBackgroundEmpty.png");
+  background-size: cover;
+  vertical-align: middle;
+}
+
 .photo {
   width: 25rem;
   margin-top: 10px;
@@ -30104,29 +30115,30 @@ ion-navbar.toolbar {
 
 .myButton {
   float: right;
-  -webkit-box-shadow: 0px 10px 14px -7px #276873;
-  box-shadow: 0px 10px 14px -7px #276873;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #599bb3), to(#408c99));
-  background: linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#599bb3', endColorstr='#408c99',GradientType=0);
-  background-color: #599bb3;
-  border-radius: 8px;
+  -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
+  box-shadow: inset 0px 1px 0px 0px #ffffff;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #ededed), to(#dfdfdf));
+  background: linear-gradient(to bottom, #ededed 5%, #dfdfdf 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf',GradientType=0);
+  background-color: #ededed;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
   display: inline-block;
   cursor: pointer;
-  color: #ffffff;
+  color: #777777;
   font-family: Arial;
   font-size: 15px;
   font-weight: bold;
-  padding: 13px 32px;
+  padding: 6px 24px;
   text-decoration: none;
-  text-shadow: 0px 1px 0px #3d768a;
+  text-shadow: 0px 1px 0px #ffffff;
 }
 
 .myButton:hover {
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #408c99), to(#599bb3));
-  background: linear-gradient(to bottom, #408c99 5%, #599bb3 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#408c99', endColorstr='#599bb3',GradientType=0);
-  background-color: #408c99;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #dfdfdf), to(#ededed));
+  background: linear-gradient(to bottom, #dfdfdf 5%, #ededed 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed',GradientType=0);
+  background-color: #dfdfdf;
 }
 
 .myButton:active {
@@ -30178,7 +30190,7 @@ page-game .cardback {
 page-game .iconTimer {
   font-size: 30px;
   margin-top: 120px;
-  color: white;
+  color: black;
 }
 
 page-game .timerItem {
@@ -30193,18 +30205,19 @@ page-game .goButton {
 }
 
 page-game .timer {
-  color: white;
+  color: black;
   margin-top: 35px;
   font-size: 22px;
   width: 25rem;
   display: inline;
   margin-left: auto;
   margin-right: auto;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 page-game .timerRed {
   color: red;
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   margin-top: 35px;
   font-size: 30px;
   width: 25rem;
@@ -30255,7 +30268,25 @@ page-guess .imgSize {
 }
 
 page-home .operationItem {
-  background-color: white;
+  background-color: transparent;
+  height: 40px;
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+page-home .homeBody {
+  background-image: url("../assets/appBackground.PNG");
+  background-size: cover;
+  vertical-align: middle;
+}
+
+page-home .segmentButton {
+  background: black;
+}
+
+page-home .segmentClass {
+  height: 100px;
 }
 
 page-home .details {
@@ -30328,7 +30359,7 @@ page-home .listClass {
 
 page-home .text-foreground {
   color: black;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.6);
   border-radius: 30px;
   margin-bottom: 5px;
 }
@@ -30339,6 +30370,40 @@ page-home .middle-vertical {
   left: 50%;
   -webkit-transform: translateY(-50%) translateX(-50%);
   transform: translateY(-50%) translateX(-50%);
+}
+
+page-home .segmentButtonClass {
+  -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
+  box-shadow: inset 0px 1px 0px 0px #ffffff;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #ededed), to(#dfdfdf));
+  background: linear-gradient(to bottom, #ededed 5%, #dfdfdf 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf',GradientType=0);
+  background-color: #ededed;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  display: inline-block;
+  cursor: pointer;
+  color: #777777;
+  font-family: Arial;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 6px 24px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #ffffff;
+  margin-left: 10px;
+  margin-top: 100px;
+}
+
+page-home .segmentButtonClass:hover {
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #dfdfdf), to(#ededed));
+  background: linear-gradient(to bottom, #dfdfdf 5%, #ededed 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed',GradientType=0);
+  background-color: #dfdfdf;
+}
+
+page-home .segmentButtonClass:active {
+  position: relative;
+  top: 1px;
 }
 
 page-info .item {
@@ -30353,6 +30418,7 @@ page-lobby .entryCodeLabel {
 
 page-lobby .settingsButton {
   background: transparent;
+  font-size: 25px;
 }
 
 page-score .backgroundWin {
@@ -30377,5 +30443,5 @@ page-settings .settingsList {
 page-settings .iconTimer {
   font-size: 30px;
   margin-top: 20px;
-  color: white;
+  color: black;
 }

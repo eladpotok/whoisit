@@ -161,7 +161,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 var HomePage = (function () {
-    function HomePage(navCtrl, afAuth, af, fb, platform, alertCtrl, authService) {
+    function HomePage(navCtrl, afAuth, af, fb, platform, alertCtrl, authService, viewCtrl) {
         var _this = this;
         this.navCtrl = navCtrl;
         this.afAuth = afAuth;
@@ -170,218 +170,80 @@ var HomePage = (function () {
         this.platform = platform;
         this.alertCtrl = alertCtrl;
         this.authService = authService;
+        this.viewCtrl = viewCtrl;
         this.currentUser = new __WEBPACK_IMPORTED_MODULE_2__Models_user_model__["a" /* UserModel */];
         this.isDebug = false;
         this.waitForRegistration();
-        platform.registerBackButtonAction(function () { return _this.myHandlerFunction(); });
-        //this.isUserAuthorized = false;
+        // platform.registerBackButtonAction(()=> this.myHandlerFunction() );
+        platform.ready().then(function () {
+            platform.registerBackButtonAction(function () {
+                if (navCtrl.getActive().name == "HomePage") {
+                    _this.showExitAlert();
+                }
+                else if (_this.pageGoBack()) {
+                    navCtrl.pop();
+                }
+                else {
+                    _this.showAlert();
+                }
+            });
+        });
         this.operation = "openRoom";
         this.isOpenRoomSelected = true;
-        // this.createCategories();
     }
-    HomePage.prototype.createCategories = function () {
-        var pokemem0 = {
-            title: "Charmander",
-            url: "assets/Pokemon/0.png",
-        };
-        var pokemem1 = {
-            title: "Bulbasaur",
-            url: "assets/Pokemon/1.png",
-        };
-        var pokemem2 = {
-            title: "Squirtle",
-            url: "assets/Pokemon/2.png",
-        };
-        var pokemem3 = {
-            title: "Pidgeot",
-            url: "assets/Pokemon/3.png",
-        };
-        var pokemem4 = {
-            title: "Gigglipuff",
-            url: "assets/Pokemon/4.png"
-        };
-        var pokemem5 = {
-            title: "Zapdos",
-            url: "assets/Pokemon/5.png"
-        };
-        // let movie_mem1: MemberModel ={
-        //   title: "Inception",
-        //   url: "assets/Movies/0.png",
-        // }
-        // let movie_mem2: MemberModel ={
-        //   title: "Titanic",
-        //   url: "assets/Movies/1.png"
-        // }
-        // let movie_mem4: MemberModel ={
-        //   title: "Shutter Island",
-        //   url: "assets/Movies/2.png"
-        // }
-        // let movie_mem5: MemberModel ={
-        //   title: "Taken",
-        //   url: "assets/Movies/3.png"
-        // }
-        // let loca_mem1: MemberModel ={
-        //   title: "Supermarket",
-        //   url: "assets/Location/0.png",
-        // }
-        // let loca_mem2: MemberModel ={
-        //   title: "Gas Station",
-        //   url: "assets/Location/1.png"
-        // }
-        // let loca_mem3: MemberModel ={
-        //   title: "Hospital",
-        //   url: "assets/Location/2.png"
-        // }
-        // let loca_mem4: MemberModel ={
-        //   title: "Records Shop",
-        //   url: "assets/Location/3.png"
-        // }
-        // let car1: MemberModel ={
-        //   title: "Popeye",
-        //   url: "assets/Cartoon/0.png",
-        // }
-        // let car2: MemberModel ={
-        //   title: "Homer Simpson",
-        //   url: "assets/Cartoon/1.png"
-        // }
-        // let car3: MemberModel ={
-        //   title: "Rick Sanchez",
-        //   url: "assets/Cartoon/2.png"
-        // }
-        // let car4: MemberModel ={
-        //   title: "Aladdin",
-        //   url: "assets/Cartoon/3.png"
-        // }
-        //  let car5: MemberModel ={
-        //   title: "Bubbles",
-        //   url: "assets/Cartoon/4.png"
-        // }
-        //   let food1: MemberModel ={
-        //   title: "Humborder",
-        //   url: "assets/Food/0.png",
-        // }
-        // let food2: MemberModel ={
-        //   title: "Pizza",
-        //   url: "assets/Food/1.png"
-        // }
-        // let food3: MemberModel ={
-        //   title: "Spagetti",
-        //   url: "assets/Food/2.png"
-        // }
-        // let food4: MemberModel ={
-        //   title: "Tost",
-        //   url: "assets/Food/3.png"
-        // }
-        //  let food5: MemberModel ={
-        //   title: "Salad",
-        //   url: "assets/Food/4.png"
-        // }
-        // let celeb1: MemberModel ={
-        //   title: "Leonardo DiCaprio",
-        //   url: "assets/Celebs/0.png",
-        // }
-        // let celeb2: MemberModel ={
-        //   title: "Mark Ruffalo",
-        //   url: "assets/Celebs/1.png"
-        // }
-        // let celeb3: MemberModel ={
-        //   title: "Amy Winehouse",
-        //   url: "assets/Celebs/2.png"
-        // }
-        // let celeb4: MemberModel ={
-        //   title: "Vince Vaughn",
-        //   url: "assets/Celebs/3.png"
-        // }
-        //  let celeb5: MemberModel ={
-        //   title: "Billy Joel",
-        //   url: "assets/Celebs/4.png"
-        // }
-        // let carMembers: MemberModel[] = [];
-        // carMembers.push(car1);
-        // carMembers.push(car2);
-        // carMembers.push(car3);
-        // carMembers.push(car4);
-        // carMembers.push(car5);
-        // let foodMembers: MemberModel[] = [];
-        // foodMembers.push(food1);
-        // foodMembers.push(food2);
-        // foodMembers.push(food3);
-        // foodMembers.push(food4);
-        // foodMembers.push(food5);
-        // let celebsMemebers: MemberModel[] = [];
-        // celebsMemebers.push(celeb1);
-        // celebsMemebers.push(celeb2);
-        // celebsMemebers.push(celeb3);
-        // celebsMemebers.push(celeb4);
-        // celebsMemebers.push(celeb5);
-        // let members: MemberModel[] = [];
-        // members.push(mem1);
-        // members.push(mem2);
-        // members.push(mem3);
-        // let movieMembers: MemberModel [] = [];
-        // movieMembers.push(movie_mem1);
-        // movieMembers.push(movie_mem2);
-        // movieMembers.push(movie_mem4);
-        // movieMembers.push(movie_mem5);
-        // let movieMembers: MemberModel [] = [];
-        // movieMembers.push(movie_mem1);
-        // movieMembers.push(movie_mem2);
-        // movieMembers.push(movie_mem4);
-        // movieMembers.push(movie_mem5);
-        // let locationMembers: MemberModel [] = [];
-        // locationMembers.push(loca_mem1);
-        // locationMembers.push(loca_mem2);
-        // locationMembers.push(loca_mem3);
-        // locationMembers.push(loca_mem4);
-        var pokemonMembers = [];
-        pokemonMembers.push(pokemem0);
-        pokemonMembers.push(pokemem1);
-        pokemonMembers.push(pokemem2);
-        pokemonMembers.push(pokemem3);
-        pokemonMembers.push(pokemem4);
-        pokemonMembers.push(pokemem5);
-        var category1 = {
-            title: "Pokemon",
-            url: "assets/pokemonIcon.png",
-            description: "Catch'em all!",
-            members: pokemonMembers
-        };
-        // let category2: CategoryModel = {
-        //     title: "Movies",
-        //     url: "assets/moviesIcon.png",
-        //     description: "Did you watch it?!",
-        //     members: movieMembers
-        // }
-        // let category3: CategoryModel = {
-        // title: "Locations",
-        // url: "assets/locationIcon.png",
-        // description: "What dould you take to...?",
-        // members: locationMembers
-        // }
-        // let category4: CategoryModel = {
-        //     title: "Food",
-        //     url: "assets/foodIcon.png",
-        //     description: "Yammmm....",
-        //     members: foodMembers
-        // }
-        // let category5: CategoryModel = {
-        //     title: "Celebs",
-        //     url: "assets/celebIcon.png",
-        //     description: "I know him!",
-        //     members: celebsMemebers
-        // }
-        // let category6: CategoryModel = {
-        //     title: "Cartoon",
-        //     url: "assets/celebIcon.png",
-        //     description: "POW!",
-        //     members: carMembers
-        // }
-        this.af.list("categories/").push(category1);
-        // this.af.list(`categories/`).push(category2);
-        // this.af.list(`categories/`).push(category3);
-        // this.af.list(`categories/`).push(category4);
-        // this.af.list(`categories/`).push(category5);
-        // this.af.list(`categories/`).push(category6);
+    HomePage.prototype.pageGoBack = function () {
+        if (this.navCtrl.getActive().name != "ChooseCategoryPage" &&
+            this.navCtrl.getActive().name != "GamePage" &&
+            this.navCtrl.getActive().name != "ScorePage") {
+            return true;
+        }
+        return false;
+    };
+    HomePage.prototype.showAlert = function () {
+        var _this = this;
+        this.alert = this.alertCtrl.create({
+            title: 'Exit?',
+            message: 'Do you want to leave the room?',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                    handler: function () {
+                        _this.alert = null;
+                    }
+                },
+                {
+                    text: 'Exit',
+                    handler: function () {
+                        _this.navCtrl.popToRoot();
+                    }
+                }
+            ]
+        });
+        this.alert.present();
+    };
+    HomePage.prototype.showExitAlert = function () {
+        var _this = this;
+        this.alert = this.alertCtrl.create({
+            title: 'Exit?',
+            message: 'Do you want to exit the app?',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                    handler: function () {
+                        _this.alert = null;
+                    }
+                },
+                {
+                    text: 'Exit',
+                    handler: function () {
+                        _this.platform.exitApp();
+                    }
+                }
+            ]
+        });
+        this.alert.present();
     };
     HomePage.prototype.waitForRegistration = function () {
         var _this = this;
@@ -566,12 +428,13 @@ var HomePage = (function () {
 }());
 HomePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-home',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/'\nbower_components/momentjs/min/moment.min.js\nbower_components/momentjs/min/locales.min.js\nbower_components/humanize-duration/humanize-duration.js\n\n<ion-content class="body">\n\n<div>\n  <ion-segment [(ngModel)]="operation" class="operationItem">\n    <ion-segment-button value="openRoom" (click)="openRoom()" >\n      Open Room\n    </ion-segment-button>\n    <ion-segment-button value="joinRoom" (click)="joinRoom()" >\n      Join Room\n    </ion-segment-button>\n  </ion-segment>\n</div>\n\n<!--<ion-grid>\n  <ion-row>\n      <button ion-button class="newRoomButton">\n        New Room\n      </button>\n\n      <button ion-button class="newRoomButton">\n        Join Room\n      </button>\n  </ion-row>\n</ion-grid>\n-->\n\n\n<div [ngSwitch]="operation" ngClass="middle-vertical">\n  <ion-grid *ngSwitchCase="\'openRoom\'"   >\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n  <ion-grid *ngSwitchCase="\'joinRoom\'"   >\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n\n\n\n\n  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">\n       Play \n  </button>\n  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">\n       Sign with FaceBook \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">\n       Logout \n  </button>-->\n  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">\n       About \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">\n       Admin \n  </button>\n\n <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">\n      <ion-avatar item-start >\n        <img [src]="photoUrl" ngClass="photo">\n      </ion-avatar>\n      <h2 > Hello {{ displayName }}</h2>\n      <p>Ugh. As if.</p>\n    </ion-item>\n</div>\n\n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/
+        selector: 'page-home',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/'\nbower_components/momentjs/min/moment.min.js\nbower_components/momentjs/min/locales.min.js\nbower_components/humanize-duration/humanize-duration.js\n\n<ion-content class="homeBody">\n\n  <ion-segment [(ngModel)]="operation" class="operationItem" color="dark">\n    <ion-segment-button value="openRoom" (click)="openRoom()" class="segmentButtonClass" >\n      <ion-icon name="create"></ion-icon>\n       <label >New Room</label>\n    </ion-segment-button>\n    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="segmentButtonClass" >\n      <ion-icon name="person-add"></ion-icon>\n      <label >Join Room</label>\n    </ion-segment-button>\n  </ion-segment>\n\n<!--<ion-grid>\n  <ion-row>\n      <button ion-button class="newRoomButton">\n        New Room\n      </button>\n\n      <button ion-button class="newRoomButton">\n        Join Room\n      </button>\n  </ion-row>\n</ion-grid>\n-->\n\n\n<div [ngSwitch]="operation" ngClass="middle-vertical">\n  <ion-grid *ngSwitchCase="\'openRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n  <ion-grid *ngSwitchCase="\'joinRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   > Entry Code</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n\n\n\n\n  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">\n       Play \n  </button>\n  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">\n       Sign with FaceBook \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">\n       Logout \n  </button>-->\n  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">\n       About \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">\n       Admin \n  </button>\n\n <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">\n      <ion-avatar item-start >\n        <img [src]="photoUrl" ngClass="photo">\n      </ion-avatar>\n      <h2 > Hello {{ displayName }}</h2>\n      <p>Ugh. As if.</p>\n    </ion-item>\n</div>\n\n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/
     }),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */]) === "function" && _g || Object])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+        __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */]])
 ], HomePage);
 
-var _a, _b, _c, _d, _e, _f, _g;
 //# sourceMappingURL=home.js.map
 
 /***/ }),
@@ -1058,10 +921,10 @@ var AuthService = AuthService_1 = (function () {
 AuthService.Isdebug = true;
 AuthService = AuthService_1 = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["j" /* Platform */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]])
 ], AuthService);
 
-var AuthService_1, _a, _b, _c, _d;
+var AuthService_1;
 //# sourceMappingURL=auth.service.js.map
 
 /***/ })

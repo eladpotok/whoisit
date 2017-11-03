@@ -3,18 +3,18 @@ bower_components/momentjs/min/moment.min.js
 bower_components/momentjs/min/locales.min.js
 bower_components/humanize-duration/humanize-duration.js
 
-<ion-content class="body">
+<ion-content class="homeBody">
 
-<div>
-  <ion-segment [(ngModel)]="operation" class="operationItem">
-    <ion-segment-button value="openRoom" (click)="openRoom()" >
-      Open Room
+  <ion-segment [(ngModel)]="operation" class="operationItem" color="dark">
+    <ion-segment-button value="openRoom" (click)="openRoom()" class="segmentButtonClass" >
+      <ion-icon name="create"></ion-icon>
+       <label >New Room</label>
     </ion-segment-button>
-    <ion-segment-button value="joinRoom" (click)="joinRoom()" >
-      Join Room
+    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="segmentButtonClass" >
+      <ion-icon name="person-add"></ion-icon>
+      <label >Join Room</label>
     </ion-segment-button>
   </ion-segment>
-</div>
 
 <!--<ion-grid>
   <ion-row>
@@ -31,7 +31,7 @@ bower_components/humanize-duration/humanize-duration.js
 
 
 <div [ngSwitch]="operation" ngClass="middle-vertical">
-  <ion-grid *ngSwitchCase="'openRoom'"   >
+  <ion-grid *ngSwitchCase="'openRoom'">
 
     <ion-row  no-lines>
       <ion-col col-4>
@@ -52,7 +52,7 @@ bower_components/humanize-duration/humanize-duration.js
     </ion-row> 
   </ion-grid>
 
-  <ion-grid *ngSwitchCase="'joinRoom'"   >
+  <ion-grid *ngSwitchCase="'joinRoom'">
 
     <ion-row  no-lines>
       <ion-col col-4>
@@ -65,7 +65,7 @@ bower_components/humanize-duration/humanize-duration.js
 
     <ion-row >
       <ion-col col-4>
-      <ion-label class="label" fixed   >Room Name</ion-label>
+      <ion-label class="label" fixed   > Entry Code</ion-label>
       </ion-col>
       <ion-col >
       <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, AlertController, ViewController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../services/auth.service';
 import { RoomsService } from '../../services/rooms.service';
@@ -26,12 +26,26 @@ export class GamePage {
   loader: any;
   lastSeconds: boolean;
   secLabel: string = "0";
+  alert: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
               private authService: AuthService, private roomsService: RoomsService, private cd : ChangeDetectorRef,
-              public platform: Platform, public alertCtrl: AlertController, public loadingCtrl: LoadingController) {
+              public platform: Platform, public alertCtrl: AlertController, public loadingCtrl: LoadingController,
+              public viewCtrl: ViewController) {
 
-    
+    platform.ready().then(() => {
+        platform.registerBackButtonAction(() => {
+
+          if(viewCtrl.name == "GamePage"){
+            if(this.alert){ 
+              this.alert.dismiss();
+              this.alert =null;     
+            }else{
+              this.showAlert();
+            }
+          }
+        });
+    });
 
     this.roundKey = this.navParams.get('roundKey');
     
@@ -75,6 +89,30 @@ export class GamePage {
        }
        cd.markForCheck();
     }, 1000); 
+  }
+
+  private showAlert() {
+    this.alert = this.alertCtrl.create({
+      title: 'Exit?',
+      message: 'Are you sure that you want to leave the room?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            this.alert =null;
+          }
+        },
+        {
+          text: 'Leave',
+          handler: () => {
+            //this.platform.exitApp();
+            this.navCtrl.popToRoot();
+          }
+        }
+      ]
+    });
+    this.alert.present();
   }
 
   private addPointsToSpy(spyState: string) {

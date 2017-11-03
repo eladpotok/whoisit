@@ -10,7 +10,7 @@
 </ion-header>
 
 
-<ion-content padding class="bodyCategory">
+<ion-content padding class="bodyCategoryEmpty">
       <ion-card class="cardback">
         <img [src]="photoImage" class="photoGame"/>
         <ion-card-content>
@@ -30,12 +30,12 @@
         
       </ion-card>
       <ion-item class="timerItem" no-lines>
-          <ion-icon name="alarm" item-start class="iconTimer" ></ion-icon>
+          <ion-icon name="clock" item-start class="iconTimer" ></ion-icon>
 
           <label [ngClass]="{'timer': !lastSeconds,
                             'timerRed': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>
 
-          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="isSpy">
+          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="!isSpy">
             <ion-icon name="hand"></ion-icon>
               Vote
           </button>
