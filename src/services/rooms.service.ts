@@ -69,7 +69,7 @@ import { Observable } from 'rxjs/Observable';
     }
 
     public updateUsersInRoom(roomKey: string) {
-        if(RoomsService._currentRooms == null) {
+        // if(RoomsService._currentRooms == null) {
             RoomsService._currentRooms = new RoomModel;
             RoomsService._currentRooms.users = [];
             this.af.object(`rooms/${roomKey}`).subscribe(t=> {
@@ -91,7 +91,7 @@ import { Observable } from 'rxjs/Observable';
                     });
                 });
             });
-        }
+        // }
     }
 
  }

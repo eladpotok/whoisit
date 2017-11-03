@@ -34,7 +34,7 @@ export class GamePage {
               public viewCtrl: ViewController) {
 
     this.roundKey = this.navParams.get('roundKey');
-    
+    console.log("roundkey" + this.roundKey);
     let subscription =this.af.object(`rounds/${roomsService.currentRoom.$key}/${this.roundKey}`).subscribe( round => {
       if(round.spyKey == this.authService.currentUser.$key){
         this.drawSpy();

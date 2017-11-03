@@ -118,16 +118,16 @@ export class HomePage {
   }
 
   private waitForRegistration() {
-      this.afAuth.authState.subscribe((user: firebase.User) => {
-        if (!user) {
-            this.clearUser();
-            return;
-        }
-            this.authService.activeUser(user); 
-            if(this.authService.isAuthenticated){
-              this.currentUser = this.authService.currentUser;
-            }
-        });
+    this.afAuth.authState.subscribe((user: firebase.User) => {
+      if (!user) {
+          this.clearUser();
+          return;
+      }
+      this.authService.activeUser(user); 
+      if(this.authService.isAuthenticated){
+        this.currentUser = this.authService.currentUser;
+      }
+      });
   }
 
   private clearUser() {
@@ -152,7 +152,7 @@ export class HomePage {
   private createRoom(): string {
 
     let settingsModel: SettingsModel = {
-      timeElapsed: 8
+      timeElapsed: 7
     }
     
     // add new settings to db

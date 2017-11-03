@@ -278,7 +278,7 @@ var HomePage = (function () {
     };
     HomePage.prototype.createRoom = function () {
         var settingsModel = {
-            timeElapsed: 8
+            timeElapsed: 7
         };
         // add new settings to db
         var settingsKey = this.af.list("settings").push(settingsModel).key;
@@ -498,28 +498,28 @@ var RoomsService = RoomsService_1 = (function () {
     };
     RoomsService.prototype.updateUsersInRoom = function (roomKey) {
         var _this = this;
-        if (RoomsService_1._currentRooms == null) {
-            RoomsService_1._currentRooms = new __WEBPACK_IMPORTED_MODULE_2__Models_room_model__["a" /* RoomModel */];
-            RoomsService_1._currentRooms.users = [];
-            this.af.object("rooms/" + roomKey).subscribe(function (t) {
-                RoomsService_1._currentRooms.$key = t.$key;
-                RoomsService_1._currentRooms.categoryName = t.categoryName;
-                RoomsService_1._currentRooms.roomName = t.roomName;
-                RoomsService_1._currentRooms.settingsKey = t.settingsKey;
-            });
-            this.af.list("rooms/" + roomKey + "/users", { preserveSnapshot: true }).subscribe(function (t) {
-                t.forEach(function (user) {
-                    var userKey = user.key;
-                    var points = user.val();
-                    _this.af.object("users/" + userKey).subscribe(function (userDetail) {
-                        if (RoomsService_1._currentRooms.users.map(function (t) { return t.$key; }).indexOf(userKey) == -1) {
-                            userDetail.pointsInRoom = points;
-                            RoomsService_1._currentRooms.users.push(userDetail);
-                        }
-                    });
+        // if(RoomsService._currentRooms == null) {
+        RoomsService_1._currentRooms = new __WEBPACK_IMPORTED_MODULE_2__Models_room_model__["a" /* RoomModel */];
+        RoomsService_1._currentRooms.users = [];
+        this.af.object("rooms/" + roomKey).subscribe(function (t) {
+            RoomsService_1._currentRooms.$key = t.$key;
+            RoomsService_1._currentRooms.categoryName = t.categoryName;
+            RoomsService_1._currentRooms.roomName = t.roomName;
+            RoomsService_1._currentRooms.settingsKey = t.settingsKey;
+        });
+        this.af.list("rooms/" + roomKey + "/users", { preserveSnapshot: true }).subscribe(function (t) {
+            t.forEach(function (user) {
+                var userKey = user.key;
+                var points = user.val();
+                _this.af.object("users/" + userKey).subscribe(function (userDetail) {
+                    if (RoomsService_1._currentRooms.users.map(function (t) { return t.$key; }).indexOf(userKey) == -1) {
+                        userDetail.pointsInRoom = points;
+                        RoomsService_1._currentRooms.users.push(userDetail);
+                    }
                 });
             });
-        }
+        });
+        // }
     };
     return RoomsService;
 }());

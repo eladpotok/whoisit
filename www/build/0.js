@@ -84,6 +84,7 @@ var GamePage = (function () {
         this.second = 0;
         this.secLabel = "0";
         this.roundKey = this.navParams.get('roundKey');
+        console.log("roundkey" + this.roundKey);
         var subscription = this.af.object("rounds/" + roomsService.currentRoom.$key + "/" + this.roundKey).subscribe(function (round) {
             if (round.spyKey == _this.authService.currentUser.$key) {
                 _this.drawSpy();
