@@ -24,8 +24,9 @@
       </ion-avatar>
       <h2> {{ item.displayName }}</h2>
       <p>{{ item.level }}</p>
+      
+      <ion-icon item-end name="key" *ngIf="item.isOwner"></ion-icon>
       <h2 item-end > {{ item.pointsInRoom  }} points </h2>
-
     </ion-item>
   </ion-list> 
 

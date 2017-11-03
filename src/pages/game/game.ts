@@ -6,6 +6,7 @@ import { RoomsService } from '../../services/rooms.service';
 import {CategoryModel } from '../../Models/category.model';
 import { ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { LoadingController } from 'ionic-angular';
+import { MessagesService } from '../../services/messages.service';
 import 'rxjs/add/operator/map';
 
 @IonicPage()
@@ -31,7 +32,7 @@ export class GamePage {
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
               private authService: AuthService, private roomsService: RoomsService, private cd : ChangeDetectorRef,
               public platform: Platform, public alertCtrl: AlertController, public loadingCtrl: LoadingController,
-              public viewCtrl: ViewController) {
+              public viewCtrl: ViewController, public msgService: MessagesService) {
 
     this.roundKey = this.navParams.get('roundKey');
     console.log("roundkey" + this.roundKey);
@@ -123,6 +124,13 @@ export class GamePage {
           this.addPointsToSpy(spy.$value);
           // go to score page 
           this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value });
+        }
+        else if(spy.$value == "damaged") { // preserve for times when some of the players leave the room
+          clearInterval(this.id);
+          this.dismissLoading();
+
+          this.msgService.showMsg("Sorry", "One of the players left the room, you are directed to the room");
+          this.navCtrl.popTo("LobbyPage");
         }
       });
     }

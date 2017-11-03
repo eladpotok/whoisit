@@ -12,6 +12,8 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 import { SettingsModel } from '../../Models/settings.model';
 import * as firebase from 'firebase';
 import { AuthService } from '../../services/auth.service';
+import { MessagesService } from '../../services/messages.service';
+import { RoomsService } from '../../services/rooms.service';
 import { CategoryModel, MemberModel } from '../../Models/category.model';
 
 @Component({
@@ -35,8 +37,8 @@ export class HomePage {
   isAlertShown: boolean;
 
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
-              private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
-              public authService: AuthService, public viewCtrl: ViewController) {
+              private fb: Facebook, private platform: Platform, public alertCtrl: AlertController, public msgService: MessagesService,
+              public authService: AuthService, public viewCtrl: ViewController, public roomService: RoomsService) {
     this.waitForRegistration();
 
     // platform.registerBackButtonAction(()=> this.myHandlerFunction() );
@@ -86,6 +88,7 @@ export class HomePage {
           text: 'Leave',
           handler: () => {
             this.alert =null;
+            this.af.list(`rooms/${this.roomService.currentRoom.$key}/users`).remove(this.authService.currentUser.$key);
             this.navCtrl.popToRoot();
           }
         }
@@ -140,13 +143,13 @@ export class HomePage {
     if(this.roomName == null ||
        this.currentUser.displayName == null) {
     
-      this.showMsg("Wrong parameter!", "One of the given paramter is incorrect");
+      this.msgService.showMsg("Wrong parameter!", "One of the given paramter is incorrect");
       return;
     }
     
     let roomKey = this.createRoom();
     
-    this.addUserToRoom(roomKey);
+    this.addUserToRoom(roomKey, true);
   }
 
   private createRoom(): string {
@@ -184,10 +187,10 @@ export class HomePage {
     return code;
   }
 
-  private addUserToRoom(roomKey: string) {
+  private addUserToRoom(roomKey: string, isOwner: boolean) {
     // check if the user is authenticated 
     if(!this.authService.isAuthenticated)
-      this.authService.addGuestUser(this.currentUser.displayName, roomKey);
+      this.authService.addGuestUser(this.currentUser.displayName, roomKey, isOwner);
     else {
       this.af.object(`rooms/${roomKey}/users/${this.authService.currentUser.$key}`).set(0);
       this.authService.getPointsInRoom(this.currentUser, roomKey).subscribe(t=>{
@@ -218,7 +221,7 @@ export class HomePage {
      if(this.currentUser.displayName == null ||
        this.roomEntryCode == null) {
 
-      this.showMsg("Wrong parameter!", "One of the given paramter is incorrect");
+      this.msgService.showMsg("Wrong parameter!", "One of the given paramter is incorrect");
       return;
     }
 
@@ -250,18 +253,18 @@ export class HomePage {
                     });
                     console.log("user added");
                     if(!userFound)
-                      this.addUserToRoom(snapshot.key);
+                      this.addUserToRoom(snapshot.key, false);
                     sub.unsubscribe();
                   });
                 }
                 else {
-                  this.showMsg("Sorry", "The room is in during the game");
+                  this.msgService.showMsg("Sorry", "The room is in during the game");
                 }
                 subscription.unsubscribe();
               }
           });
           if(!roomFound){
-            this.showMsg("Room does not exist", "The key which is given is not exist!");
+            this.msgService.showMsg("Room does not exist", "The key which is given is not exist!");
             subscription.unsubscribe();
           }
       });
@@ -280,16 +283,6 @@ export class HomePage {
         this.joinRoomSubmit();
     }
   }
-
-  private showMsg(title: string, subTitle: string) {
-     let alert = this.alertCtrl.create({
-            title: title,
-            subTitle: subTitle,
-            buttons: ['OK']
-          });
-      alert.present();
-  }
-
 
   public signInWithFacebook() {
 

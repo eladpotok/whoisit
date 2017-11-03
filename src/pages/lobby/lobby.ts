@@ -9,7 +9,7 @@ import { RoomsService } from '../../services/rooms.service';
 import { RoundModel } from '../../Models/round.model';
 import { LoadingController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
-
+import { MessagesService } from '../../services/messages.service';
 
 @IonicPage()
 @Component({
@@ -34,7 +34,7 @@ export class LobbyPage {
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
               private roomService: RoomsService, public loadingCtrl: LoadingController,
-              public alertCtrl: AlertController) {
+              public alertCtrl: AlertController, public msgService: MessagesService) {
                 
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
@@ -128,19 +128,10 @@ export class LobbyPage {
       this.loader.dismiss();
   }
 
-  private showMsg(title: string, subTitle: string) {
-    let alert = this.alertCtrl.create({
-          title: title,
-          subTitle: subTitle,
-          buttons: ['OK']
-        });
-    alert.present();
-  }
-
   startGame() {
       
       if(this.usersCount < 4 && !this.authService.IsDebug) {
-        this.showMsg("Sorry", "The round can be executed only for 4 players and above.");
+        this.msgService.showMsg("Sorry", "The round can be executed only for 4 players and above.");
         return;
       }
 

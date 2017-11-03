@@ -14,6 +14,7 @@ import { Observable } from 'rxjs/Observable';
 
     private static _currentRooms: RoomModel;
     private static _currentRound: RoundModel;
+    private static _cuurentRoundKey: string;
 
     constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
 
@@ -21,6 +22,14 @@ import { Observable } from 'rxjs/Observable';
 
     public get currentRoom(): RoomModel {
         return RoomsService._currentRooms;
+    }
+
+    public get currentRoundKey(): string {
+        return RoomsService._cuurentRoundKey;
+    }
+
+    public setCurrentRoundKey(roundKey: string) {
+        RoomsService._cuurentRoundKey = roundKey;
     }
 
     public getRoundBy(roomKey: string) : RoundModel {

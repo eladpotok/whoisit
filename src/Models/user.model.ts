@@ -9,4 +9,5 @@ export class UserModel extends BaseModel {
     level: string
     isAuthenticated: Boolean
     pointsInRoom?: number
+    isOwner: boolean;
 }

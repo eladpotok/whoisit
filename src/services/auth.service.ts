@@ -14,7 +14,8 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
     private static _currentUser: UserModel;
     private static Isdebug: boolean = true;
 
-    constructor( public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
+    constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, 
+                public af: AngularFireDatabase) {
       
     }
 
@@ -54,18 +55,19 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
   }
 
 
-  public addGuestUser(userName: string, roomKey: string) {
+  public addGuestUser(userName: string, roomKey: string, isOwner: boolean) {
 
-        let userModel: UserModel = 
-        {
-            displayName: userName,
-            games: 0,
-            totalPoints: 0,
-            imageUrl: "assets/geust.png",
-            level: "beginner",
-            isAuthenticated: false
-        }
-    console.log("added user ");
+    let userModel: UserModel = 
+    {
+        displayName: userName,
+        games: 0,
+        totalPoints: 0,
+        imageUrl: "assets/geust.png",
+        level: "beginner",
+        isAuthenticated: false,
+        isOwner: isOwner
+    }
+    
     let userId = this.af.list(`users`).push(userModel).key;
     
 
@@ -107,7 +109,8 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
             $key: user.uid,
             totalPoints: 0,
             games: 0,
-            level: "beginner"
+            level: "beginner",
+            isOwner: false
       }
 
       AuthService._currentUser = userModel;
