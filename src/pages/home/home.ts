@@ -31,7 +31,8 @@ export class HomePage {
   currentUser: UserModel = new UserModel;
   usersInRoom: UserModel[];
   isDebug: boolean = false;
-  alert: any;
+  alert: any = null;
+  isAlertShown: boolean;
 
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
               private fb: Facebook, private platform: Platform, public alertCtrl: AlertController,
@@ -41,7 +42,8 @@ export class HomePage {
     // platform.registerBackButtonAction(()=> this.myHandlerFunction() );
     platform.ready().then(() => {
         platform.registerBackButtonAction(() => {
-
+          if(this.alert != null)
+            return;
           if(navCtrl.getActive().name == "HomePage") {
             this.showExitAlert();
           }
@@ -70,7 +72,7 @@ export class HomePage {
   private showAlert() {
     
     this.alert = this.alertCtrl.create({
-      title: 'Exit?',
+      title: 'Leave?',
       message: 'Do you want to leave the room?',
       buttons: [
         {
@@ -83,6 +85,7 @@ export class HomePage {
         {
           text: 'Leave',
           handler: () => {
+            this.alert =null;
             this.navCtrl.popToRoot();
           }
         }
@@ -303,30 +306,5 @@ export class HomePage {
   public adminPanel() {
     this.navCtrl.push('AdminPage');
   }
-
-
-  private myHandlerFunction(){
-      let confirm = this.alertCtrl.create({
-      title: 'Attention?',
-      message: 'Are you sure that you want to leave the room?',
-      buttons: [
-        {
-          text: 'Disagree',
-          handler: () => {
-            
-        }
-        },
-        {
-          text: 'Agree',
-          handler: () => {
-            // this.platform.registerBackButtonAction( () => { this.navCtrl.pop();  });
-            this.navCtrl.popToRoot();
-          }
-        }
-      ]
-    });
-    confirm.present();
-  }
-  
 }
 

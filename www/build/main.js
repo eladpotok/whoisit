@@ -173,10 +173,13 @@ var HomePage = (function () {
         this.viewCtrl = viewCtrl;
         this.currentUser = new __WEBPACK_IMPORTED_MODULE_2__Models_user_model__["a" /* UserModel */];
         this.isDebug = false;
+        this.alert = null;
         this.waitForRegistration();
         // platform.registerBackButtonAction(()=> this.myHandlerFunction() );
         platform.ready().then(function () {
             platform.registerBackButtonAction(function () {
+                if (_this.alert != null)
+                    return;
                 if (navCtrl.getActive().name == "HomePage") {
                     _this.showExitAlert();
                 }
@@ -202,7 +205,7 @@ var HomePage = (function () {
     HomePage.prototype.showAlert = function () {
         var _this = this;
         this.alert = this.alertCtrl.create({
-            title: 'Exit?',
+            title: 'Leave?',
             message: 'Do you want to leave the room?',
             buttons: [
                 {
@@ -213,8 +216,9 @@ var HomePage = (function () {
                     }
                 },
                 {
-                    text: 'Exit',
+                    text: 'Leave',
                     handler: function () {
+                        _this.alert = null;
                         _this.navCtrl.popToRoot();
                     }
                 }
@@ -401,28 +405,6 @@ var HomePage = (function () {
     };
     HomePage.prototype.adminPanel = function () {
         this.navCtrl.push('AdminPage');
-    };
-    HomePage.prototype.myHandlerFunction = function () {
-        var _this = this;
-        var confirm = this.alertCtrl.create({
-            title: 'Attention?',
-            message: 'Are you sure that you want to leave the room?',
-            buttons: [
-                {
-                    text: 'Disagree',
-                    handler: function () {
-                    }
-                },
-                {
-                    text: 'Agree',
-                    handler: function () {
-                        // this.platform.registerBackButtonAction( () => { this.navCtrl.pop();  });
-                        _this.navCtrl.popToRoot();
-                    }
-                }
-            ]
-        });
-        confirm.present();
     };
     return HomePage;
 }());

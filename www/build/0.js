@@ -83,19 +83,6 @@ var GamePage = (function () {
         this.viewCtrl = viewCtrl;
         this.second = 0;
         this.secLabel = "0";
-        platform.ready().then(function () {
-            platform.registerBackButtonAction(function () {
-                if (viewCtrl.name == "GamePage") {
-                    if (_this.alert) {
-                        _this.alert.dismiss();
-                        _this.alert = null;
-                    }
-                    else {
-                        _this.showAlert();
-                    }
-                }
-            });
-        });
         this.roundKey = this.navParams.get('roundKey');
         var subscription = this.af.object("rounds/" + roomsService.currentRoom.$key + "/" + this.roundKey).subscribe(function (round) {
             if (round.spyKey == _this.authService.currentUser.$key) {
@@ -135,30 +122,6 @@ var GamePage = (function () {
             cd.markForCheck();
         }, 1000);
     }
-    GamePage.prototype.showAlert = function () {
-        var _this = this;
-        this.alert = this.alertCtrl.create({
-            title: 'Exit?',
-            message: 'Are you sure that you want to leave the room?',
-            buttons: [
-                {
-                    text: 'Cancel',
-                    role: 'cancel',
-                    handler: function () {
-                        _this.alert = null;
-                    }
-                },
-                {
-                    text: 'Leave',
-                    handler: function () {
-                        //this.platform.exitApp();
-                        _this.navCtrl.popToRoot();
-                    }
-                }
-            ]
-        });
-        this.alert.present();
-    };
     GamePage.prototype.addPointsToSpy = function (spyState) {
         var points = 0;
         switch (spyState) {
@@ -192,10 +155,12 @@ var GamePage = (function () {
                 if (spy.$value == "found") {
                     _this.dismissLoading();
                     // go to guess subject page
+                    clearInterval(_this.id);
                     _this.navCtrl.push("GuessPage", { roundKey: _this.roundKey });
                 }
                 else if (spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
                     _this.dismissLoading();
+                    clearInterval(_this.id);
                     _this.addPointsToSpy(spy.$value);
                     // go to score page 
                     _this.navCtrl.push('ScorePage', { roundKey: _this.roundKey, spyState: spy.$value });

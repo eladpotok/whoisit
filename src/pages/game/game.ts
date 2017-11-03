@@ -33,20 +33,6 @@ export class GamePage {
               public platform: Platform, public alertCtrl: AlertController, public loadingCtrl: LoadingController,
               public viewCtrl: ViewController) {
 
-    platform.ready().then(() => {
-        platform.registerBackButtonAction(() => {
-
-          if(viewCtrl.name == "GamePage"){
-            if(this.alert){ 
-              this.alert.dismiss();
-              this.alert =null;     
-            }else{
-              this.showAlert();
-            }
-          }
-        });
-    });
-
     this.roundKey = this.navParams.get('roundKey');
     
     let subscription =this.af.object(`rounds/${roomsService.currentRoom.$key}/${this.roundKey}`).subscribe( round => {
@@ -91,30 +77,6 @@ export class GamePage {
     }, 1000); 
   }
 
-  private showAlert() {
-    this.alert = this.alertCtrl.create({
-      title: 'Exit?',
-      message: 'Are you sure that you want to leave the room?',
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
-            this.alert =null;
-          }
-        },
-        {
-          text: 'Leave',
-          handler: () => {
-            //this.platform.exitApp();
-            this.navCtrl.popToRoot();
-          }
-        }
-      ]
-    });
-    this.alert.present();
-  }
-
   private addPointsToSpy(spyState: string) {
     let points =0;
     switch(spyState) {
@@ -151,11 +113,13 @@ export class GamePage {
         if(spy.$value == "found") {
           this.dismissLoading();
           // go to guess subject page
+          clearInterval(this.id);
+
           this.navCtrl.push("GuessPage", { roundKey: this.roundKey });
         }
         else if(spy.$value == "win" || spy.$value == "semi-win" || spy.$value == "lose") {
           this.dismissLoading();
-
+          clearInterval(this.id);
           this.addPointsToSpy(spy.$value);
           // go to score page 
           this.navCtrl.push('ScorePage',  { roundKey: this.roundKey, spyState: spy.$value });

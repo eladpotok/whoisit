@@ -30169,6 +30169,16 @@ page-choose-category .title {
   font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 
+page-end-game .listHeader {
+  background: transparent;
+  margin-right: auto;
+  margin-left: auto;
+  display: block;
+  font-size: 30px;
+  color: darkslategray;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+}
+
 page-game .photoGame {
   width: 25rem;
   height: 30rem;
@@ -30269,7 +30279,7 @@ page-guess .imgSize {
 
 page-home .operationItem {
   background-color: transparent;
-  height: 40px;
+  height: 20px;
   width: 90%;
   margin-right: auto;
   margin-left: auto;
@@ -30391,7 +30401,7 @@ page-home .segmentButtonClass {
   text-decoration: none;
   text-shadow: 0px 1px 0px #ffffff;
   margin-left: 10px;
-  margin-top: 100px;
+  margin-top: 10%;
 }
 
 page-home .segmentButtonClass:hover {
@@ -30419,6 +30429,38 @@ page-lobby .entryCodeLabel {
 page-lobby .settingsButton {
   background: transparent;
   font-size: 25px;
+}
+
+page-lobby .leaveButton {
+  -webkit-box-shadow: inset 0px 1px 0px 0px #f7c5c0;
+  box-shadow: inset 0px 1px 0px 0px #f7c5c0;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #fc8d83), to(#e4685d));
+  background: linear-gradient(to bottom, #fc8d83 5%, #e4685d 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fc8d83', endColorstr='#e4685d',GradientType=0);
+  background-color: #fc8d83;
+  border-radius: 6px;
+  border: 1px solid #d83526;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 6px 24px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #b23e35;
+}
+
+page-lobby .leaveButton:hover {
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(5%, #e4685d), to(#fc8d83));
+  background: linear-gradient(to bottom, #e4685d 5%, #fc8d83 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#e4685d', endColorstr='#fc8d83',GradientType=0);
+  background-color: #e4685d;
+}
+
+page-lobby .leaveButton:active {
+  position: relative;
+  top: 1px;
 }
 
 page-score .backgroundWin {

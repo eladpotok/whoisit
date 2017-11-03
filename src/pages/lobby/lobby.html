@@ -1,7 +1,7 @@
 
 <ion-header class="title">
 
-  <ion-navbar class="title">
+  <ion-navbar class="title" hideBackButton >
     <ion-title class="title">
       <label>   {{ roomName }} - </label>
       <label class="entryCodeLabel"> {{ entryCode }} </label>
@@ -30,6 +30,7 @@
   </ion-list> 
 
   <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>
+  <button ion-button (click)="exit()" class="leaveButton" >Leave</button>
 
   <!--<button ion-button (click)="exit()" class="myButton">Exit</button>-->
 </ion-content>

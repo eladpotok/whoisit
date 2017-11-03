@@ -166,8 +166,26 @@ export class LobbyPage {
   }
 
   public exit() {
-    this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
-    this.navCtrl.push('HomePage');
+    let alert = this.alertCtrl.create({
+      title: 'Attention?',
+      message: 'Are you sure that you want to leave the room?',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+          }
+        },
+        {
+          text: 'Leave',
+          handler: () => {
+            this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
+            this.navCtrl.popToRoot();
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 
   public goSettings() {
