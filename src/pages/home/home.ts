@@ -41,7 +41,7 @@ export class HomePage {
               public authService: AuthService, public viewCtrl: ViewController, public roomService: RoomsService) {
     this.waitForRegistration();
 
-    // platform.registerBackButtonAction(()=> this.myHandlerFunction() );
+
     platform.ready().then(() => {
         platform.registerBackButtonAction(() => {
           if(this.alert != null)
@@ -64,7 +64,8 @@ export class HomePage {
   private pageGoBack() : Boolean {
     if(this.navCtrl.getActive().name != "ChooseCategoryPage" && 
        this.navCtrl.getActive().name != "GamePage" &&
-       this.navCtrl.getActive().name != "ScorePage") {
+       this.navCtrl.getActive().name != "ScorePage" && 
+       this.navCtrl.getActive().name != "GuessPage") {
       return true;
     }
     
@@ -90,6 +91,7 @@ export class HomePage {
             this.alert =null;
             this.af.list(`rooms/${this.roomService.currentRoom.$key}/users`).remove(this.authService.currentUser.$key);
             this.navCtrl.popToRoot();
+            
           }
         }
       ]

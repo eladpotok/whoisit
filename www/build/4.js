@@ -68,7 +68,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var LobbyPage = (function () {
     function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl, alertCtrl, msgService) {
-        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
@@ -84,20 +83,30 @@ var LobbyPage = (function () {
         this.loadUsers();
         // find the room by the given entry code
         this.findRoom();
+        //this.prepareRoom();
+    }
+    LobbyPage.prototype.ionViewDidEnter = function () {
+        this.prepareRoom();
+    };
+    LobbyPage.prototype.prepareRoom = function () {
+        var _this = this;
         var subscription = this.af.list("rounds/" + this.roomKey + "/").subscribe(function (t) {
             t.forEach(function (r) {
+                console.log("in foreach");
                 if (r != null && r.roomKey == _this.roomKey && r.state != "done") {
-                    var roundKey_1 = r.$key;
+                    _this.currentRound = r.$key;
                     subscription.unsubscribe();
-                    _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/isCategorySelected").subscribe(function (category) {
+                    _this.af.object("rounds/" + _this.roomKey + "/" + _this.currentRound + "/isCategorySelected").subscribe(function (category) {
+                        console.log("category selected - changed");
                         if (category.$value) {
                             _this.dismissLoading();
-                            _this.navCtrl.push('GamePage', { roundKey: roundKey_1 });
+                            _this.navCtrl.push('GamePage', { roundKey: _this.currentRound });
                         }
                     });
-                    _this.af.object("rounds/" + _this.roomKey + "/" + roundKey_1 + "/selectorKey").subscribe(function (selector) {
+                    _this.af.object("rounds/" + _this.roomKey + "/" + _this.currentRound + "/selectorKey").subscribe(function (selector) {
                         if (selector.$value == _this.authService.currentUser.$key) {
-                            _this.navCtrl.push('ChooseCategoryPage', { roundKey: roundKey_1, roomKey: _this.roomKey });
+                            console.log("selector key - changed");
+                            _this.navCtrl.push('ChooseCategoryPage', { roundKey: _this.currentRound, roomKey: _this.roomKey });
                         }
                         else if (selector.$value != null) {
                             _this.presentLoading();
@@ -106,7 +115,7 @@ var LobbyPage = (function () {
                 }
             });
         });
-    }
+    };
     LobbyPage.prototype.findRoom = function () {
         var _this = this;
         // Get the current room
@@ -123,8 +132,8 @@ var LobbyPage = (function () {
     LobbyPage.prototype.loadUsers = function () {
         var _this = this;
         // get the users in the current room
-        this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
-            console.log("enter here");
+        this.loadUserSubscriber = this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
+            _this.checkUserLeft(snapshots.length);
             _this.usersModel = [];
             _this.usersCount = snapshots.length;
             snapshots.forEach(function (snapshot) {
@@ -136,6 +145,17 @@ var LobbyPage = (function () {
                 });
             });
         });
+    };
+    LobbyPage.prototype.checkUserLeft = function (newUserCount) {
+        if (this.usersCount > newUserCount) {
+            this.msgService.showMsg("Attention", "One of the players left the room");
+            if (this.isOwner) {
+                this.af.object("rooms/" + this.roomKey + "/usersCount").set(newUserCount);
+                this.af.object("rooms/" + this.roomKey + "/isStarted").set(false);
+                this.af.object("rounds/" + this.roomKey + "/" + this.currentRound + "/state").set("done");
+            }
+            this.navCtrl.popTo(this.navCtrl.getByIndex(1));
+        }
     };
     LobbyPage.prototype.raffleSpy = function () {
         var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
@@ -161,9 +181,12 @@ var LobbyPage = (function () {
             this.msgService.showMsg("Sorry", "The round can be executed only for 4 players and above.");
             return;
         }
+        console.log("start game 1 ");
         this.roomService.updateUsersInRoom(this.roomKey);
+        console.log("start game 2 ");
         // raffle spy and category selector  
         this.raffleSelector();
+        console.log("start game 3 ");
         this.raffleSpy();
         var round = {
             categoryKey: "",
@@ -192,13 +215,17 @@ var LobbyPage = (function () {
                 {
                     text: 'Leave',
                     handler: function () {
-                        _this.af.list("rooms/" + _this.roomKey + "/users/").remove(_this.authService.currentUser.$key);
-                        _this.navCtrl.popToRoot();
+                        _this.leaveRoom();
                     }
                 }
             ]
         });
         alert.present();
+    };
+    LobbyPage.prototype.leaveRoom = function () {
+        this.loadUserSubscriber.unsubscribe();
+        this.af.list("rooms/" + this.roomKey + "/users/").remove(this.authService.currentUser.$key);
+        this.navCtrl.popToRoot();
     };
     LobbyPage.prototype.goSettings = function () {
         this.navCtrl.push('SettingsPage', { roomKey: this.roomKey });

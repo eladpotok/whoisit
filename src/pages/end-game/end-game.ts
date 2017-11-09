@@ -106,7 +106,7 @@ export class EndGamePage {
 
     // vote for the selected user
     this.voteUser(user);
-    
+    console.log("the spy is " + this.roomService.getSpy());
     // check if I selected right
     if(user.$key == this.roomService.getSpy()) {
       this.auth.currentUser.pointsInRoom += 1;

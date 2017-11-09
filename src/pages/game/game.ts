@@ -34,6 +34,8 @@ export class GamePage {
               public platform: Platform, public alertCtrl: AlertController, public loadingCtrl: LoadingController,
               public viewCtrl: ViewController, public msgService: MessagesService) {
 
+    
+
     this.roundKey = this.navParams.get('roundKey');
     console.log("roundkey" + this.roundKey);
     let subscription =this.af.object(`rounds/${roomsService.currentRoom.$key}/${this.roundKey}`).subscribe( round => {
@@ -45,7 +47,7 @@ export class GamePage {
         this.drawRandomCard(round.secret, round.categoryKey);
         subscription.unsubscribe();
       }
-
+      console.log("set spy " + round.spyKey);
       // set the spy so we could know him in the future
       this.roomsService.setSpy(round.spyKey);
     });
@@ -76,6 +78,10 @@ export class GamePage {
        }
        cd.markForCheck();
     }, 1000); 
+  }
+
+  ionViewWillLeave() {
+    clearInterval(this.id);
   }
 
   private addPointsToSpy(spyState: string) {
@@ -110,7 +116,7 @@ export class GamePage {
     // wait till other users will vote
     if(this.isSpy) {
       this.af.object(`rounds/${this.roomsService.currentRoom.$key}/${this.roundKey}/spyState`).subscribe(spy =>{
-          
+          console.log("the state is " + spy.$value);
         if(spy.$value == "found") {
           this.dismissLoading();
           // go to guess subject page

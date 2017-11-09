@@ -1,6 +1,6 @@
 {
   "name": "spyApp",
-  "app_id": "",
+  "app_id": "d0c6dba9",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}

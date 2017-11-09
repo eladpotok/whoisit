@@ -22,6 +22,7 @@ export class LobbyPage {
   roomsItems: Observable<RoomModel>;
   users: Observable<UserModel[]>;
   isOwner: Boolean;
+  loadUserSubscriber: any;
   selectorUserKey: string; 
   spyUser: string;
   roomName: string;
@@ -30,12 +31,13 @@ export class LobbyPage {
   usersCount: number;
   loader: any;
   entryCode: string;
+  currentRound: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
               private roomService: RoomsService, public loadingCtrl: LoadingController,
               public alertCtrl: AlertController, public msgService: MessagesService) {
-                
+    
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
 
@@ -45,21 +47,32 @@ export class LobbyPage {
     // find the room by the given entry code
     this.findRoom();
 
+    //this.prepareRoom();
+    
+  }
 
+  ionViewDidEnter() {
+    this.prepareRoom()
+  }
+  
+  private prepareRoom() {
     let subscription = this.af.list(`rounds/${this.roomKey}/`).subscribe(t=>{
       t.forEach(r=>{
+        console.log("in foreach");
         if(r != null && r.roomKey == this.roomKey && r.state != "done"){
-          let roundKey = r.$key;
+          this.currentRound = r.$key;
           subscription.unsubscribe();
-          this.af.object(`rounds/${this.roomKey}/${roundKey}/isCategorySelected`).subscribe(category => {
+          this.af.object(`rounds/${this.roomKey}/${this.currentRound}/isCategorySelected`).subscribe(category => {
+            console.log("category selected - changed");
             if(category.$value){
               this.dismissLoading();
-              this.navCtrl.push('GamePage', {roundKey: roundKey});
+              this.navCtrl.push('GamePage', {roundKey: this.currentRound});
             }
           });
-          this.af.object(`rounds/${this.roomKey}/${roundKey}/selectorKey`).subscribe(selector => {
+          this.af.object(`rounds/${this.roomKey}/${this.currentRound}/selectorKey`).subscribe(selector => {
             if(selector.$value == this.authService.currentUser.$key){
-              this.navCtrl.push('ChooseCategoryPage', {roundKey: roundKey , roomKey: this.roomKey});
+              console.log("selector key - changed");
+              this.navCtrl.push('ChooseCategoryPage', {roundKey: this.currentRound , roomKey: this.roomKey});
             }
             else if(selector.$value != null) {
               this.presentLoading();
@@ -86,8 +99,10 @@ export class LobbyPage {
 
   private loadUsers() {
       // get the users in the current room
-      this.af.list(`rooms/${this.roomKey}/users`).subscribe( snapshots => {
-        console.log("enter here");
+      this.loadUserSubscriber = this.af.list(`rooms/${this.roomKey}/users`).subscribe( snapshots => {
+
+        this.checkUserLeft(snapshots.length);
+
         this.usersModel = [];
         this.usersCount = snapshots.length;
         snapshots.forEach( snapshot=> {
@@ -100,6 +115,18 @@ export class LobbyPage {
           });
         });
       });
+  }
+
+  private checkUserLeft(newUserCount: number) {
+    if(this.usersCount > newUserCount) {
+      this.msgService.showMsg("Attention", "One of the players left the room");
+      if(this.isOwner){
+        this.af.object(`rooms/${this.roomKey}/usersCount`).set(newUserCount);
+        this.af.object(`rooms/${this.roomKey}/isStarted`).set(false);
+        this.af.object(`rounds/${this.roomKey}/${this.currentRound}/state`).set("done");
+      }
+      this.navCtrl.popTo(this.navCtrl.getByIndex(1));      
+    }
   }
     
   private raffleSpy(){ 
@@ -134,11 +161,12 @@ export class LobbyPage {
         this.msgService.showMsg("Sorry", "The round can be executed only for 4 players and above.");
         return;
       }
-
+      console.log("start game 1 ");
       this.roomService.updateUsersInRoom(this.roomKey);
-
+      console.log("start game 2 ");
       // raffle spy and category selector  
       this.raffleSelector(); 
+      console.log("start game 3 ");
       this.raffleSpy();
 
       let round: RoundModel = {
@@ -170,13 +198,18 @@ export class LobbyPage {
         {
           text: 'Leave',
           handler: () => {
-            this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
-            this.navCtrl.popToRoot();
+            this.leaveRoom();
           }
         }
       ]
     });
     alert.present();
+  }
+
+  private leaveRoom() {
+      this.loadUserSubscriber.unsubscribe();
+      this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
+      this.navCtrl.popToRoot();
   }
 
   public goSettings() {

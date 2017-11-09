@@ -15,6 +15,7 @@ import { Observable } from 'rxjs/Observable';
     private static _currentRooms: RoomModel;
     private static _currentRound: RoundModel;
     private static _cuurentRoundKey: string;
+    private static _currentSpy: string;
 
     constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
 
@@ -49,11 +50,11 @@ import { Observable } from 'rxjs/Observable';
     }
 
     public setSpy(spy: string) {
-        RoomsService._currentRooms.spy = spy;
+        RoomsService._currentSpy = spy;
     }
 
     public getSpy() : string {
-        return RoomsService._currentRooms.spy;
+        return RoomsService._currentSpy;
     }
 
     public getUsersFromRoom() : UserModel[] {
@@ -79,6 +80,7 @@ import { Observable } from 'rxjs/Observable';
 
     public updateUsersInRoom(roomKey: string) {
         // if(RoomsService._currentRooms == null) {
+            console.log("update once again the room");
             RoomsService._currentRooms = new RoomModel;
             RoomsService._currentRooms.users = [];
             this.af.object(`rooms/${roomKey}`).subscribe(t=> {
