@@ -68,6 +68,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var LobbyPage = (function () {
     function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl, alertCtrl, msgService) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
@@ -83,7 +84,14 @@ var LobbyPage = (function () {
         this.loadUsers();
         // find the room by the given entry code
         this.findRoom();
-        //this.prepareRoom();
+        this.af.object("rooms/" + this.roomKey + "/isClosed").subscribe(function (t) {
+            console.log("check1");
+            _this.isOwnerLeft = t.$value;
+            if (t.$value && !_this.isOwner) {
+                _this.msgService.showMsg("Oh No!", "The owner of the room just left the room. You are redirected back to the home page");
+                _this.leaveRoom();
+            }
+        });
     }
     LobbyPage.prototype.ionViewDidEnter = function () {
         this.prepareRoom();
@@ -133,7 +141,9 @@ var LobbyPage = (function () {
         var _this = this;
         // get the users in the current room
         this.loadUserSubscriber = this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
-            _this.checkUserLeft(snapshots.length);
+            console.log("check2");
+            if (!_this.isOwnerLeft)
+                _this.checkUserLeft(snapshots.length);
             _this.usersModel = [];
             _this.usersCount = snapshots.length;
             snapshots.forEach(function (snapshot) {
@@ -224,6 +234,11 @@ var LobbyPage = (function () {
     };
     LobbyPage.prototype.leaveRoom = function () {
         this.loadUserSubscriber.unsubscribe();
+        if (this.isOwner) {
+            console.log("i am owner");
+            // alert that the room is closed
+            this.af.object("rooms/" + this.roomKey + "/isClosed").set(true);
+        }
         this.af.list("rooms/" + this.roomKey + "/users/").remove(this.authService.currentUser.$key);
         this.navCtrl.popToRoot();
     };
@@ -235,7 +250,7 @@ var LobbyPage = (function () {
 LobbyPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* IonicPage */])(),
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header class="title">\n\n  <ion-navbar class="title" hideBackButton >\n    <ion-title class="title">\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n    <ion-buttons end>\n      <button (click)="goSettings()" class="settingsButton" *ngIf="isOwner">\n        <ion-icon name="md-settings" ></ion-icon>    \n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      \n      <ion-icon item-end name="key" *ngIf="item.isOwner"></ion-icon>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n  <button ion-button (click)="exit()" class="leaveButton" >Leave</button>\n\n  <!--<button ion-button (click)="exit()" class="myButton">Exit</button>-->\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
+        selector: 'page-lobby',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header class="title">\n\n  <ion-navbar class="title" hideBackButton >\n    <ion-title class="title">\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n    <ion-buttons end>\n      <button (click)="goSettings()" class="settingsButton" *ngIf="isOwner">\n        <ion-icon name="md-settings" ></ion-icon>    \n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      \n      <ion-icon item-end name="key" *ngIf="item.isOwner"></ion-icon>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n  <button ion-button (click)="exit()" class="leaveButton" >Leave</button>\n</ion-content>\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\lobby\lobby.html"*/
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* NavParams */],
         __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */],

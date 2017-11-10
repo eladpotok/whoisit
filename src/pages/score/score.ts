@@ -22,10 +22,15 @@ export class ScorePage {
   spyState: string;
   isSpyWon: boolean;
   isGreatGuess: boolean;
+  intervalId: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
               private auth: AuthService, private roomsSerivce: RoomsService) {
     
+    this.intervalId = setInterval(()=> {
+      this.backToLobby();
+    }, 8000);
+
     this.users = roomsSerivce.getNonSpyPlayers();
     this.currentUser = this.auth.currentUser;
 
@@ -50,6 +55,10 @@ export class ScorePage {
     this.af.object(`users/${this.roomsSerivce.getSpy()}/`).subscribe(t=> {
       this.spy = t;
     });
+  }
+
+  ionViewWillLeave() {
+    clearInterval(this.intervalId);
   }
 
   public backToLobby() {

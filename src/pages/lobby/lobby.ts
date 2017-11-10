@@ -32,6 +32,7 @@ export class LobbyPage {
   loader: any;
   entryCode: string;
   currentRound: string;
+  isOwnerLeft: boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
@@ -47,7 +48,14 @@ export class LobbyPage {
     // find the room by the given entry code
     this.findRoom();
 
-    //this.prepareRoom();
+    this.af.object(`rooms/${this.roomKey}/isClosed`).subscribe( t=> {
+      console.log("check1");
+      this.isOwnerLeft = t.$value;
+      if(t.$value && !this.isOwner) {
+        this.msgService.showMsg("Oh No!", "The owner of the room just left the room. You are redirected back to the home page")
+        this.leaveRoom();
+      }
+    });
     
   }
 
@@ -100,8 +108,9 @@ export class LobbyPage {
   private loadUsers() {
       // get the users in the current room
       this.loadUserSubscriber = this.af.list(`rooms/${this.roomKey}/users`).subscribe( snapshots => {
-
-        this.checkUserLeft(snapshots.length);
+        console.log("check2");
+        if(!this.isOwnerLeft)
+          this.checkUserLeft(snapshots.length);
 
         this.usersModel = [];
         this.usersCount = snapshots.length;
@@ -118,6 +127,7 @@ export class LobbyPage {
   }
 
   private checkUserLeft(newUserCount: number) {
+    
     if(this.usersCount > newUserCount) {
       this.msgService.showMsg("Attention", "One of the players left the room");
       if(this.isOwner){
@@ -208,6 +218,12 @@ export class LobbyPage {
 
   private leaveRoom() {
       this.loadUserSubscriber.unsubscribe();
+      
+      if(this.isOwner) {
+          console.log("i am owner");
+          // alert that the room is closed
+          this.af.object(`rooms/${this.roomKey}/isClosed`).set(true);
+      }
       this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
       this.navCtrl.popToRoot();
   }
@@ -215,5 +231,5 @@ export class LobbyPage {
   public goSettings() {
     this.navCtrl.push('SettingsPage', {roomKey: this.roomKey});
   }
-  
+
 }

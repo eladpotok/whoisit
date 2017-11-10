@@ -115,10 +115,10 @@ var RoomsService = RoomsService_1 = (function () {
 }());
 RoomsService = RoomsService_1 = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["j" /* Platform */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]])
 ], RoomsService);
 
-var RoomsService_1, _a, _b, _c, _d;
+var RoomsService_1;
 //# sourceMappingURL=rooms.service.js.map
 
 /***/ }),
@@ -356,6 +356,7 @@ var HomePage = (function () {
         this.isDebug = false;
         this.alert = null;
         this.waitForRegistration();
+        this.isDebug = this.authService.IsDebug;
         platform.ready().then(function () {
             platform.registerBackButtonAction(function () {
                 if (_this.alert != null)
@@ -374,6 +375,10 @@ var HomePage = (function () {
         this.operation = "openRoom";
         this.isOpenRoomSelected = true;
     }
+    HomePage.prototype.ionViewDidEnter = function () {
+        this.roomEntryCode = null;
+        this.roomName = null;
+    };
     HomePage.prototype.pageGoBack = function () {
         if (this.navCtrl.getActive().name != "ChooseCategoryPage" &&
             this.navCtrl.getActive().name != "GamePage" &&
@@ -400,6 +405,10 @@ var HomePage = (function () {
                     text: 'Leave',
                     handler: function () {
                         _this.alert = null;
+                        if (_this.currentUser.isOwner) {
+                            // alert that the room is closed
+                            _this.af.object("rooms/" + _this.roomService.currentRoom.$key + "/isClosed").set(true);
+                        }
                         _this.af.list("rooms/" + _this.roomService.currentRoom.$key + "/users").remove(_this.authService.currentUser.$key);
                         _this.navCtrl.popToRoot();
                     }
@@ -525,27 +534,32 @@ var HomePage = (function () {
                     roomFound = true;
                     // check if the room is not started yet
                     if (!snapshot.val().isStarted) {
-                        // iterate over the users so there is not a user with a same name
-                        var sub_1 = _this.af.list("rooms/" + snapshot.key + "/users", { preserveSnapshot: true }).subscribe(function (t) {
-                            console.log("enter " + snapshot.key);
-                            t.forEach(function (u) {
-                                if (u != null) {
-                                    console.log("enter 2 " + u.key);
-                                    _this.af.object("users/" + u.key).subscribe(function (user) {
-                                        if (user.displayName == _this.currentUser.displayName) {
-                                            // this.showMsg("Sorry", "The given name is already exists in the room");
-                                            sub_1.unsubscribe();
-                                            userFound = true;
-                                            return;
-                                        }
-                                    });
-                                }
+                        if (!snapshot.val().isClosed) {
+                            // iterate over the users so there is not a user with a same name
+                            var sub_1 = _this.af.list("rooms/" + snapshot.key + "/users", { preserveSnapshot: true }).subscribe(function (t) {
+                                console.log("enter " + snapshot.key);
+                                t.forEach(function (u) {
+                                    if (u != null) {
+                                        console.log("enter 2 " + u.key);
+                                        _this.af.object("users/" + u.key).subscribe(function (user) {
+                                            if (user.displayName == _this.currentUser.displayName) {
+                                                // this.showMsg("Sorry", "The given name is already exists in the room");
+                                                sub_1.unsubscribe();
+                                                userFound = true;
+                                                return;
+                                            }
+                                        });
+                                    }
+                                });
+                                console.log("user added");
+                                if (!userFound)
+                                    _this.addUserToRoom(snapshot.key, false);
+                                sub_1.unsubscribe();
                             });
-                            console.log("user added");
-                            if (!userFound)
-                                _this.addUserToRoom(snapshot.key, false);
-                            sub_1.unsubscribe();
-                        });
+                        }
+                        else {
+                            _this.msgService.showMsg("Sorry", "The room is no longer activated");
+                        }
                     }
                     else {
                         _this.msgService.showMsg("Sorry", "The room is in during the game");
@@ -586,11 +600,10 @@ HomePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
         selector: 'page-home',template:/*ion-inline-start:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/'\nbower_components/momentjs/min/moment.min.js\nbower_components/momentjs/min/locales.min.js\nbower_components/humanize-duration/humanize-duration.js\n\n<ion-content class="homeBody">\n\n  <ion-segment [(ngModel)]="operation" class="operationItem" color="dark">\n    <ion-segment-button value="openRoom" (click)="openRoom()" class="segmentButtonClass" >\n      <ion-icon name="create"></ion-icon>\n       <label >New Room</label>\n    </ion-segment-button>\n    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="segmentButtonClass" >\n      <ion-icon name="person-add"></ion-icon>\n      <label >Join Room</label>\n    </ion-segment-button>\n  </ion-segment>\n\n<!--<ion-grid>\n  <ion-row>\n      <button ion-button class="newRoomButton">\n        New Room\n      </button>\n\n      <button ion-button class="newRoomButton">\n        Join Room\n      </button>\n  </ion-row>\n</ion-grid>\n-->\n\n\n<div [ngSwitch]="operation" ngClass="middle-vertical">\n  <ion-grid *ngSwitchCase="\'openRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n  <ion-grid *ngSwitchCase="\'joinRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   > Entry Code</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n\n\n\n\n  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">\n       Play \n  </button>\n  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">\n       Sign with FaceBook \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">\n       Logout \n  </button>-->\n  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">\n       About \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">\n       Admin \n  </button>\n\n <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">\n      <ion-avatar item-start >\n        <img [src]="photoUrl" ngClass="photo">\n      </ion-avatar>\n      <h2 > Hello {{ displayName }}</h2>\n      <p>Ugh. As if.</p>\n    </ion-item>\n</div>\n\n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\coockieSpyClone\trunk\src\pages\home\home.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_7__services_messages_service__["a" /* MessagesService */],
-        __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */], __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* Platform */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_7__services_messages_service__["a" /* MessagesService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__services_messages_service__["a" /* MessagesService */]) === "function" && _g || Object, typeof (_h = typeof __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */]) === "function" && _h || Object, typeof (_j = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */]) === "function" && _j || Object, typeof (_k = typeof __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */]) === "function" && _k || Object])
 ], HomePage);
 
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
 //# sourceMappingURL=home.js.map
 
 /***/ }),

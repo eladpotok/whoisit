@@ -47,7 +47,7 @@ export class GamePage {
         this.drawRandomCard(round.secret, round.categoryKey);
         subscription.unsubscribe();
       }
-      console.log("set spy " + round.spyKey);
+      
       // set the spy so we could know him in the future
       this.roomsService.setSpy(round.spyKey);
     });

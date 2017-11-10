@@ -41,6 +41,7 @@ export class HomePage {
               public authService: AuthService, public viewCtrl: ViewController, public roomService: RoomsService) {
     this.waitForRegistration();
 
+    this.isDebug = this.authService.IsDebug;
 
     platform.ready().then(() => {
         platform.registerBackButtonAction(() => {
@@ -59,6 +60,11 @@ export class HomePage {
     });
     this.operation = "openRoom";
     this.isOpenRoomSelected = true;
+  }
+
+  ionViewDidEnter() {
+    this.roomEntryCode = null;
+    this.roomName = null;
   }
 
   private pageGoBack() : Boolean {
@@ -89,7 +95,13 @@ export class HomePage {
           text: 'Leave',
           handler: () => {
             this.alert =null;
+
+            if(this.currentUser.isOwner) {
+              // alert that the room is closed
+              this.af.object(`rooms/${this.roomService.currentRoom.$key}/isClosed`).set(true);
+            }
             this.af.list(`rooms/${this.roomService.currentRoom.$key}/users`).remove(this.authService.currentUser.$key);
+
             this.navCtrl.popToRoot();
             
           }
@@ -237,27 +249,32 @@ export class HomePage {
                 roomFound = true;
                 // check if the room is not started yet
                 if(!snapshot.val().isStarted) {
-                  // iterate over the users so there is not a user with a same name
-                  let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=> {
-                    console.log("enter " + snapshot.key);
-                    t.forEach(u => {
-                      if(u != null) {
-                        console.log("enter 2 " + u.key);
-                        this.af.object(`users/${u.key}`).subscribe( user=>{
-                          if(user.displayName == this.currentUser.displayName){
-                            // this.showMsg("Sorry", "The given name is already exists in the room");
-                            sub.unsubscribe();
-                            userFound = true;
-                            return;
-                          }
-                        });
-                      } 
+                  if(!snapshot.val().isClosed) {
+                    // iterate over the users so there is not a user with a same name
+                    let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=> {
+                      console.log("enter " + snapshot.key);
+                      t.forEach(u => {
+                        if(u != null) {
+                          console.log("enter 2 " + u.key);
+                          this.af.object(`users/${u.key}`).subscribe( user=>{
+                            if(user.displayName == this.currentUser.displayName){
+                              // this.showMsg("Sorry", "The given name is already exists in the room");
+                              sub.unsubscribe();
+                              userFound = true;
+                              return;
+                            }
+                          });
+                        } 
+                      });
+                      console.log("user added");
+                      if(!userFound)
+                        this.addUserToRoom(snapshot.key, false);
+                      sub.unsubscribe();
                     });
-                    console.log("user added");
-                    if(!userFound)
-                      this.addUserToRoom(snapshot.key, false);
-                    sub.unsubscribe();
-                  });
+                  }
+                  else {
+                    this.msgService.showMsg("Sorry", "The room is no longer activated");
+                  }
                 }
                 else {
                   this.msgService.showMsg("Sorry", "The room is in during the game");
