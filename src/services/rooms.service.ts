@@ -16,6 +16,7 @@ import { Observable } from 'rxjs/Observable';
     private static _currentRound: RoundModel;
     private static _cuurentRoundKey: string;
     private static _currentSpy: string;
+    public isLeftRoom: boolean ;
 
     constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
 

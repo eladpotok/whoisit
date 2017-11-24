@@ -10,6 +10,7 @@ import { RoundModel } from '../../Models/round.model';
 import { LoadingController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import { MessagesService } from '../../services/messages.service';
+import { HomePage } from '../home/home'
 
 @IonicPage()
 @Component({
@@ -23,6 +24,7 @@ export class LobbyPage {
   users: Observable<UserModel[]>;
   isOwner: Boolean;
   loadUserSubscriber: any;
+  roomClosedSubscriber: any;
   selectorUserKey: string; 
   spyUser: string;
   roomName: string;
@@ -33,12 +35,14 @@ export class LobbyPage {
   entryCode: string;
   currentRound: string;
   isOwnerLeft: boolean;
+  
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
               private roomService: RoomsService, public loadingCtrl: LoadingController,
               public alertCtrl: AlertController, public msgService: MessagesService) {
     
+    console.log("ctor of lobby");
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
 
@@ -48,7 +52,12 @@ export class LobbyPage {
     // find the room by the given entry code
     this.findRoom();
 
-    this.af.object(`rooms/${this.roomKey}/isClosed`).subscribe( t=> {
+    
+  }
+
+  ionViewDidLoad() {
+    
+    this.roomClosedSubscriber = this.af.object(`rooms/${this.roomKey}/isClosed`).subscribe( t=> {
       console.log("check1");
       this.isOwnerLeft = t.$value;
       if(t.$value && !this.isOwner) {
@@ -56,13 +65,19 @@ export class LobbyPage {
         this.leaveRoom();
       }
     });
-    
+  }
+
+  ionViewWillLeave() {
+    console.log("leave the lobby page");
+    if(this.roomService.isLeftRoom)
+      this.leaveRoom();
   }
 
   ionViewDidEnter() {
+    console.log("enter back");
     this.prepareRoom()
   }
-  
+
   private prepareRoom() {
     let subscription = this.af.list(`rounds/${this.roomKey}/`).subscribe(t=>{
       t.forEach(r=>{
@@ -93,22 +108,28 @@ export class LobbyPage {
 
   private findRoom(){
       // Get the current room
-      this.af.object(`/rooms/${this.roomKey}`).subscribe( t=> {
-      this.roomName = t.roomName;
-      if(t.owner == this.authService.currentUser.displayName)
-          this.isOwner = true;
-      else {
-          this.roomService.updateUsersInRoom(this.roomKey);      
-      }
+      let subscription = this.af.object(`/rooms/${this.roomKey}`).subscribe( t=> {
+        this.roomName = t.roomName;
+        if(t.owner == this.authService.currentUser.displayName)
+            this.isOwner = true;
+        else {
+            this.roomService.updateUsersInRoom(this.roomKey);      
+        }
 
-      this.entryCode = t.entryCode;
+        this.entryCode = t.entryCode;
+        if(subscription != null)
+          subscription.unsubscribe();
     })
   }
 
   private loadUsers() {
+    
       // get the users in the current room
       this.loadUserSubscriber = this.af.list(`rooms/${this.roomKey}/users`).subscribe( snapshots => {
         console.log("check2");
+        if(this.roomService.isLeftRoom)
+          return;
+          console.log("get here " + this.roomService.isLeftRoom);
         if(!this.isOwnerLeft)
           this.checkUserLeft(snapshots.length);
 
@@ -129,13 +150,16 @@ export class LobbyPage {
   private checkUserLeft(newUserCount: number) {
     
     if(this.usersCount > newUserCount) {
-      this.msgService.showMsg("Attention", "One of the players left the room");
+      console.log("someone left the room")
+      this.msgService.showToast("One of the players left the room");
       if(this.isOwner){
         this.af.object(`rooms/${this.roomKey}/usersCount`).set(newUserCount);
         this.af.object(`rooms/${this.roomKey}/isStarted`).set(false);
         this.af.object(`rounds/${this.roomKey}/${this.currentRound}/state`).set("done");
       }
-      this.navCtrl.popTo(this.navCtrl.getByIndex(1));      
+      console.log("jump");
+      if(this.navCtrl.getActive().name != "LobbyPage")
+        this.navCtrl.popTo(this.navCtrl.getByIndex(1));      
     }
   }
     
@@ -217,14 +241,19 @@ export class LobbyPage {
   }
 
   private leaveRoom() {
-      this.loadUserSubscriber.unsubscribe();
       
+      if(this.loadUserSubscriber != null)
+        this.loadUserSubscriber.unsubscribe();
+      this.roomClosedSubscriber.unsubscribe();
+
       if(this.isOwner) {
           console.log("i am owner");
           // alert that the room is closed
           this.af.object(`rooms/${this.roomKey}/isClosed`).set(true);
       }
       this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
+      
+      console.log("popToRoot")
       this.navCtrl.popToRoot();
   }
 

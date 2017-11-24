@@ -4826,6 +4826,10 @@ textarea:-ms-input-placeholder {
   padding-left: 2px;
 }
 
+textarea::-ms-input-placeholder {
+  padding-left: 2px;
+}
+
 textarea::placeholder {
   padding-left: 2px;
 }
@@ -14155,8 +14159,8 @@ input.text-input:-webkit-autofill {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
+  -webkit-box-orient: inherit;
+  -webkit-box-direction: inherit;
   -webkit-flex-direction: inherit;
   -ms-flex-direction: inherit;
   flex-direction: inherit;
@@ -14181,8 +14185,8 @@ input.text-input:-webkit-autofill {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
+  -webkit-box-orient: inherit;
+  -webkit-box-direction: inherit;
   -webkit-flex-direction: inherit;
   -ms-flex-direction: inherit;
   flex-direction: inherit;
@@ -15947,7 +15951,7 @@ ion-list[inset] {
 }
 
 .list-md ion-item-options .button {
-  margin: 0;
+  margin: 1px 0;
   border-radius: 0;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -15957,7 +15961,7 @@ ion-list[inset] {
   -webkit-align-items: center;
   -ms-flex-align: center;
   align-items: center;
-  height: 100%;
+  height: calc(100% - 2px);
   border: 0;
   -webkit-box-shadow: none;
   box-shadow: none;
@@ -30148,7 +30152,18 @@ ion-navbar.toolbar {
 
 page-about label {
   white-space: pre-wrap;
-  color: white;
+  font-size: 20px;
+}
+
+page-about .versionClass {
+  margin-right: auto;
+  margin-left: auto;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  /* Set the fixed height of the footer here */
+  height: 230px;
 }
 
 page-choose-category .list {
@@ -30418,7 +30433,6 @@ page-home .segmentButtonClass:active {
 
 page-info .item {
   background: transparent;
-  color: white;
 }
 
 page-lobby .entryCodeLabel {

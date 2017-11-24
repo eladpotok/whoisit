@@ -39,6 +39,8 @@ export class HomePage {
   constructor(public navCtrl: NavController, public afAuth: AngularFireAuth, public af: AngularFireDatabase,
               private fb: Facebook, private platform: Platform, public alertCtrl: AlertController, public msgService: MessagesService,
               public authService: AuthService, public viewCtrl: ViewController, public roomService: RoomsService) {
+    
+
     this.waitForRegistration();
 
     this.isDebug = this.authService.IsDebug;
@@ -69,9 +71,10 @@ export class HomePage {
 
   private pageGoBack() : Boolean {
     if(this.navCtrl.getActive().name != "ChooseCategoryPage" && 
-       this.navCtrl.getActive().name != "GamePage" &&
+       this.navCtrl.getActive().name != "GamePage"    &&
        this.navCtrl.getActive().name != "ScorePage" && 
-       this.navCtrl.getActive().name != "GuessPage") {
+       this.navCtrl.getActive().name != "GuessPage" && 
+       this.navCtrl.getActive().name != "LobbyPage") {
       return true;
     }
     
@@ -95,15 +98,16 @@ export class HomePage {
           text: 'Leave',
           handler: () => {
             this.alert =null;
-
+            this.roomService.isLeftRoom = true;
             if(this.currentUser.isOwner) {
               // alert that the room is closed
               this.af.object(`rooms/${this.roomService.currentRoom.$key}/isClosed`).set(true);
             }
-            this.af.list(`rooms/${this.roomService.currentRoom.$key}/users`).remove(this.authService.currentUser.$key);
-
-            this.navCtrl.popToRoot();
             
+            this.af.list(`rooms/${this.roomService.currentRoom.$key}/users`).remove(this.authService.currentUser.$key);
+            console.log("popToRoot");
+            this.navCtrl.popToRoot();
+            this.roomService.isLeftRoom = false;
           }
         }
       ]
@@ -211,7 +215,7 @@ export class HomePage {
         this.currentUser.pointsInRoom = t.$value;
       });
     }
-
+    console.log("go to lobby with key " + roomKey);
     this.navCtrl.push('LobbyPage', {
         roomKey: roomKey
     });
@@ -251,26 +255,26 @@ export class HomePage {
                 if(!snapshot.val().isStarted) {
                   if(!snapshot.val().isClosed) {
                     // iterate over the users so there is not a user with a same name
-                    let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=> {
-                      console.log("enter " + snapshot.key);
-                      t.forEach(u => {
-                        if(u != null) {
-                          console.log("enter 2 " + u.key);
-                          this.af.object(`users/${u.key}`).subscribe( user=>{
-                            if(user.displayName == this.currentUser.displayName){
-                              // this.showMsg("Sorry", "The given name is already exists in the room");
-                              sub.unsubscribe();
-                              userFound = true;
-                              return;
-                            }
-                          });
-                        } 
-                      });
-                      console.log("user added");
-                      if(!userFound)
+                    // let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=> {
+                    //   console.log("enter " + snapshot.key);
+                    //   t.forEach(u => {
+                    //     if(u != null) {
+                    //       console.log("enter 2 " + u.key);
+                    //       this.af.object(`users/${u.key}`).subscribe( user=>{
+                    //         if(user.displayName == this.currentUser.displayName){
+                    //           this.msgService.showMsg("Sorry", "The given name is already exists in the room");
+                    //           sub.unsubscribe();
+                    //           userFound = true;
+                    //           return;
+                    //         }
+                    //       });
+                    //     } 
+                    //   });
+                    //   console.log("user added");
+                    //   if(!userFound)
                         this.addUserToRoom(snapshot.key, false);
-                      sub.unsubscribe();
-                    });
+                    //   sub.unsubscribe();
+                    // });
                   }
                   else {
                     this.msgService.showMsg("Sorry", "The room is no longer activated");

@@ -1,9 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController, ViewController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ViewController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { CategoryModel } from '../../Models/category.model';
-import { AuthService } from '../../services/auth.service';
-import {RoomsService } from '../../services/rooms.service';
 
 @IonicPage()
 @Component({
@@ -17,8 +15,7 @@ export class ChooseCategoryPage {
   alert: any;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
-              private roomService: RoomsService, private platform: Platform, public alertCtrl: AlertController,
-              public viewCtrl: ViewController) {
+              public alertCtrl: AlertController, public viewCtrl: ViewController) {
 
     this.af.list(`categories/`).subscribe(t=>{
       this.categories = t;

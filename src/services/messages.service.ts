@@ -5,14 +5,14 @@ import { UserModel } from '../Models/user.model'
 import { RoomModel } from '../Models/room.model'
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { RoundModel } from '../Models/round.model';
-import { Platform, AlertController } from 'ionic-angular';
+import { Platform, AlertController, ToastController  } from 'ionic-angular';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 import { Observable } from 'rxjs/Observable'; 
  
  @Injectable()
   export class MessagesService {
     constructor(public afAuth: AngularFireAuth, private fb: Facebook, public alertCtrl: AlertController,
-                private platform: Platform, public af: AngularFireDatabase) {
+                private platform: Platform, public af: AngularFireDatabase, public toastCtrl: ToastController) {
             
     }
 
@@ -23,5 +23,13 @@ import { Observable } from 'rxjs/Observable';
             buttons: ['OK']
             });
         alert.present();
+    }
+
+    public showToast(message: string) {
+        let toast = this.toastCtrl.create({
+        message: message,
+        duration: 3000
+        });
+        toast.present();
     }
   }

@@ -29,7 +29,7 @@ export class ScorePage {
     
     this.intervalId = setInterval(()=> {
       this.backToLobby();
-    }, 8000);
+    }, 6000);
 
     this.users = roomsSerivce.getNonSpyPlayers();
     this.currentUser = this.auth.currentUser;
@@ -66,12 +66,13 @@ export class ScorePage {
     // set the round as done
     this.af.object(`rounds/${this.roomsSerivce.currentRoom.$key}/${this.roundKey}/state`).set("done");
 
-    this.navCtrl.push('LobbyPage', {
-      roomKey: this.roomsSerivce.currentRoom.$key
-    });
+    // this.navCtrl.push('LobbyPage', {
+    //   roomKey: this.roomsSerivce.currentRoom.$key
+    // });
+
     //this.af.object(`rooms/${this.roomKey}/isCategorySelected`).set(false);
     //this.af.object(`rooms/${this.roomKey}/selector`).set("");
-    // this.navCtrl.popTo(this.navCtrl.getByIndex(1));
+    this.navCtrl.popTo(this.navCtrl.getByIndex(1));
     // console.log("pop to");
   }
 

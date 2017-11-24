@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
-import { CategoryModel, MemberModel } from '../../Models/category.model';
+import { MemberModel } from '../../Models/category.model';
 import { AuthService } from '../../services/auth.service';
 import { RoomsService } from '../../services/rooms.service';
 

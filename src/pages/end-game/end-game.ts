@@ -53,27 +53,8 @@ export class EndGamePage {
     }
   }
 
-  private addPointsToSpy(spyState: string) {
-    let points =0;
-    switch(spyState) {
-      case "win":
-        points = 5;
-        break;
-      case "semi-win":
-        points = 3;
-        break;
-    }
-
-    this.auth.currentUser.pointsInRoom += points;
-    this.af.object(`/rooms/${this.roomService.currentRoom.$key}/users/${this.auth.currentUser.$key}`).set(this.auth.currentUser.pointsInRoom);
-  }
-
   private loadUsers() : UserModel[] {
     return this.roomService.getUsersFromRoomButme(this.auth.currentUser);
-  }
-
-  private IamTheSpy() : boolean {
-    return this.auth.currentUser.$key == this.roomService.getSpy();
   }
 
   private presentLoading() {

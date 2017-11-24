@@ -4,7 +4,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../services/auth.service';
 import { RoomsService } from '../../services/rooms.service';
 import {CategoryModel } from '../../Models/category.model';
-import { ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import { LoadingController } from 'ionic-angular';
 import { MessagesService } from '../../services/messages.service';
 import 'rxjs/add/operator/map';
