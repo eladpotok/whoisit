@@ -77,6 +77,7 @@ export class EndGamePage {
         subscribtion.unsubscribe();
       counter++;
       this.af.object(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/votes/${user.$key}`).set(counter);
+      this.af.object(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/votesStatus/${this.auth.currentUser.displayName}`).set(user.displayName);
     });
   }
 

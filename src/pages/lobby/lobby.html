@@ -18,7 +18,7 @@
 <ion-content padding class="body">
 
   <ion-list no-lines>
-    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >
+    <ion-item ion-item *ngFor="let item of roomService.usersModel" class="cardBody" >
       <ion-avatar item-start>
         <img [src]="item.imageUrl">
       </ion-avatar>

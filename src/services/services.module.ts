@@ -4,6 +4,7 @@ import { RoomsService } from './rooms.service';
 import { MessagesService } from './messages.service';
 import { NgModule } from '@angular/core';
 
+
 export const firebaseConfig = {
     apiKey: "AIzaSyCrhPHs2WduPHNofLVkU4a4b1knUGH6gFA",
     authDomain: "spycookie-31a6f.firebaseapp.com",

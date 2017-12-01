@@ -1,6 +1,6 @@
 webpackJsonp([4],{
 
-/***/ 458:
+/***/ 461:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8,7 +8,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LobbyPageModule", function() { return LobbyPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lobby__ = __webpack_require__(471);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__lobby__ = __webpack_require__(474);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -38,7 +38,7 @@ LobbyPageModule = __decorate([
 
 /***/ }),
 
-/***/ 471:
+/***/ 474:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -46,9 +46,9 @@ LobbyPageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_messages_service__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_messages_service__ = __webpack_require__(90);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -68,6 +68,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 var LobbyPage = (function () {
     function LobbyPage(navCtrl, navParams, af, authService, roomService, loadingCtrl, alertCtrl, msgService) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.navParams = navParams;
         this.af = af;
@@ -76,34 +77,22 @@ var LobbyPage = (function () {
         this.loadingCtrl = loadingCtrl;
         this.alertCtrl = alertCtrl;
         this.msgService = msgService;
-        this.usersModel = [];
         console.log("ctor of lobby");
         // Get thr paramters from the navigation controller
         this.roomKey = this.navParams.get('roomKey');
-        // load the users from the room
-        this.loadUsers();
         // find the room by the given entry code
         this.findRoom();
+        // load the users from the room
+        this.loadUsers();
+        // check if the room is closed by the owner
+        this.roomService.checkRoomClosed(this.isOwner, function () { _this.navCtrl.popToRoot(); });
     }
-    LobbyPage.prototype.ionViewDidLoad = function () {
-        var _this = this;
-        this.roomClosedSubscriber = this.af.object("rooms/" + this.roomKey + "/isClosed").subscribe(function (t) {
-            console.log("check1");
-            _this.isOwnerLeft = t.$value;
-            if (t.$value && !_this.isOwner) {
-                _this.msgService.showMsg("Oh No!", "The owner of the room just left the room. You are redirected back to the home page");
-                _this.leaveRoom();
-            }
-        });
-    };
-    LobbyPage.prototype.ionViewWillLeave = function () {
-        console.log("leave the lobby page");
-        if (this.roomService.isLeftRoom)
-            this.leaveRoom();
-    };
     LobbyPage.prototype.ionViewDidEnter = function () {
-        console.log("enter back");
-        this.prepareRoom();
+        // this workaround helps when we leave the page only for settings page
+        // and do not want the room to prepare it again.
+        if (!this.enterToSettings)
+            this.prepareRoom();
+        this.enterToSettings = false;
     };
     LobbyPage.prototype.prepareRoom = function () {
         var _this = this;
@@ -150,48 +139,19 @@ var LobbyPage = (function () {
     };
     LobbyPage.prototype.loadUsers = function () {
         var _this = this;
-        // get the users in the current room
-        this.loadUserSubscriber = this.af.list("rooms/" + this.roomKey + "/users").subscribe(function (snapshots) {
-            console.log("check2");
-            if (_this.roomService.isLeftRoom)
-                return;
-            console.log("get here " + _this.roomService.isLeftRoom);
-            if (!_this.isOwnerLeft)
-                _this.checkUserLeft(snapshots.length);
-            _this.usersModel = [];
-            _this.usersCount = snapshots.length;
-            snapshots.forEach(function (snapshot) {
-                var userId = snapshot.$key;
-                var points = snapshot.$value;
-                _this.af.object("users/" + userId).subscribe(function (t) {
-                    t.pointsInRoom = points;
-                    _this.usersModel.push(t);
-                });
-            });
+        this.roomService.loadUsers(this.isOwner, this.currentRound, this.roomKey, function () {
+            if (_this.navCtrl.getActive().name != "LobbyPage")
+                _this.navCtrl.popTo(_this.navCtrl.getByIndex(1));
         });
     };
-    LobbyPage.prototype.checkUserLeft = function (newUserCount) {
-        if (this.usersCount > newUserCount) {
-            console.log("someone left the room");
-            this.msgService.showToast("One of the players left the room");
-            if (this.isOwner) {
-                this.af.object("rooms/" + this.roomKey + "/usersCount").set(newUserCount);
-                this.af.object("rooms/" + this.roomKey + "/isStarted").set(false);
-                this.af.object("rounds/" + this.roomKey + "/" + this.currentRound + "/state").set("done");
-            }
-            console.log("jump");
-            if (this.navCtrl.getActive().name != "LobbyPage")
-                this.navCtrl.popTo(this.navCtrl.getByIndex(1));
-        }
-    };
     LobbyPage.prototype.raffleSpy = function () {
-        var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
-        this.spyUser = this.usersModel[spyRandNumber].$key;
+        var spyRandNumber = Math.floor(Math.random() * this.roomService.usersModel.length);
+        this.spyUser = this.roomService.usersModel[spyRandNumber].$key;
         this.roomService.setSpy(this.spyUser);
     };
     LobbyPage.prototype.raffleSelector = function () {
-        var spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
-        this.selectorUserKey = this.usersModel[spyRandNumber].$key;
+        var spyRandNumber = Math.floor(Math.random() * this.roomService.usersModel.length);
+        this.selectorUserKey = this.roomService.usersModel[spyRandNumber].$key;
     };
     LobbyPage.prototype.presentLoading = function () {
         this.loader = this.loadingCtrl.create({
@@ -204,16 +164,14 @@ var LobbyPage = (function () {
             this.loader.dismiss();
     };
     LobbyPage.prototype.startGame = function () {
-        if (this.usersCount < 4 && !this.authService.IsDebug) {
+        if (this.roomService.usersCount < 4 && !this.authService.IsDebug) {
             this.msgService.showMsg("Sorry", "The round can be executed only for 4 players and above.");
             return;
         }
-        console.log("start game 1 ");
+        console.log("start game - room key" + this.roomKey);
         this.roomService.updateUsersInRoom(this.roomKey);
-        console.log("start game 2 ");
         // raffle spy and category selector  
         this.raffleSelector();
-        console.log("start game 3 ");
         this.raffleSpy();
         var round = {
             categoryKey: "",
@@ -225,7 +183,7 @@ var LobbyPage = (function () {
         this.af.list("rounds/" + this.roomKey + "/").push(round);
         // Add new room to the db
         this.af.object("rooms/" + this.roomKey + "/isStarted").set(true);
-        this.af.object("rooms/" + this.roomKey + "/usersCount").set(this.usersCount);
+        this.af.object("rooms/" + this.roomKey + "/usersCount").set(this.roomService.usersCount);
     };
     LobbyPage.prototype.exit = function () {
         var _this = this;
@@ -250,26 +208,19 @@ var LobbyPage = (function () {
         alert.present();
     };
     LobbyPage.prototype.leaveRoom = function () {
-        if (this.loadUserSubscriber != null)
-            this.loadUserSubscriber.unsubscribe();
-        this.roomClosedSubscriber.unsubscribe();
-        if (this.isOwner) {
-            console.log("i am owner");
-            // alert that the room is closed
-            this.af.object("rooms/" + this.roomKey + "/isClosed").set(true);
-        }
-        this.af.list("rooms/" + this.roomKey + "/users/").remove(this.authService.currentUser.$key);
-        console.log("popToRoot");
+        console.log("leave room from lobby");
+        this.roomService.leaveRoom(this.isOwner);
         this.navCtrl.popToRoot();
     };
     LobbyPage.prototype.goSettings = function () {
+        this.enterToSettings = true;
         this.navCtrl.push('SettingsPage', { roomKey: this.roomKey });
     };
     return LobbyPage;
 }());
 LobbyPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-lobby',template:/*ion-inline-start:"C:\mole\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header class="title">\n\n  <ion-navbar class="title" hideBackButton >\n    <ion-title class="title">\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n    <ion-buttons end>\n      <button (click)="goSettings()" class="settingsButton" *ngIf="isOwner">\n        <ion-icon name="md-settings" ></ion-icon>    \n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      \n      <ion-icon item-end name="key" *ngIf="item.isOwner"></ion-icon>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n  <button ion-button (click)="exit()" class="leaveButton" >Leave</button>\n</ion-content>\n'/*ion-inline-end:"C:\mole\trunk\src\pages\lobby\lobby.html"*/
+        selector: 'page-lobby',template:/*ion-inline-start:"C:\mole-app\trunk\src\pages\lobby\lobby.html"*/'\n<ion-header class="title">\n\n  <ion-navbar class="title" hideBackButton >\n    <ion-title class="title">\n      <label>   {{ roomName }} - </label>\n      <label class="entryCodeLabel"> {{ entryCode }} </label>\n    </ion-title>\n    <ion-buttons end>\n      <button (click)="goSettings()" class="settingsButton" *ngIf="isOwner">\n        <ion-icon name="md-settings" ></ion-icon>    \n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list no-lines>\n    <ion-item ion-item *ngFor="let item of roomService.usersModel" class="cardBody" >\n      <ion-avatar item-start>\n        <img [src]="item.imageUrl">\n      </ion-avatar>\n      <h2> {{ item.displayName }}</h2>\n      <p>{{ item.level }}</p>\n      \n      <ion-icon item-end name="key" *ngIf="item.isOwner"></ion-icon>\n      <h2 item-end > {{ item.pointsInRoom  }} points </h2>\n    </ion-item>\n  </ion-list> \n\n  <button ion-button (click)="startGame()" *ngIf="isOwner" class="myButton" >Start !</button>\n  <button ion-button (click)="exit()" class="leaveButton" >Leave</button>\n</ion-content>\n'/*ion-inline-end:"C:\mole-app\trunk\src\pages\lobby\lobby.html"*/
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */],
         __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */],

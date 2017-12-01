@@ -11,7 +11,9 @@
 
 
 <ion-content padding class="bodyCategoryEmpty">
+      {{ currentTime }}
       <ion-card class="cardback">
+        <label class="categoryNameClass"> {{ categoryTitle | uppercase}} </label>
         <img [src]="photoImage" class="photoGame"/>
         <ion-card-content>
             <ion-card-title text-align: center>

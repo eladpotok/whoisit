@@ -35,6 +35,7 @@
           </ion-avatar>
           <h2 >{{ user.displayName }}</h2>
           <p>+ {{ getNewPointsForWinners()}} points</p>
+          <p item-end> Voted for {{  votesFor(user) }} </p>
         </ion-item>
 
   </ion-item-group>
@@ -47,6 +48,7 @@
           </ion-avatar>
           <h2 >{{ user.displayName }}</h2>
           <p>+ {{ getNewPointsForLosers()}} points</p>
+          <p item-end> Voted for {{  votesFor(user) }} </p>
         </ion-item>
 
   </ion-item-group>

@@ -1,6 +1,6 @@
 webpackJsonp([12],{
 
-/***/ 157:
+/***/ 158:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11,6 +11,8 @@ webpackJsonp([12],{
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__ = __webpack_require__(54);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_ionic_angular__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_messages_service__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_auth_service__ = __webpack_require__(68);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -26,13 +28,78 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 
 
 
+
+
 var RoomsService = RoomsService_1 = (function () {
-    function RoomsService(afAuth, fb, platform, af) {
+    function RoomsService(afAuth, fb, platform, af, msgService, authService) {
         this.afAuth = afAuth;
         this.fb = fb;
         this.platform = platform;
         this.af = af;
+        this.msgService = msgService;
+        this.authService = authService;
+        this.isOwnerLeft = false;
+        this.usersModel = [];
     }
+    RoomsService.prototype.dispose = function () {
+        if (this.roomClosedSubscriber != null)
+            this.roomClosedSubscriber.unsubscribe();
+        if (this.loadUserSubscriber != null)
+            this.loadUserSubscriber.unsubscribe();
+    };
+    RoomsService.prototype.checkRoomClosed = function (isOwner, leaveToRoot) {
+        var _this = this;
+        this.roomClosedSubscriber = this.af.object("rooms/" + RoomsService_1.roomKey + "/isClosed").subscribe(function (t) {
+            if (t.$value != null)
+                _this.isOwnerLeft = t.$value;
+            console.log("check Room Closed value = " + _this.isOwnerLeft);
+            if (t.$value && !isOwner) {
+                _this.msgService.showMsg("Oh No!", "The owner of the room just left the room. You are redirected back to the home page");
+                _this.leaveRoom(isOwner);
+                console.log("leave to root");
+                // leave to the home page
+                leaveToRoot();
+            }
+        });
+    };
+    RoomsService.prototype.checkUserLeft = function (newUserCount, isOwner, currentRound, leaveToLobby) {
+        if (this.usersCount > newUserCount) {
+            this.msgService.showToast("One of the players left the room");
+            if (isOwner) {
+                this.af.object("rooms/" + RoomsService_1.roomKey + "/usersCount").set(newUserCount);
+                this.af.object("rooms/" + RoomsService_1.roomKey + "/isStarted").set(false);
+                this.af.object("rounds/" + RoomsService_1.roomKey + "/" + currentRound + "/state").set("done");
+            }
+            leaveToLobby();
+        }
+    };
+    RoomsService.prototype.loadUsers = function (isOwner, currentRound, roomKey, leaveToLobby) {
+        var _this = this;
+        RoomsService_1.roomKey = roomKey;
+        // get the users in the current room
+        this.loadUserSubscriber = this.af.list("rooms/" + roomKey + "/users").subscribe(function (snapshots) {
+            if (_this.isOwnerLeft != null && !_this.isOwnerLeft)
+                _this.checkUserLeft(snapshots.length, isOwner, currentRound, leaveToLobby);
+            _this.usersModel = [];
+            _this.usersCount = snapshots.length;
+            snapshots.forEach(function (snapshot) {
+                var userId = snapshot.$key;
+                var points = snapshot.$value;
+                _this.af.object("users/" + userId).subscribe(function (t) {
+                    t.pointsInRoom = points;
+                    _this.usersModel.push(t);
+                });
+            });
+        });
+    };
+    RoomsService.prototype.leaveRoom = function (isOwner) {
+        this.dispose();
+        if (isOwner) {
+            // alert that the room is closed
+            this.af.object("rooms/" + RoomsService_1.roomKey + "/isClosed").set(true);
+        }
+        this.af.list("rooms/" + RoomsService_1.roomKey + "/users/").remove(this.authService.currentUser.$key);
+    };
     Object.defineProperty(RoomsService.prototype, "currentRoom", {
         get: function () {
             return RoomsService_1._currentRooms;
@@ -115,71 +182,13 @@ var RoomsService = RoomsService_1 = (function () {
 }());
 RoomsService = RoomsService_1 = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]])
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */],
+        __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */],
+        __WEBPACK_IMPORTED_MODULE_6__services_messages_service__["a" /* MessagesService */], __WEBPACK_IMPORTED_MODULE_7__services_auth_service__["a" /* AuthService */]])
 ], RoomsService);
 
 var RoomsService_1;
 //# sourceMappingURL=rooms.service.js.map
-
-/***/ }),
-
-/***/ 158:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MessagesService; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic_angular__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_facebook__ = __webpack_require__(67);
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-
-
-
-
-
-var MessagesService = (function () {
-    function MessagesService(afAuth, fb, alertCtrl, platform, af, toastCtrl) {
-        this.afAuth = afAuth;
-        this.fb = fb;
-        this.alertCtrl = alertCtrl;
-        this.platform = platform;
-        this.af = af;
-        this.toastCtrl = toastCtrl;
-    }
-    MessagesService.prototype.showMsg = function (title, message) {
-        var alert = this.alertCtrl.create({
-            title: title,
-            subTitle: message,
-            buttons: ['OK']
-        });
-        alert.present();
-    };
-    MessagesService.prototype.showToast = function (message) {
-        var toast = this.toastCtrl.create({
-            message: message,
-            duration: 3000
-        });
-        toast.present();
-    };
-    return MessagesService;
-}());
-MessagesService = __decorate([
-    Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_4__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["a" /* AlertController */],
-        __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["j" /* ToastController */]])
-], MessagesService);
-
-//# sourceMappingURL=messages.service.js.map
 
 /***/ }),
 
@@ -244,7 +253,7 @@ var map = {
 		7
 	],
 	"../pages/info/info.module": [
-		462,
+		458,
 		6
 	],
 	"../pages/instructions/instructions.module": [
@@ -252,7 +261,7 @@ var map = {
 		5
 	],
 	"../pages/lobby/lobby.module": [
-		458,
+		461,
 		4
 	],
 	"../pages/points-info/points-info.module": [
@@ -260,7 +269,7 @@ var map = {
 		3
 	],
 	"../pages/score/score.module": [
-		461,
+		462,
 		2
 	],
 	"../pages/settings/settings.module": [
@@ -324,9 +333,9 @@ var UserModel = (function (_super) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__ = __webpack_require__(54);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__ = __webpack_require__(52);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__ = __webpack_require__(67);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_auth_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_messages_service__ = __webpack_require__(158);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__ = __webpack_require__(157);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__services_auth_service__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__services_messages_service__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__ = __webpack_require__(158);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -414,15 +423,18 @@ var HomePage = (function () {
                     text: 'Leave',
                     handler: function () {
                         _this.alert = null;
-                        _this.roomService.isLeftRoom = true;
-                        if (_this.currentUser.isOwner) {
+                        console.log("the current user is " + _this.authService.currentUser);
+                        console.log("is owner " + _this.authService.currentUser.isOwner);
+                        if (_this.authService.currentUser.isOwner) {
                             // alert that the room is closed
-                            _this.af.object("rooms/" + _this.roomService.currentRoom.$key + "/isClosed").set(true);
+                            console.log("you are owner " + __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */].roomKey);
+                            _this.af.object("rooms/" + __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */].roomKey + "/isClosed").set(true);
+                            _this.roomService.leaveRoom(true);
                         }
-                        _this.af.list("rooms/" + _this.roomService.currentRoom.$key + "/users").remove(_this.authService.currentUser.$key);
-                        console.log("popToRoot");
+                        else {
+                            _this.roomService.leaveRoom(false);
+                        }
                         _this.navCtrl.popToRoot();
-                        _this.roomService.isLeftRoom = false;
                     }
                 }
             ]
@@ -499,7 +511,7 @@ var HomePage = (function () {
         return roomKey;
     };
     HomePage.prototype.generateCode = function () {
-        var codePool = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var codePool = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"; //abcdefghijklmnopqrstuvwxyz
         var code = "";
         for (var i = 0; i < 4; i++) {
             code += codePool.charAt(Math.random() * codePool.length);
@@ -543,32 +555,27 @@ var HomePage = (function () {
         var subscription = this.af.list('/rooms', { preserveSnapshot: true }).subscribe(function (snapshots) {
             snapshots.forEach(function (snapshot) {
                 // we find the room by entry code
-                if (snapshot.val().entryCode == _this.roomEntryCode) {
+                if (snapshot.val().entryCode != null && snapshot.val().entryCode.toUpperCase() == _this.roomEntryCode.toUpperCase()) {
                     roomFound = true;
                     // check if the room is not started yet
                     if (!snapshot.val().isStarted) {
                         if (!snapshot.val().isClosed) {
                             // iterate over the users so there is not a user with a same name
-                            // let sub = this.af.list(`rooms/${snapshot.key}/users`, { preserveSnapshot: true}).subscribe( t=> {
-                            //   console.log("enter " + snapshot.key);
-                            //   t.forEach(u => {
-                            //     if(u != null) {
-                            //       console.log("enter 2 " + u.key);
-                            //       this.af.object(`users/${u.key}`).subscribe( user=>{
-                            //         if(user.displayName == this.currentUser.displayName){
-                            //           this.msgService.showMsg("Sorry", "The given name is already exists in the room");
-                            //           sub.unsubscribe();
-                            //           userFound = true;
-                            //           return;
-                            //         }
-                            //       });
-                            //     } 
-                            //   });
-                            //   console.log("user added");
-                            //   if(!userFound)
-                            _this.addUserToRoom(snapshot.key, false);
-                            //   sub.unsubscribe();
-                            // });
+                            var sub_1 = _this.af.list("rooms/" + snapshot.key + "/usernames", { preserveSnapshot: true }).subscribe(function (t) {
+                                t.forEach(function (u) {
+                                    if (u != null) {
+                                        if (u.val() == _this.currentUser.displayName) {
+                                            _this.msgService.showMsg("Sorry", "The given name is already exists in the room");
+                                            sub_1.unsubscribe();
+                                            userFound = true;
+                                            return;
+                                        }
+                                    }
+                                });
+                                if (!userFound)
+                                    _this.addUserToRoom(snapshot.key, false);
+                                sub_1.unsubscribe();
+                            });
                         }
                         else {
                             _this.msgService.showMsg("Sorry", "The room is no longer activated");
@@ -611,13 +618,12 @@ var HomePage = (function () {
 }());
 HomePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-home',template:/*ion-inline-start:"C:\mole\trunk\src\pages\home\home.html"*/'\nbower_components/momentjs/min/moment.min.js\nbower_components/momentjs/min/locales.min.js\nbower_components/humanize-duration/humanize-duration.js\n\n<ion-content class="homeBody">\n\n  <ion-segment [(ngModel)]="operation" class="operationItem" color="dark">\n    <ion-segment-button value="openRoom" (click)="openRoom()" class="segmentButtonClass" >\n      <ion-icon name="create"></ion-icon>\n       <label >New Room</label>\n    </ion-segment-button>\n    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="segmentButtonClass" >\n      <ion-icon name="person-add"></ion-icon>\n      <label >Join Room</label>\n    </ion-segment-button>\n  </ion-segment>\n\n<!--<ion-grid>\n  <ion-row>\n      <button ion-button class="newRoomButton">\n        New Room\n      </button>\n\n      <button ion-button class="newRoomButton">\n        Join Room\n      </button>\n  </ion-row>\n</ion-grid>\n-->\n\n\n<div [ngSwitch]="operation" ngClass="middle-vertical">\n  <ion-grid *ngSwitchCase="\'openRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n  <ion-grid *ngSwitchCase="\'joinRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   > Entry Code</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n\n\n\n\n  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">\n       Play \n  </button>\n  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">\n       Sign with FaceBook \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">\n       Logout \n  </button>-->\n  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">\n       About \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">\n       Admin \n  </button>\n\n <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">\n      <ion-avatar item-start >\n        <img [src]="photoUrl" ngClass="photo">\n      </ion-avatar>\n      <h2 > Hello {{ displayName }}</h2>\n      <p>Ugh. As if.</p>\n    </ion-item>\n</div>\n\n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\mole\trunk\src\pages\home\home.html"*/
+        selector: 'page-home',template:/*ion-inline-start:"C:\mole-app\trunk\src\pages\home\home.html"*/'\nbower_components/momentjs/min/moment.min.js\nbower_components/momentjs/min/locales.min.js\nbower_components/humanize-duration/humanize-duration.js\n\n<ion-content class="homeBody">\n\n  <ion-segment [(ngModel)]="operation" class="operationItem" color="dark">\n    <ion-segment-button value="openRoom" (click)="openRoom()" class="segmentButtonClass" >\n      <ion-icon name="create"></ion-icon>\n       <label >New Room</label>\n    </ion-segment-button>\n    <ion-segment-button value="joinRoom" (click)="joinRoom()" class="segmentButtonClass" >\n      <ion-icon name="person-add"></ion-icon>\n      <label >Join Room</label>\n    </ion-segment-button>\n  </ion-segment>\n\n<!--<ion-grid>\n  <ion-row>\n      <button ion-button class="newRoomButton">\n        New Room\n      </button>\n\n      <button ion-button class="newRoomButton">\n        Join Room\n      </button>\n  </ion-row>\n</ion-grid>\n-->\n\n\n<div [ngSwitch]="operation" ngClass="middle-vertical">\n  <ion-grid *ngSwitchCase="\'openRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   >Room Name</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomName" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n  <ion-grid *ngSwitchCase="\'joinRoom\'">\n\n    <ion-row  no-lines>\n      <ion-col col-4>\n      <ion-label ngClass="label"  fixed >Username</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input [disabled]="currentUser.isAuthenticated" type="text" value="" class="text-foreground"  [(ngModel)]="currentUser.displayName"></ion-input>\n      </ion-col>\n    </ion-row>\n\n    <ion-row >\n      <ion-col col-4>\n      <ion-label class="label" fixed   > Entry Code</ion-label>\n      </ion-col>\n      <ion-col >\n      <ion-input type="text" value="" [(ngModel)]="roomEntryCode" class="text-foreground" ></ion-input>\n      </ion-col>\n    </ion-row> \n  </ion-grid>\n\n\n\n\n\n  <button ion-button color="dark" round icon-start class="goButton" (click)="submitRoom()">\n       Play \n  </button>\n  <!--<button ion-button color="dark" round icon-start class="goButton" (click)="signInWithFacebook()" *ngIf="!currentUser.isAuthenticated">\n       Sign with FaceBook \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="signOut()" *ngIf="currentUser.isAuthenticated">\n       Logout \n  </button>-->\n  <button ion-button color="dark" round icon-start class="goButton" (click)="about()">\n       About \n  </button>\n  <button ion-button color="dark" round icon-start class="goButton" (click)="adminPanel()" *ngIf="isDebug">\n       Admin \n  </button>\n\n <ion-item ion-item no-lines ngClass="profileCard" *ngIf="isUserAuthorized">\n      <ion-avatar item-start >\n        <img [src]="photoUrl" ngClass="photo">\n      </ion-avatar>\n      <h2 > Hello {{ displayName }}</h2>\n      <p>Ugh. As if.</p>\n    </ion-item>\n</div>\n\n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\mole-app\trunk\src\pages\home\home.html"*/
     }),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */],
-        __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */], __WEBPACK_IMPORTED_MODULE_7__services_messages_service__["a" /* MessagesService */],
-        __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */], __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5__ionic_native_facebook__["a" /* Facebook */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */]) === "function" && _e || Object, typeof (_f = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */]) === "function" && _f || Object, typeof (_g = typeof __WEBPACK_IMPORTED_MODULE_7__services_messages_service__["a" /* MessagesService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_7__services_messages_service__["a" /* MessagesService */]) === "function" && _g || Object, typeof (_h = typeof __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__services_auth_service__["a" /* AuthService */]) === "function" && _h || Object, typeof (_j = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["k" /* ViewController */]) === "function" && _j || Object, typeof (_k = typeof __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_8__services_rooms_service__["a" /* RoomsService */]) === "function" && _k || Object])
 ], HomePage);
 
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
 //# sourceMappingURL=home.js.map
 
 /***/ }),
@@ -704,11 +710,11 @@ AppModule = __decorate([
                     { loadChildren: '../pages/end-game/end-game.module#EndGamePageModule', name: 'EndGamePage', segment: 'end-game', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/game/game.module#GamePageModule', name: 'GamePage', segment: 'game', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/guess/guess.module#GuessPageModule', name: 'GuessPage', segment: 'guess', priority: 'low', defaultHistory: [] },
-                    { loadChildren: '../pages/lobby/lobby.module#LobbyPageModule', name: 'LobbyPage', segment: 'lobby', priority: 'low', defaultHistory: [] },
+                    { loadChildren: '../pages/info/info.module#InfoPageModule', name: 'InfoPage', segment: 'info', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/instructions/instructions.module#InstructionsPageModule', name: 'InstructionsPage', segment: 'instructions', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/points-info/points-info.module#PointsInfoPageModule', name: 'PointsInfoPage', segment: 'points-info', priority: 'low', defaultHistory: [] },
+                    { loadChildren: '../pages/lobby/lobby.module#LobbyPageModule', name: 'LobbyPage', segment: 'lobby', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/score/score.module#ScorePageModule', name: 'ScorePage', segment: 'score', priority: 'low', defaultHistory: [] },
-                    { loadChildren: '../pages/info/info.module#InfoPageModule', name: 'InfoPage', segment: 'info', priority: 'low', defaultHistory: [] },
                     { loadChildren: '../pages/settings/settings.module#SettingsPageModule', name: 'SettingsPage', segment: 'settings', priority: 'low', defaultHistory: [] }
                 ]
             }),
@@ -772,9 +778,9 @@ var RoomModel = (function (_super) {
 /* unused harmony export firebaseConfig */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ServicesModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_angularfire2__ = __webpack_require__(300);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__auth_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__rooms_service__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__messages_service__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__auth_service__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__rooms_service__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__messages_service__ = __webpack_require__(90);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__angular_core__ = __webpack_require__(0);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -829,7 +835,7 @@ ServicesModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__ = __webpack_require__(299);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(298);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_auth_service__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_auth_service__ = __webpack_require__(68);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__pages_home_home__ = __webpack_require__(301);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -862,7 +868,7 @@ var MyApp = (function () {
     return MyApp;
 }());
 MyApp = __decorate([
-    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"C:\mole\trunk\src\app\app.html"*/'<ion-nav [root]="rootPage">\n\n <ion-header>\n    <ion-toolbar>\n      <ion-title>Pages</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n\n</ion-nav>\n\n\n'/*ion-inline-end:"C:\mole\trunk\src\app\app.html"*/
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({template:/*ion-inline-start:"C:\mole-app\trunk\src\app\app.html"*/'<ion-nav [root]="rootPage">\n\n <ion-header>\n    <ion-toolbar>\n      <ion-title>Pages</ion-title>\n    </ion-toolbar>\n  </ion-header>\n\n\n</ion-nav>\n\n\n'/*ion-inline-end:"C:\mole-app\trunk\src\app\app.html"*/
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */], __WEBPACK_IMPORTED_MODULE_4_angularfire2_auth__["a" /* AngularFireAuth */],
         __WEBPACK_IMPORTED_MODULE_5__services_auth_service__["a" /* AuthService */]])
@@ -872,7 +878,7 @@ MyApp = __decorate([
 
 /***/ }),
 
-/***/ 89:
+/***/ 68:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -967,6 +973,8 @@ var AuthService = AuthService_1 = (function () {
         this.getPointsInRoom(AuthService_1._currentUser, roomKey).subscribe(function (t) {
             AuthService_1._currentUser.pointsInRoom = t.$value;
         });
+        // add the name of the user to room so we can check if the name exists
+        this.af.list("rooms/" + roomKey + "/usernames").push(userName);
         // this.getPointsInRoom(AuthService._currentUser, roomKey).subscribe( t=> {
         //     console.log("add guest " + t.pointsinRoom);
         //     AuthService._currentUser.pointsInRoom = t;
@@ -993,15 +1001,74 @@ var AuthService = AuthService_1 = (function () {
     };
     return AuthService;
 }());
-AuthService.Isdebug = true;
+AuthService.Isdebug = false;
 AuthService = AuthService_1 = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
-    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["i" /* Platform */],
-        __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]])
+    __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_6__ionic_native_facebook__["a" /* Facebook */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["i" /* Platform */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_5_ionic_angular__["i" /* Platform */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object])
 ], AuthService);
 
-var AuthService_1;
+var AuthService_1, _a, _b, _c, _d;
 //# sourceMappingURL=auth.service.js.map
+
+/***/ }),
+
+/***/ 90:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MessagesService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__ = __webpack_require__(52);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(54);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic_angular__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__ionic_native_facebook__ = __webpack_require__(67);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var MessagesService = (function () {
+    function MessagesService(afAuth, fb, alertCtrl, platform, af, toastCtrl) {
+        this.afAuth = afAuth;
+        this.fb = fb;
+        this.alertCtrl = alertCtrl;
+        this.platform = platform;
+        this.af = af;
+        this.toastCtrl = toastCtrl;
+    }
+    MessagesService.prototype.showMsg = function (title, message) {
+        var alert = this.alertCtrl.create({
+            title: title,
+            subTitle: message,
+            buttons: ['OK']
+        });
+        alert.present();
+    };
+    MessagesService.prototype.showToast = function (message) {
+        var toast = this.toastCtrl.create({
+            message: message,
+            duration: 3000
+        });
+        toast.present();
+    };
+    return MessagesService;
+}());
+MessagesService = __decorate([
+    Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["B" /* Injectable */])(),
+    __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_0_angularfire2_auth__["a" /* AngularFireAuth */], __WEBPACK_IMPORTED_MODULE_4__ionic_native_facebook__["a" /* Facebook */], __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["a" /* AlertController */],
+        __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */], __WEBPACK_IMPORTED_MODULE_3_ionic_angular__["j" /* ToastController */]])
+], MessagesService);
+
+//# sourceMappingURL=messages.service.js.map
 
 /***/ })
 

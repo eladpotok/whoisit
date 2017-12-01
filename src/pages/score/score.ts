@@ -23,6 +23,7 @@ export class ScorePage {
   isSpyWon: boolean;
   isGreatGuess: boolean;
   intervalId: any;
+  votes: { [id: string] : string; } = {};
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
               private auth: AuthService, private roomsSerivce: RoomsService) {
@@ -54,6 +55,19 @@ export class ScorePage {
     // get the spy user
     this.af.object(`users/${this.roomsSerivce.getSpy()}/`).subscribe(t=> {
       this.spy = t;
+    });
+
+    this.checkVotesStatus();
+  }
+
+  private checkVotesStatus() {
+    this.af.list(`/rounds/${this.roomsSerivce.currentRoom.$key}/${this.roundKey}/votesStatus`).subscribe(t=>{
+      t.forEach(vote=>{
+        if(vote.$key != null && vote.$value != null) {
+          console.log("the key is " + vote.$key + " and the value is = " + vote.$value);
+          this.votes[vote.$key] = vote.$value;
+        }
+      });
     });
   }
 
@@ -98,6 +112,10 @@ export class ScorePage {
 
   getNewPointsForWinners() : number {
     return this.getNewPointsForLosers() + 1;
+  }
+
+  public votesFor(user: UserModel) : string {
+    return this.votes[user.displayName];
   }
 }
 

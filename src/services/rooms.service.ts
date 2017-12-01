@@ -8,6 +8,8 @@ import { RoundModel } from '../Models/round.model';
 import { Platform } from 'ionic-angular';
 import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
 import { Observable } from 'rxjs/Observable';
+import { MessagesService } from '../services/messages.service';
+import { AuthService } from '../services/auth.service'
 
  @Injectable()
  export class RoomsService {
@@ -16,10 +18,85 @@ import { Observable } from 'rxjs/Observable';
     private static _currentRound: RoundModel;
     private static _cuurentRoundKey: string;
     private static _currentSpy: string;
-    public isLeftRoom: boolean ;
+    public static roomKey: string;
+    private isOwnerLeft: Boolean = false;
+    public loadUserSubscriber: any;
+    public roomClosedSubscriber: any;
+    public usersModel: UserModel[] = [];
+    public usersCount: number;
 
-    constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, public af: AngularFireDatabase) {
+    constructor(public afAuth: AngularFireAuth, private fb: Facebook,
+                private platform: Platform, public af: AngularFireDatabase, 
+                public msgService: MessagesService, private authService: AuthService) {
 
+    }
+
+    private dispose() {
+        if(this.roomClosedSubscriber != null)
+            this.roomClosedSubscriber.unsubscribe();
+
+        if(this.loadUserSubscriber != null)
+            this.loadUserSubscriber.unsubscribe();
+    }
+
+    public checkRoomClosed(isOwner: Boolean, leaveToRoot: Function) {
+        this.roomClosedSubscriber = this.af.object(`rooms/${RoomsService.roomKey}/isClosed`).subscribe( t=> {
+            if(t.$value != null)
+                this.isOwnerLeft = t.$value;
+            console.log("check Room Closed value = " + this.isOwnerLeft);
+            if(t.$value && !isOwner) {
+                this.msgService.showMsg("Oh No!", "The owner of the room just left the room. You are redirected back to the home page")
+                this.leaveRoom(isOwner);
+                console.log("leave to root");
+                // leave to the home page
+                leaveToRoot();
+            }
+        });
+    }
+
+    private checkUserLeft(newUserCount: number, isOwner: Boolean, currentRound: string, leaveToLobby: Function) {
+        if(this.usersCount > newUserCount) {
+            this.msgService.showToast("One of the players left the room");
+            if(isOwner){
+                this.af.object(`rooms/${RoomsService.roomKey}/usersCount`).set(newUserCount);
+                this.af.object(`rooms/${RoomsService.roomKey}/isStarted`).set(false);
+                this.af.object(`rounds/${RoomsService.roomKey}/${currentRound}/state`).set("done");
+            }
+            leaveToLobby();
+        }
+    }  
+
+    public loadUsers(isOwner: Boolean, currentRound: string, roomKey: string, leaveToLobby: Function) {
+        RoomsService.roomKey = roomKey;
+
+        // get the users in the current room
+        this.loadUserSubscriber = this.af.list(`rooms/${roomKey}/users`).subscribe( snapshots => {
+            if(this.isOwnerLeft != null && !this.isOwnerLeft)
+                this.checkUserLeft(snapshots.length, isOwner, currentRound, leaveToLobby);
+    
+            this.usersModel = [];
+            this.usersCount = snapshots.length;
+            snapshots.forEach( snapshot=> {
+                let userId = snapshot.$key;
+                let points = snapshot.$value;
+                
+                this.af.object(`users/${userId}`).subscribe( t=> {
+                    t.pointsInRoom = points;
+                    this.usersModel.push(t);
+                });
+            });
+        });
+    }
+
+    public leaveRoom(isOwner: Boolean) {
+        
+        this.dispose();
+  
+        if(isOwner) {
+            // alert that the room is closed
+            this.af.object(`rooms/${RoomsService.roomKey}/isClosed`).set(true);
+        }
+        this.af.list(`rooms/${RoomsService.roomKey}/users/`).remove(this.authService.currentUser.$key);
     }
 
     public get currentRoom(): RoomModel {
@@ -46,8 +123,6 @@ import { Observable } from 'rxjs/Observable';
                 }
             });
         });
-
-        
     }
 
     public setSpy(spy: string) {

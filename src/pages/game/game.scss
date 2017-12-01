@@ -12,6 +12,19 @@ page-game {
         position: relative;
     }
 
+    .categoryNameClass {
+        color: black;
+        font-family:  Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;	
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        width: 25rem;
+        display: block;
+        font-size: 25px;
+        margin-top: 10px;
+    }
+    
+
     .cardback {
         	background-color: rgba(300,2300,1155, 0.3);
 
@@ -48,12 +61,12 @@ page-game {
 
     .timerRed {
         color: red;
-        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
         margin-top: 35px;
-        font-size: 30px;
+        font-size: 22px;
         width: 25rem;
-        display: block;
+        display: inline;
         margin-left: auto;
         margin-right: auto;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     }
 }

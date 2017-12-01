@@ -8,6 +8,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { LoadingController } from 'ionic-angular';
 import { MessagesService } from '../../services/messages.service';
 import 'rxjs/add/operator/map';
+import { DateTime } from 'ionic-angular/components/datetime/datetime';
 
 @IonicPage()
 @Component({
@@ -28,50 +29,52 @@ export class GamePage {
   lastSeconds: boolean;
   secLabel: string = "0";
   alert: any;
+  startTime;
+  currentTime;
+  dateTime: Date = new Date();
 
   constructor(public navCtrl: NavController, public navParams: NavParams,  public af: AngularFireDatabase,
               private authService: AuthService, private roomsService: RoomsService, private cd : ChangeDetectorRef,
               public platform: Platform, public alertCtrl: AlertController, public loadingCtrl: LoadingController,
               public viewCtrl: ViewController, public msgService: MessagesService) {
-
     
+    // save the start date 
+    this.startTime = this.dateTime.getTime();
 
     this.roundKey = this.navParams.get('roundKey');
-    console.log("roundkey" + this.roundKey);
+    
     let subscription =this.af.object(`rounds/${roomsService.currentRoom.$key}/${this.roundKey}`).subscribe( round => {
       if(round.spyKey == this.authService.currentUser.$key){
-        this.drawSpy();
+        this.drawSpy(round.categoryKey);
         subscription.unsubscribe();
       }
       else {
         this.drawRandomCard(round.secret, round.categoryKey);
         subscription.unsubscribe();
       }
-      
       // set the spy so we could know him in the future
       this.roomsService.setSpy(round.spyKey);
     });
 
     this.af.object(`/settings/${roomsService.currentRoom.settingsKey}`).subscribe( set=> {
-      this.min = set.timeElapsed;
+      //this.min = set.timeElapsed;
+      this.startTime += set.timeElapsed * 60000;
     });
 
     this.id = setInterval(()=> {
-       if(this.second == 0){
-         this.second = 59;
-         this.secLabel = this.second.toString();
-         this.min--;
-       }
-       else {
-         this.second--;
-         if(this.second <= 9 && this.second >= 0){
+      var date: Date = new Date();
+      var currTime = this.startTime - date.getTime();
+      this.second = new Date(currTime).getSeconds();
+      this.min = new Date(currTime).getMinutes();
+
+      if(this.second <= 9 && this.second >= 0) {
            this.secLabel = "0" + this.second;
          }
-         else{
+      else {
            this.secLabel = this.second.toString();
          }
-       }
-       if(this.second == 30 && this.min == 0)
+       
+      if(this.second == 30 && this.min == 0)
         this.lastSeconds = true;
        if((this.second == 0 && this.min == 0) || this.min < 0) {
          this.LeaveGame();
@@ -108,7 +111,11 @@ export class GamePage {
     });
   }
   
-  private drawSpy() {
+  private drawSpy(categoryKey: string) {
+    this.af.object(`categories/${categoryKey}/`).subscribe( category =>{
+      this.categoryTitle = category.title;
+    });
+
     this.photoImage = "assets/spy2.png";
     this.subjectTitle = "Mole";
     this.isSpy = true;

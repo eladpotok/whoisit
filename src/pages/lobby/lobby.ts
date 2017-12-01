@@ -23,19 +23,14 @@ export class LobbyPage {
   roomsItems: Observable<RoomModel>;
   users: Observable<UserModel[]>;
   isOwner: Boolean;
-  loadUserSubscriber: any;
-  roomClosedSubscriber: any;
   selectorUserKey: string; 
   spyUser: string;
   roomName: string;
   usersInRoomKey: string;
-  usersModel: UserModel[] = [];
-  usersCount: number;
   loader: any;
   entryCode: string;
   currentRound: string;
-  isOwnerLeft: boolean;
-  
+  enterToSettings: Boolean;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
@@ -46,36 +41,22 @@ export class LobbyPage {
     // Get thr paramters from the navigation controller
     this.roomKey = this.navParams.get('roomKey');
 
+   // find the room by the given entry code
+   this.findRoom();
+
     // load the users from the room
     this.loadUsers();
-    
-    // find the room by the given entry code
-    this.findRoom();
 
-    
-  }
-
-  ionViewDidLoad() {
-    
-    this.roomClosedSubscriber = this.af.object(`rooms/${this.roomKey}/isClosed`).subscribe( t=> {
-      console.log("check1");
-      this.isOwnerLeft = t.$value;
-      if(t.$value && !this.isOwner) {
-        this.msgService.showMsg("Oh No!", "The owner of the room just left the room. You are redirected back to the home page")
-        this.leaveRoom();
-      }
-    });
-  }
-
-  ionViewWillLeave() {
-    console.log("leave the lobby page");
-    if(this.roomService.isLeftRoom)
-      this.leaveRoom();
+    // check if the room is closed by the owner
+    this.roomService.checkRoomClosed(this.isOwner, () => { this.navCtrl.popToRoot(); });
   }
 
   ionViewDidEnter() {
-    console.log("enter back");
-    this.prepareRoom()
+    // this workaround helps when we leave the page only for settings page
+    // and do not want the room to prepare it again.
+    if(!this.enterToSettings)
+      this.prepareRoom();
+    this.enterToSettings = false;
   }
 
   private prepareRoom() {
@@ -123,58 +104,24 @@ export class LobbyPage {
   }
 
   private loadUsers() {
-    
-      // get the users in the current room
-      this.loadUserSubscriber = this.af.list(`rooms/${this.roomKey}/users`).subscribe( snapshots => {
-        console.log("check2");
-        if(this.roomService.isLeftRoom)
-          return;
-          console.log("get here " + this.roomService.isLeftRoom);
-        if(!this.isOwnerLeft)
-          this.checkUserLeft(snapshots.length);
-
-        this.usersModel = [];
-        this.usersCount = snapshots.length;
-        snapshots.forEach( snapshot=> {
-          let userId = snapshot.$key;
-          let points = snapshot.$value;
-          
-          this.af.object(`users/${userId}`).subscribe( t=> {
-            t.pointsInRoom = points;
-            this.usersModel.push(t);
-          });
-        });
+      this.roomService.loadUsers(this.isOwner, this.currentRound, this.roomKey,
+      () => {
+        if(this.navCtrl.getActive().name != "LobbyPage")
+          this.navCtrl.popTo(this.navCtrl.getByIndex(1));
       });
-  }
-
-  private checkUserLeft(newUserCount: number) {
-    
-    if(this.usersCount > newUserCount) {
-      console.log("someone left the room")
-      this.msgService.showToast("One of the players left the room");
-      if(this.isOwner){
-        this.af.object(`rooms/${this.roomKey}/usersCount`).set(newUserCount);
-        this.af.object(`rooms/${this.roomKey}/isStarted`).set(false);
-        this.af.object(`rounds/${this.roomKey}/${this.currentRound}/state`).set("done");
-      }
-      console.log("jump");
-      if(this.navCtrl.getActive().name != "LobbyPage")
-        this.navCtrl.popTo(this.navCtrl.getByIndex(1));      
-    }
   }
     
   private raffleSpy(){ 
-     let spyRandNumber = Math.floor(Math.random() * this.usersModel.length );
-     this.spyUser = this.usersModel[spyRandNumber].$key;
+     let spyRandNumber = Math.floor(Math.random() * this.roomService.usersModel.length );
+     this.spyUser = this.roomService.usersModel[spyRandNumber].$key;
      
      this.roomService.setSpy(this.spyUser);
   }
 
   private raffleSelector(){ 
-    
-    let spyRandNumber = Math.floor(Math.random() * this.usersModel.length);
+    let spyRandNumber = Math.floor(Math.random() * this.roomService.usersModel.length);
 
-    this.selectorUserKey = this.usersModel[spyRandNumber].$key;
+    this.selectorUserKey = this.roomService.usersModel[spyRandNumber].$key;
   }
   
   presentLoading() {
@@ -191,16 +138,14 @@ export class LobbyPage {
 
   startGame() {
       
-      if(this.usersCount < 4 && !this.authService.IsDebug) {
+      if(this.roomService.usersCount < 4 && !this.authService.IsDebug) {
         this.msgService.showMsg("Sorry", "The round can be executed only for 4 players and above.");
         return;
       }
-      console.log("start game 1 ");
+      console.log("start game - room key" + this.roomKey);
       this.roomService.updateUsersInRoom(this.roomKey);
-      console.log("start game 2 ");
       // raffle spy and category selector  
       this.raffleSelector(); 
-      console.log("start game 3 ");
       this.raffleSpy();
 
       let round: RoundModel = {
@@ -215,7 +160,7 @@ export class LobbyPage {
 
       // Add new room to the db
       this.af.object(`rooms/${this.roomKey}/isStarted`).set(true);
-      this.af.object(`rooms/${this.roomKey}/usersCount`).set(this.usersCount);
+      this.af.object(`rooms/${this.roomKey}/usersCount`).set(this.roomService.usersCount);
   }
 
   public exit() {
@@ -241,23 +186,13 @@ export class LobbyPage {
   }
 
   private leaveRoom() {
-      
-      if(this.loadUserSubscriber != null)
-        this.loadUserSubscriber.unsubscribe();
-      this.roomClosedSubscriber.unsubscribe();
-
-      if(this.isOwner) {
-          console.log("i am owner");
-          // alert that the room is closed
-          this.af.object(`rooms/${this.roomKey}/isClosed`).set(true);
-      }
-      this.af.list(`rooms/${this.roomKey}/users/`).remove(this.authService.currentUser.$key);
-      
-      console.log("popToRoot")
-      this.navCtrl.popToRoot();
+    console.log("leave room from lobby");
+    this.roomService.leaveRoom(this.isOwner);
+    this.navCtrl.popToRoot();
   }
 
   public goSettings() {
+    this.enterToSettings = true;
     this.navCtrl.push('SettingsPage', {roomKey: this.roomKey});
   }
 

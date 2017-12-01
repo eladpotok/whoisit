@@ -47,9 +47,9 @@ GamePageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(157);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_messages_service__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(158);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_messages_service__ = __webpack_require__(90);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__ = __webpack_require__(469);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -86,11 +86,13 @@ var GamePage = (function () {
         this.msgService = msgService;
         this.second = 0;
         this.secLabel = "0";
+        this.dateTime = new Date();
+        // save the start date 
+        this.startTime = this.dateTime.getTime();
         this.roundKey = this.navParams.get('roundKey');
-        console.log("roundkey" + this.roundKey);
         var subscription = this.af.object("rounds/" + roomsService.currentRoom.$key + "/" + this.roundKey).subscribe(function (round) {
             if (round.spyKey == _this.authService.currentUser.$key) {
-                _this.drawSpy();
+                _this.drawSpy(round.categoryKey);
                 subscription.unsubscribe();
             }
             else {
@@ -101,22 +103,19 @@ var GamePage = (function () {
             _this.roomsService.setSpy(round.spyKey);
         });
         this.af.object("/settings/" + roomsService.currentRoom.settingsKey).subscribe(function (set) {
-            _this.min = set.timeElapsed;
+            //this.min = set.timeElapsed;
+            _this.startTime += set.timeElapsed * 60000;
         });
         this.id = setInterval(function () {
-            if (_this.second == 0) {
-                _this.second = 59;
-                _this.secLabel = _this.second.toString();
-                _this.min--;
+            var date = new Date();
+            var currTime = _this.startTime - date.getTime();
+            _this.second = new Date(currTime).getSeconds();
+            _this.min = new Date(currTime).getMinutes();
+            if (_this.second <= 9 && _this.second >= 0) {
+                _this.secLabel = "0" + _this.second;
             }
             else {
-                _this.second--;
-                if (_this.second <= 9 && _this.second >= 0) {
-                    _this.secLabel = "0" + _this.second;
-                }
-                else {
-                    _this.secLabel = _this.second.toString();
-                }
+                _this.secLabel = _this.second.toString();
             }
             if (_this.second == 30 && _this.min == 0)
                 _this.lastSeconds = true;
@@ -151,8 +150,11 @@ var GamePage = (function () {
             _this.subjectTitle = catModel.members[subject].title;
         });
     };
-    GamePage.prototype.drawSpy = function () {
+    GamePage.prototype.drawSpy = function (categoryKey) {
         var _this = this;
+        this.af.object("categories/" + categoryKey + "/").subscribe(function (category) {
+            _this.categoryTitle = category.title;
+        });
         this.photoImage = "assets/spy2.png";
         this.subjectTitle = "Mole";
         this.isSpy = true;
@@ -207,7 +209,7 @@ var GamePage = (function () {
 }());
 GamePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-game',template:/*ion-inline-start:"C:\mole\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategoryEmpty">\n      <ion-card class="cardback">\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ subjectTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the questions and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The mole is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n\n        \n      </ion-card>\n      <ion-item class="timerItem" no-lines>\n          <ion-icon name="clock" item-start class="iconTimer" ></ion-icon>\n\n          <label [ngClass]="{\'timer\': !lastSeconds,\n                            \'timerRed\': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>\n\n          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="!isSpy">\n            <ion-icon name="hand"></ion-icon>\n              Vote\n          </button>\n      </ion-item>\n      \n      \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\mole\trunk\src\pages\game\game.html"*/,
+        selector: 'page-game',template:/*ion-inline-start:"C:\mole-app\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategoryEmpty">\n      {{ currentTime }}\n      <ion-card class="cardback">\n        <label class="categoryNameClass"> {{ categoryTitle | uppercase}} </label>\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ subjectTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the questions and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The mole is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n\n        \n      </ion-card>\n      <ion-item class="timerItem" no-lines>\n          <ion-icon name="clock" item-start class="iconTimer" ></ion-icon>\n\n          <label [ngClass]="{\'timer\': !lastSeconds,\n                            \'timerRed\': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>\n\n          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="!isSpy">\n            <ion-icon name="hand"></ion-icon>\n              Vote\n          </button>\n      </ion-item>\n      \n      \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\mole-app\trunk\src\pages\game\game.html"*/,
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
         __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* ChangeDetectorRef */],
@@ -225,7 +227,7 @@ GamePage = __decorate([
 "use strict";
 
 var Observable_1 = __webpack_require__(10);
-var map_1 = __webpack_require__(90);
+var map_1 = __webpack_require__(91);
 Observable_1.Observable.prototype.map = map_1.map;
 //# sourceMappingURL=map.js.map
 

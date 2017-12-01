@@ -46,7 +46,7 @@ SettingsPageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Models_settings_model__ = __webpack_require__(477);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__ = __webpack_require__(157);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__ = __webpack_require__(54);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -87,7 +87,7 @@ var SettingsPage = (function () {
 }());
 SettingsPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-settings',template:/*ion-inline-start:"C:\mole\trunk\src\pages\settings\settings.html"*/'<!--\n  Generated template for the SettingsPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Settings</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list title="Setings" >\n    <ion-item class="settingsList">\n      <ion-avatar item-start >\n        <ion-icon name="timer" class="iconTimer"></ion-icon>\n      </ion-avatar>\n      <ion-range min="3" max="8" [(ngModel)]="settings.timeElapsed" color="dark" pin="true" step="1">\n         <ion-label range-left color="dark">3 mins</ion-label>\n         <ion-label range-right color="dark">8 mins</ion-label>\n      </ion-range>\n    </ion-item>   \n    \n\n   \n  </ion-list>\n  <button ion-button (click)="submit()"  class="myButton" >Submit</button>\n</ion-content>\n'/*ion-inline-end:"C:\mole\trunk\src\pages\settings\settings.html"*/,
+        selector: 'page-settings',template:/*ion-inline-start:"C:\mole-app\trunk\src\pages\settings\settings.html"*/'<!--\n  Generated template for the SettingsPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Settings</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n\n  <ion-list title="Setings" >\n    <ion-item class="settingsList">\n      <ion-avatar item-start >\n        <ion-icon name="timer" class="iconTimer"></ion-icon>\n      </ion-avatar>\n      <ion-range min="3" max="8" [(ngModel)]="settings.timeElapsed" color="dark" pin="true" step="1">\n         <ion-label range-left color="dark">3 mins</ion-label>\n         <ion-label range-right color="dark">8 mins</ion-label>\n      </ion-range>\n    </ion-item>   \n    \n\n   \n  </ion-list>\n  <button ion-button (click)="submit()"  class="myButton" >Submit</button>\n</ion-content>\n'/*ion-inline-end:"C:\mole-app\trunk\src\pages\settings\settings.html"*/,
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_3__services_rooms_service__["a" /* RoomsService */],
         __WEBPACK_IMPORTED_MODULE_4_angularfire2_database__["a" /* AngularFireDatabase */]])

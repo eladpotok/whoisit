@@ -10,5 +10,6 @@ export class RoomModel extends BaseModel {
      users: UserModel[];
      spy: string;
      settingsKey: string;
+     usernames?: string[];
      
 }
