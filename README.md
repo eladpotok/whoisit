@@ -1,4 +1,9 @@
 # whoisit
 let's find who's the spy among your freinds.
 
-In order to install please write npm install in the cli
+
+install the following packages:
+nodejs
+npm install
+npm install -g cordova
+npm install -g ionic
