@@ -33,6 +33,7 @@
     "@ionic/storage": "2.0.1",
     "angularfire2": "^4.0.0-rc0",
     "cordova-android": "^6.2.3",
+    "cordova-android-support-gradle-release": "^1.2.0",
     "cordova-plugin-device": "^1.1.7",
     "cordova-plugin-facebook4": "^1.9.1",
     "cordova-plugin-splashscreen": "^4.1.0",

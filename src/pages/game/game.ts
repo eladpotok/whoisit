@@ -117,7 +117,7 @@ export class GamePage {
     });
 
     this.photoImage = "assets/spy2.png";
-    this.subjectTitle = "Mole";
+    this.subjectTitle = "Spy";
     this.isSpy = true;
 
     // wait till other users will vote

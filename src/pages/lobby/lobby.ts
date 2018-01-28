@@ -153,7 +153,8 @@ export class LobbyPage {
         selectorKey: this.selectorUserKey,
         spyKey: this.spyUser,
         roomKey: this.roomKey,
-        secret: 0
+        secret: 0,
+        votesCount: 0
       }
 
       this.af.list(`rounds/${this.roomKey}/`).push(round);

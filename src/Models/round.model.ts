@@ -6,4 +6,5 @@ export class RoundModel extends BaseModel {
      selectorKey: string
      categoryKey: string
      secret: number
+     votesCount: number
 }
