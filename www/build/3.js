@@ -1,6 +1,6 @@
 webpackJsonp([3],{
 
-/***/ 461:
+/***/ 458:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8,7 +8,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PointsInfoPageModule", function() { return PointsInfoPageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__points_info__ = __webpack_require__(474);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__points_info__ = __webpack_require__(471);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -38,7 +38,7 @@ PointsInfoPageModule = __decorate([
 
 /***/ }),
 
-/***/ 474:
+/***/ 471:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -74,7 +74,7 @@ var PointsInfoPage = (function () {
 }());
 PointsInfoPage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-points-info',template:/*ion-inline-start:"C:\mole-app\trunk\src\pages\points-info\points-info.html"*/'<!--\n  Generated template for the PointsInfoPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Points Calculation</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="alternativeBack">\n  <label class="textLabel">\nThe points is divided to two scenarios.\n<br><br>\n<b>The first case - The mole Wins:</b>\n<br>\nEach of the players who voted for the mole, earn 1 Point.\n<br>\nThe mole itself earn 5 Points.\n<br>\n<br>\n<b>The second case - The mole loses:</b>\n<br>\nThis case is devided to two scenarios as well.\n<br>\nEach of the players who voted for the mole earn 1 Point.\n<br>\nThe mole now has an option to guess what the subject is.\n<br>\nIf he guesses correctly, he earns 3 points, and other players earn nothing.\n<br>\nIf he guesses worng, all other players earn 5 points.\n  </label>\n</ion-content>\n'/*ion-inline-end:"C:\mole-app\trunk\src\pages\points-info\points-info.html"*/,
+        selector: 'page-points-info',template:/*ion-inline-start:"C:\Users\elad.potok\Desktop\whoisit.git\trunk\src\pages\points-info\points-info.html"*/'<!--\n  Generated template for the PointsInfoPage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n  <ion-navbar>\n    <ion-title>Points Calculation</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n\n<ion-content padding class="body">\n  <label class="textLabel">\nThe points is divided to two scenarios.\n<br><br>\n<b>The first case - The spy Wins:</b>\n<br>\nEach of the players who voted for the spy, earn 1 Point.\n<br>\nThe spy itself earns 5 Points.\n<br>\n<br>\n<b>The second case - The spy loses:</b>\n<br>\nThis case is devided to two scenarios as well.\n<br>\nEach of the players who voted for the spy earns 1 Point.\n<br>\nThe spy now has an option to guess what the subject is.\n<br>\nIf he guesses correctly, he earns 3 points, and other players earn nothing.\n<br>\nIf he guesses worng, all other players earn 5 points.\n  </label>\n</ion-content>\n'/*ion-inline-end:"C:\Users\elad.potok\Desktop\whoisit.git\trunk\src\pages\points-info\points-info.html"*/,
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */]])
 ], PointsInfoPage);

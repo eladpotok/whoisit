@@ -1,6 +1,6 @@
 webpackJsonp([0],{
 
-/***/ 456:
+/***/ 453:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8,7 +8,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GamePageModule", function() { return GamePageModule; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game__ = __webpack_require__(468);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__game__ = __webpack_require__(465);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -39,7 +39,7 @@ GamePageModule = __decorate([
 
 /***/ }),
 
-/***/ 468:
+/***/ 465:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -47,10 +47,10 @@ GamePageModule = __decorate([
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__ = __webpack_require__(54);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_auth_service__ = __webpack_require__(67);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__ = __webpack_require__(158);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__services_messages_service__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__ = __webpack_require__(469);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__ = __webpack_require__(466);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_6_rxjs_add_operator_map__);
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -209,7 +209,7 @@ var GamePage = (function () {
 }());
 GamePage = __decorate([
     Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["n" /* Component */])({
-        selector: 'page-game',template:/*ion-inline-start:"C:\mole-app\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategoryEmpty">\n      {{ currentTime }}\n      <ion-card class="cardback">\n        <label class="categoryNameClass"> {{ categoryTitle | uppercase}} </label>\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ subjectTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the questions and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The spy is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n\n        \n      </ion-card>\n      <ion-item class="timerItem" no-lines>\n          <ion-icon name="clock" item-start class="iconTimer" ></ion-icon>\n\n          <label [ngClass]="{\'timer\': !lastSeconds,\n                            \'timerRed\': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>\n\n          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="!isSpy">\n            <ion-icon name="hand"></ion-icon>\n              Vote\n          </button>\n      </ion-item>\n      \n      \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\mole-app\trunk\src\pages\game\game.html"*/,
+        selector: 'page-game',template:/*ion-inline-start:"C:\Users\elad.potok\Desktop\whoisit.git\trunk\src\pages\game\game.html"*/'<!--\n  Generated template for the GamePage page.\n\n  See http://ionicframework.com/docs/components/#navigation for more info on\n  Ionic pages and navigation.\n-->\n<ion-header>\n\n \n</ion-header>\n\n\n<ion-content padding class="bodyCategoryEmpty">\n      {{ currentTime }}\n      <ion-card class="cardback">\n        <label class="categoryNameClass"> {{ categoryTitle | uppercase}} </label>\n        <img [src]="photoImage" class="photoGame"/>\n        <ion-card-content>\n            <ion-card-title text-align: center>\n                {{ subjectTitle }}\n            </ion-card-title>\n          <p *ngIf="isSpy">\n            Be aware for the questions and try to obsorb any information you can.\n            If you have been caught, you can guess what the subject is.\n          </p>\n          <p *ngIf="!isSpy">\n            Be aware for the question and try to obsorb any information you can.\n            Remember! The spy is listening and can guess what the subject is.\n          </p>\n        </ion-card-content>\n\n        \n      </ion-card>\n      <ion-item class="timerItem" no-lines>\n          <ion-icon name="clock" item-start class="iconTimer" ></ion-icon>\n\n          <label [ngClass]="{\'timer\': !lastSeconds,\n                            \'timerRed\': lastSeconds}"> Time left {{min}} : {{secLabel}} </label>\n\n          <button ion-button color="light"  item-end icon-left (click)="LeaveGame()" *ngIf="!isSpy">\n            <ion-icon name="hand"></ion-icon>\n              Vote\n          </button>\n      </ion-item>\n      \n      \n\n</ion-content>\n\n\n'/*ion-inline-end:"C:\Users\elad.potok\Desktop\whoisit.git\trunk\src\pages\game\game.html"*/,
     }),
     __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavController */], __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* NavParams */], __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
         __WEBPACK_IMPORTED_MODULE_3__services_auth_service__["a" /* AuthService */], __WEBPACK_IMPORTED_MODULE_4__services_rooms_service__["a" /* RoomsService */], __WEBPACK_IMPORTED_MODULE_0__angular_core__["k" /* ChangeDetectorRef */],
@@ -221,7 +221,7 @@ GamePage = __decorate([
 
 /***/ }),
 
-/***/ 469:
+/***/ 466:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

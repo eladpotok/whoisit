@@ -12,7 +12,7 @@ import { Facebook, FacebookLoginResponse } from '@ionic-native/facebook';
  export class AuthService {
 
     private static _currentUser: UserModel;
-    private static Isdebug: boolean = true;
+    private static Isdebug: boolean = false;
     
 
     constructor(public afAuth: AngularFireAuth, private fb: Facebook, private platform: Platform, 
