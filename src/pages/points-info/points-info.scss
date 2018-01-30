@@ -1,3 +1,38 @@
 page-points-info {
+    .instructionItem {
+        background: white;
+        font-family: Arial, Helvetica, sans-serif;
+        border-radius: 5px;
+        font-size: 17px;
+        color: black;
+        text-align: left;
+        margin-bottom: 35px;
+        font-weight: bold;
+        vertical-align: center;
+    }
 
+    .speech-bubble {
+        position: relative;
+        background: #03707a;
+        border-radius: .4em;
+        padding: 10px;
+        color: white;
+    }
+    
+    .speech-bubble:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border: 27px solid transparent;
+        border-bottom-color: #03707a;
+        margin-left: -200px;
+        margin-top: -54px;
+    }
+
+    p {
+        font-size: 17px;
+    }
 }

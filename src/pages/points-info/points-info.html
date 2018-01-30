@@ -15,25 +15,45 @@
 
 <ion-content padding class="body">
   <label class="textLabel">
-The points is divided to two scenarios.
-<br><br>
-<b>The first case - The spy Wins:</b>
+
+
+      <ion-list>
+          <ion-list-header class="instructionItem" no-lines>
+              <ion-icon name="play" style="color: #03707a"></ion-icon>
+            Spy Wins
+          </ion-list-header>
+          <div class="speech-bubble">
+              <p>
+                  Each of the players who voted for the spy, earns 1 Point.
+                  <br>
+                  The spy itself earns 5 Points.
+              </p>
+            </div>
+      
+          
+      </ion-list>
 <br>
-Each of the players who voted for the spy, earn 1 Point.
-<br>
-The spy itself earns 5 Points.
-<br>
-<br>
-<b>The second case - The spy loses:</b>
-<br>
-This case is devided to two scenarios as well.
-<br>
-Each of the players who voted for the spy earns 1 Point.
-<br>
-The spy now has an option to guess what the subject is.
-<br>
-If he guesses correctly, he earns 3 points, and other players earn nothing.
-<br>
-If he guesses worng, all other players earn 5 points.
+      <ion-list>
+          <ion-list-header class="instructionItem" no-lines>
+              <ion-icon name="play" style="color: #03707a"></ion-icon>
+            Spy Loses
+          </ion-list-header>
+          <div class="speech-bubble">
+              <p>
+                  Each of the players who voted for the spy earns 1 Point.
+                  <br>
+                  The spy now has an option to guess what the subject is.
+                  <br>
+                  If he guesses correctly, he earns 3 points, and other players earn nothing.
+                  <br>
+                  If he guesses worng, all other players earn 5 points.
+              </p>
+            </div>
+      
+          
+      </ion-list>
+
+
+
   </label>
 </ion-content>
