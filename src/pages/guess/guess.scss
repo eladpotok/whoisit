@@ -29,10 +29,10 @@ page-guess {
     }
 
     .cardsize {
-        height: 140px;
-        background-color: rgba(100,100,100, 0.4);
-        border-radius: 30px;
-        margin-bottom: 5px; 
+        // height: 140px;
+        background-color: transparent;
+        // border-radius: 30px;
+        // margin-bottom: 5px; 
     }
 
     .imgSize {
@@ -41,5 +41,14 @@ page-guess {
         margin-left: 10px;
         width: 140px;
         top: 16%;
+    }
+
+    .swipeIcon {
+        height: 35px;
+    }
+
+    .timer {
+        margin-right: 20px;
+        font-size: 25px;
     }
 }

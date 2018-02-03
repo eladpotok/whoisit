@@ -4,6 +4,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { UserModel } from '../../Models/user.model';
 import { AuthService} from '../../services/auth.service';
 import { RoomsService } from '../../services/rooms.service';
+import { SettingsModel } from '../../Models/settings.model';
 
 
 @IonicPage()
@@ -13,6 +14,7 @@ import { RoomsService } from '../../services/rooms.service';
 })
 export class ScorePage {
 
+  settings: SettingsModel;
   roundKey: string;
   currentUser: UserModel;
   users: UserModel[];
@@ -24,6 +26,7 @@ export class ScorePage {
   isGreatGuess: boolean;
   intervalId: any;
   votes: { [id: string] : string; } = {};
+  roundsInterval: number;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public af: AngularFireDatabase,
               private auth: AuthService, private roomsSerivce: RoomsService) {
@@ -38,6 +41,11 @@ export class ScorePage {
     this.roundKey = this.navParams.get('roundKey');
     this.spyState = this.navParams.get('spyState');
     
+    this.af.object(`settings/${roomsSerivce.currentRoom.settingsKey}`).subscribe(t=>{
+      this.roundsInterval = t.roundsInterval;
+      console.log("rounds interval:" + this.roundsInterval );
+    });
+
     this.af.list(`rounds/${roomsSerivce.currentRoom.$key}/${this.roundKey}/wins`).subscribe(t=>{
       t.forEach( user => {
         let userKey = user.$value;
@@ -76,6 +84,7 @@ export class ScorePage {
   }
 
   public backToLobby() {
+    
     
     // set the round as done
     this.af.object(`rounds/${this.roomsSerivce.currentRoom.$key}/${this.roundKey}/state`).set("done");

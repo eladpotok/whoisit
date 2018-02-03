@@ -59,7 +59,7 @@ export class EndGamePage {
 
   private presentLoading() {
     this.loader = this.loadingCtrl.create({
-      content: "Wait till all players vote...",
+      content: "Wait till all players vote  ...",
     });
     this.loader.present();
   }
@@ -73,6 +73,7 @@ export class EndGamePage {
     let counter = 0;  
     let subscribtion = this.af.object(`/rounds/${this.roomService.currentRoom.$key}/${this.roundKey}/votes/${user.$key}`).subscribe(u => {
       counter = u.$value;
+      
       if(subscribtion != null)
         subscribtion.unsubscribe();
       counter++;

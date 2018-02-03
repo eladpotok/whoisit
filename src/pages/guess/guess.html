@@ -7,19 +7,31 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>guess</ion-title>
+    <ion-title>Guess</ion-title>
+    <ion-buttons end class="timer">{{secLabel}}</ion-buttons>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content class="card-background-page" >
-
-  <ion-card *ngFor="let cat of members " (click)="choose(cat)" class="cardsize">
+  
+  <!-- <ion-card *ngFor="let cat of members " (click)="choose(cat)" class="cardsize">
     <img [src]="cat.url" class="imgSize"/>
-    <div class="card-title">{{cat.title}}</div>
-    <!--<div class="card-subtitle">41 Listings</div>-->
-  </ion-card>
+    <div class="card-title">{{cat.title}}</div> -->
+    
+  <!-- </ion-card> -->
+
+  
+    <ion-item *ngFor="let cat of members"  class="cardsize" (swipe)="swipeEvent($event, cat)">
+      <ion-thumbnail item-start>
+        <img [src]="cat.url">
+      </ion-thumbnail>
+      <h2>{{cat.title}}</h2>
+      <p>Swipe me!</p>
+      <img src="assets/swipe.png" item-end class="swipeIcon"/>
+    </ion-item>
+  
 
 
 </ion-content>

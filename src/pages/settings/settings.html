@@ -26,7 +26,15 @@
       </ion-range>
     </ion-item>   
     
-
+    <ion-item class="settingsList">
+      <ion-avatar item-start >
+        <ion-icon name="timer" class="iconTimer"></ion-icon>
+      </ion-avatar>
+      <ion-range min="3" max="8" [(ngModel)]="settings.roundsInterval" color="dark" pin="true" step="1">
+         <ion-label range-left color="dark">3</ion-label>
+         <ion-label range-right color="dark">6</ion-label>
+      </ion-range>
+    </ion-item>  
    
   </ion-list>
   <button ion-button (click)="submit()"  class="myButton" >Submit</button>

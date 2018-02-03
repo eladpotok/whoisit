@@ -30219,7 +30219,7 @@ page-about .speech-bubble:after {
   height: 0;
   border: 27px solid transparent;
   border-bottom-color: #03707a;
-  margin-left: -200px;
+  margin-left: 0;
   margin-top: -54px;
 }
 
@@ -30356,10 +30356,7 @@ page-guess .card-background-page .card-subtitle {
 }
 
 page-guess .cardsize {
-  height: 140px;
-  background-color: rgba(100, 100, 100, 0.4);
-  border-radius: 30px;
-  margin-bottom: 5px;
+  background-color: transparent;
 }
 
 page-guess .imgSize {
@@ -30368,6 +30365,15 @@ page-guess .imgSize {
   margin-left: 10px;
   width: 140px;
   top: 16%;
+}
+
+page-guess .swipeIcon {
+  height: 35px;
+}
+
+page-guess .timer {
+  margin-right: 20px;
+  font-size: 25px;
 }
 
 page-home .operationItem {
@@ -30465,23 +30471,23 @@ page-home .loginIcon {
 }
 
 page-home .photoHome {
-  opacity: 0.5;
   height: 30rem;
   margin-top: 10px;
   display: block;
   margin-left: auto;
   margin-right: auto;
-  -webkit-box-shadow: 0 1px #FFFFFF inset, 0 1px 3px rgba(34, 25, 25, 0.4);
-  box-shadow: 0 1px #FFFFFF inset, 0 1px 3px rgba(34, 25, 25, 0.4);
+  margin-bottom: 10px;
   position: relative;
 }
 
 page-home .loginInput {
+  height: 43px;
   color: black;
   background-color: white;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
   margin-bottom: 5px;
+  margin-left: -1px;
 }
 
 page-home .goButton {
@@ -30515,10 +30521,6 @@ page-home .loginWelcomeText {
 
 page-home .middle-vertical {
   position: relative;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translateY(-50%) translateX(-50%);
-  transform: translateY(-50%) translateX(-50%);
 }
 
 page-home .segmentButtonClass {
@@ -30588,7 +30590,7 @@ page-instructions .speech-bubble:after {
   height: 0;
   border: 27px solid transparent;
   border-bottom-color: #03707a;
-  margin-left: -200px;
+  margin-left: -0;
   margin-top: -54px;
 }
 
@@ -30667,7 +30669,7 @@ page-points-info .speech-bubble:after {
   height: 0;
   border: 27px solid transparent;
   border-bottom-color: #03707a;
-  margin-left: -200px;
+  margin-left: 0;
   margin-top: -54px;
 }
 

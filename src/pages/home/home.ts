@@ -176,7 +176,8 @@ export class HomePage {
   private createRoom(): string {
 
     let settingsModel: SettingsModel = {
-      timeElapsed: 7
+      timeElapsed: 7,
+
     }
     
     // add new settings to db
@@ -191,7 +192,7 @@ export class HomePage {
         isCategorySelected: false,
         users: [],
         spy: "",
-        settingsKey: settingsKey
+        settingsKey: settingsKey,
     }
 
     let roomKey = this.af.list(`/rooms`).push(roomModel).key;

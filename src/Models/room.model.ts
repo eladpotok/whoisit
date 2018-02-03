@@ -11,5 +11,4 @@ export class RoomModel extends BaseModel {
      spy: string;
      settingsKey: string;
      usernames?: string[];
-     
 }

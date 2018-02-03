@@ -31,6 +31,7 @@ export class LobbyPage {
   entryCode: string;
   currentRound: string;
   enterToSettings: Boolean;
+  intervals: number = 0;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, 
               public af: AngularFireDatabase, private authService: AuthService,
@@ -162,6 +163,8 @@ export class LobbyPage {
       // Add new room to the db
       this.af.object(`rooms/${this.roomKey}/isStarted`).set(true);
       this.af.object(`rooms/${this.roomKey}/usersCount`).set(this.roomService.usersCount);
+
+      this.intervals++;
   }
 
   public exit() {
